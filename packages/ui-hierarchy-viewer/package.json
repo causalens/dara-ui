@@ -1,7 +1,7 @@
 {
   "name": "@darajs/ui-hierarchy-viewer",
   "version": "0.2.2",
-  "description": "Hierarchy Viewer for the causaLens UI framework",
+  "description": "Hierarchy Viewer for the Dara UI framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "jsnext:main": "dist/index.js",

@@ -1,7 +1,7 @@
 {
   "name": "@darajs/ui-components",
   "version": "0.2.2",
-  "description": "The core React UI kit for causalens",
+  "description": "The core React UI kit for Dara",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "jsnext:main": "dist/index.js",

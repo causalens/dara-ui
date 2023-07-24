@@ -1,7 +1,7 @@
 {
   "name": "@darajs/stylelint-config",
   "version": "0.2.2",
-  "description": "causaLens Stylelint configuration",
+  "description": "Dara Stylelint configuration",
   "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
   "main": "index.json",
   "files": [

@@ -1,7 +1,7 @@
 {
   "name": "@darajs/ui-notifications",
   "version": "0.2.2",
-  "description": "Notification system for the causaLens UI Framework",
+  "description": "Notification system for the Dara UI Framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "jsnext:main": "dist/index.js",

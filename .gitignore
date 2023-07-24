@@ -1,5 +1,6 @@
 # CL
 .causalens.env
+.borg.env
 venv/
 
 # Build

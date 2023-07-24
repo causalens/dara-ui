@@ -9,4 +9,3 @@
 
 # Overrides for specific packages
 /packages/ui-causal-graph-editor @krzysztof-causalens @patricia-causalens
-/packages/ui-causal-graph-editor-internal @krzysztof-causalens @patricia-causalens

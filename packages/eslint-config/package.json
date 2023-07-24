@@ -1,7 +1,7 @@
 {
   "name": "@darajs/eslint-config",
   "version": "0.2.2",
-  "description": "causaLens ESLint configuration",
+  "description": "Dara ESLint configuration",
   "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
   "license": "BUSL-1.1",
   "main": "index.js",

@@ -1,6 +1,6 @@
 # `@darajs/eslint-config`
 
-causaLens `ESLint` configuration
+Dara `ESLint` configuration
 
 ## Installation
 

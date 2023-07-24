@@ -1,6 +1,6 @@
 # `@darajs/prettier-config`
 
-causaLens `Prettier` configuration
+Dara `Prettier` configuration
 
 ## Installation
 

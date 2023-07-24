@@ -1,6 +1,6 @@
 # `@darajs/stylelint-config`
 
-causaLens `Stylelint` configuration
+Dara `Stylelint` configuration
 
 ## Installation
 

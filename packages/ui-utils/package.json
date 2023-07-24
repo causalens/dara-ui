@@ -1,7 +1,7 @@
 {
   "name": "@darajs/ui-utils",
   "version": "0.2.2",
-  "description": "General utilities for the causaLens UI framework",
+  "description": "General utilities for the Dara UI framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "jsnext:main": "dist/index.js",
