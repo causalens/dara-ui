@@ -6,11 +6,6 @@ version = "0.2.2"
 description = "Borg Meta Package"
 authors = ["causaLens team"]
 
-[[tool.poetry.source]]
-name = "causalens"
-url = "https://causalens.jfrog.io/artifactory/api/pypi/python-internal/simple/"
-default = true
-
 [tool.poetry.dependencies]
 
 [tool.poetry.dev-dependencies]
