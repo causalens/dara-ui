@@ -1,0 +1,39 @@
+# CL
+.causalens.env
+venv/
+
+# Build
+docker/mount
+/docker-compose.yml
+*~
+.build
+logs/
+aws/
+awscliv2.zip
+bin
+
+# Editors
+**/.DS_Store
+**/.vscode
+.idea/
+\#*
+pyrightconfig.json
+
+# Python
+__pycache__/
+**/.mypy_cache
+.pytest_cache/
+test_results
+.venv
+poetry.toml
+poetry.lock
+!/poetry.lock
+pyrightconfig.json
+
+# JS
+**/node_modules
+yarn.lock
+package-lock.json
+
+# Wat
+test-results
