@@ -1,0 +1,65 @@
+name: TESTS
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  lint-and-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: "causalens.jfrog.io/docker-internal/causalens-base:latest"
+      credentials:
+        username: "${{ secrets.JF_USERNAME }}"
+        password: "${{ secrets.JF_PASSWORD }}"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Detect if running on master
+        id: check_master
+        run: |
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            echo "::set-output name=is_master::true"
+          else
+            echo "::set-output name=is_master::false"
+          fi
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install packages
+        run: make deps-project
+      - name: Build packages
+        run: make prepare
+      - name: Run linting
+        run: make lint
+      - name: Run JS security - Bearer
+        run: make bearer
+      - name: Run tests
+        run: make test
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              username: 'action-slack',
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                text: `${process.env.AS_WORKFLOW}\n${process.env.AS_JOB} (${process.env.AS_COMMIT}) of ${process.env.AS_REPO}@${process.env.AS_REF} by ${process.env.AS_AUTHOR} ${{ job.status }} in ${process.env.AS_TOOK}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: "${{ secrets.SLACK_BUILD_CHANNEL_WEBHOOK }}"
+        if: "${{ always() }}"

@@ -1,0 +1,33 @@
+{
+  "name": "@darajs/styled-components",
+  "version": "0.2.2",
+  "description": "CL wrapper around styled components so everything gets the same instance",
+  "main": "dist/index.js",
+  "license": "BUSL-1.1",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "lint": "eslint src --ext .tsx --max-warnings 0 && stylelint './src/**/*.tsx'",
+    "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix",
+    "package": "yarn build && yarn publish --no-git-tag-version"
+  },
+  "prettier": "@darajs/prettier-config",
+  "devDependencies": {
+    "@darajs/eslint-config": "^0.2.2",
+    "@darajs/prettier-config": "^0.2.2",
+    "@darajs/stylelint-config": "^0.2.2",
+    "@types/styled-components": "^5.1.26",
+    "eslint": "^7.32.0",
+    "prettier": "2.4.1",
+    "rimraf": "^3.0.2",
+    "stylelint": "^13.5.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "polished": "^4.1.1",
+    "styled-components": "^5.3.10"
+  },
+  "files": [
+    "dist",
+    "LICENSES"
+  ]
+}

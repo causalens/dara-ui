@@ -1,0 +1,14 @@
+import { faExplosion } from '@fortawesome/free-solid-svg-icons';
+
+import { IconProps, StyledFAIcon } from './icon-utils';
+
+/**
+ * Explosion icon from FontAwesome
+ *
+ * @param {IconProps} props - the component props
+ */
+const Explosion = (props: IconProps): JSX.Element => {
+    return <StyledFAIcon icon={faExplosion} {...props} />;
+};
+
+export default Explosion;

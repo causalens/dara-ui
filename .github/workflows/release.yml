@@ -1,0 +1,85 @@
+name: package and publish
+
+on:
+  push:
+    tags:
+      - VERSION*
+
+jobs:
+  package-and-publish:
+    runs-on: ubuntu-latest
+    container:
+      image: "causalens.jfrog.io/docker-internal/causalens-base:latest"
+      credentials:
+        username: "${{ secrets.JF_USERNAME }}"
+        password: "${{ secrets.JF_PASSWORD }}"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup git config
+        # Temporarily add safe directory due to issue https://github.com/actions/checkout/issues/766
+        run: |
+          git config --global --add safe.directory /__w/dara-ui/dara-ui
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+      - name: Extract branch name
+        shell: bash
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          echo ::set-output name=branch::${raw/origin\/}
+        id: extract_branch
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install project dependencies
+        run: make deps-project
+      - name: Get version
+        id: set-version
+        # Retrieves version from 'version = "<version>"' line in borg.toml
+        run: echo "::set-output name=version::$(sed -n 's/version = \"\(.*\)\"/\1/p' borg.toml)"
+      - name: Parse and resolve changelog
+        id: set-changelog
+        run: |
+          echo "::set-output name=changelog::$(tooling/changelog-parser/main.js ${{ steps.set-version.outputs.version }})"
+      - name: Build packages
+        run: make prepare
+      - name: Publish packages
+        run: make publish
+        env:
+          NPMJS_TOKEN: "${{ secrets.NPMJS_TOKEN }}"
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              username: 'action-slack',
+              blocks: [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "ui-components changelog for tag ${{ steps.set-version.outputs.version }}"
+                  }
+                },
+                ...(${{ steps.set-changelog.outputs.changelog }}.map(section => ({
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": section
+                  }
+                })))
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: "${{ secrets.SLACK_TEAM_ENGINEERING_CHANNEL_WEBHOOK }}"
+        if: "${{ always() }}"

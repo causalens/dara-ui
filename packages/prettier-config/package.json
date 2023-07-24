@@ -1,0 +1,15 @@
+{
+  "name": "@darajs/prettier-config",
+  "version": "0.2.2",
+  "description": "causaLens Prettier configuration",
+  "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
+  "license": "BUSL-1.1",
+  "main": "index.json",
+  "files": [
+    "index.json",
+    "LICENSES"
+  ],
+  "dependencies": {
+    "prettier": "2.4.1"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "stylelint-config-prettier",
+    "stylelint-config-styled-components",
+    "stylelint-config-clean-order"
+  ],
+  "customSyntax": "@stylelint/postcss-css-in-js",
+  "plugins": [
+    "stylelint-prettier",
+    "stylelint-order"
+  ],
+  "rules": {
+    "prettier/prettier": true
+  }
+}

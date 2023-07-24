@@ -1,0 +1,14 @@
+import { faDisease } from '@fortawesome/free-solid-svg-icons';
+
+import { IconProps, StyledFAIcon } from './icon-utils';
+
+/**
+ * Disease icon from FontAwesome
+ *
+ * @param {IconProps} props - the component props
+ */
+const Disease = (props: IconProps): JSX.Element => {
+    return <StyledFAIcon icon={faDisease} {...props} />;
+};
+
+export default Disease;
