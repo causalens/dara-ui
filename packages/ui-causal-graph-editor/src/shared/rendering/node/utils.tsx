@@ -1,0 +1,48 @@
+/**
+ * Copyright 2023 Impulse Innovations Limited
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { DefaultTheme } from '@darajs/styled-components';
+
+import { PixiNodeStyle } from './definitions';
+
+/**
+ * Get node color based on its group
+ *
+ * @param group node group
+ * @param theme current theme colors
+ */
+export function getNodeColor(group: PixiNodeStyle['group'], theme: DefaultTheme): [bg: string, font: string] {
+    switch (group) {
+        case 'target':
+            return [theme.colors.secondary, theme.colors.blue1];
+        case 'latent':
+            return [theme.colors.blue1, theme.colors.text];
+        default:
+            return [theme.colors.blue4, theme.colors.text];
+    }
+}
+
+/**
+ * Get node size based on configured size and group
+ *
+ * @param size configured node size
+ * @param group group node is in
+ */
+export function getNodeSize(size: number, group: PixiNodeStyle['group']): number {
+    const sizeMultiplier = group === 'target' ? 1.25 : 1;
+
+    return size * sizeMultiplier;
+}

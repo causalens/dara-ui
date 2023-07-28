@@ -1,0 +1,19 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^7.0.0"
+  },
+  "workspaces": [
+    "packages/**",
+    "projects/**"
+  ],
+  "pnpm": {
+    "overrides": {
+      "webpack": "^5.0.0"
+    }
+  },
+  "dependencies": {
+    "glob": "^10.3.3"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "npmClient": "pnpm",
+  "packages": [
+    "packages/**"
+  ],
+  "version": "1.0.0-a.1",
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
+}

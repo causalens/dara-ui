@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "exclude": ["tests/**", "**/*.spec.tsx", "**/*.stories.tsx", "dist/**"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "./src",
+    "outDir": "./dist/",
+    "esModuleInterop": true,
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@types": ["./src/types"]
+    }
+  }
+}
