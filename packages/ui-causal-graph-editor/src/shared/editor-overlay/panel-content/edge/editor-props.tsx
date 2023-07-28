@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { GraphApi } from '@shared/use-causal-graph-editor';
-import { EdgeConstraintItem, SimulationEdge } from '@types';
+import { EdgeConstraintItem, GraphState, SimulationEdge } from '@types';
 
 export interface EdgeEditorProps {
     /** Graph API */
@@ -28,6 +28,8 @@ export interface EdgeEditorProps {
     onUpdateConstraint: (constraint: EdgeConstraintItem) => void | Promise<void>;
     /** The id of the source node */
     source: string;
+    /** Graph data  */
+    state: GraphState;
     /** The id of the target node */
     target: string;
 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { willCreateCycle } from 'graphology-dag';
 import debounce from 'lodash/debounce';
 import noop from 'lodash/noop';
 import { useEffect, useMemo, useState } from 'react';
@@ -23,7 +22,6 @@ import { GetReferenceClientRect } from 'tippy.js';
 
 import { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
-import { NotificationPayload } from '@darajs/ui-notifications';
 import { Status, useUpdateEffect } from '@darajs/ui-utils';
 import { ConfirmationModal } from '@darajs/ui-widgets';
 
@@ -41,7 +39,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
-import { getTooltipContent } from '@shared/utils';
+import { getTooltipContent, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
     CausalGraphEdge,
@@ -85,8 +83,6 @@ export interface CausalGraphEditorProps extends Settings {
     onClickNode?: (node: CausalGraphNode) => void | Promise<void>;
     /** Handler called when constraints are update in edge encoder mode */
     onEdgeConstraintsUpdate?: (constraints: EdgeConstraint[]) => void | Promise<void>;
-    /** On notify handler to show a notification */
-    onNotify?: (payload: NotificationPayload) => void | Promise<void>;
     /** onUpdate handler for live updating the edited graph */
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
     /** Pass through of the native style prop */
@@ -254,7 +250,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     function onAddEdge(edge: [string, string]): void {
         // Skip if a cycle would be created
         // The check needs to happen before we commit an action
-        if (willCreateCycle(state.graph, ...edge)) {
+        if (willCreateCycle(state.graph, edge)) {
             props.onNotify?.({
                 key: 'create-edge-cycle',
                 message: 'Could not create an edge as it would create a cycle',
@@ -286,7 +282,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         // This creates a clone of the graph without the reversed edge so we can properly check if the reverse would create a cycle
         const graphCopy = state.graph.copy();
         graphCopy.dropEdge(source, target);
-        if (willCreateCycle(graphCopy, target, source)) {
+        if (willCreateCycle(graphCopy, selectedEdge)) {
             props.onNotify?.({
                 key: 'reverse-edge-cycle',
                 message: 'Could not reverse the edge as it would create a cycle',
@@ -541,6 +537,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 disableNodeRemoval: props.disableNodeRemoval,
                 editable: props.editable,
                 editorMode: props.editorMode,
+                onNotify: props.onNotify,
                 verboseDescriptions: props.verboseDescriptions,
             }}
         >

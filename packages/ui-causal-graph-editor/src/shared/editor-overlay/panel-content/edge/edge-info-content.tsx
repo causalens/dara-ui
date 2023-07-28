@@ -69,6 +69,7 @@ function EdgeInfoContent(props: EdgeInfoContentProps): JSX.Element {
                         edgeConstraint={props.selectedConstraint}
                         onUpdateConstraint={props.onUpdateConstraint}
                         source={source}
+                        state={props.state}
                         target={target}
                     />
                 )}

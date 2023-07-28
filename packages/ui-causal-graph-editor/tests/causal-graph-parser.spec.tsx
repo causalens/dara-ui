@@ -2,6 +2,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { causalGraphParser } from '../src/shared/parsers';
 import { serializeGraphEdge, serializeGraphNode } from '../src/shared/serializer';
+import { EdgeType } from '../src/types';
 import { MockCausalGraph } from './utils';
 
 describe('CausalGraphParser', () => {
@@ -19,6 +20,10 @@ describe('CausalGraphParser', () => {
             // Add rendering properties
             if (Object.keys(expectedEdge.meta).length === 0) {
                 expectedEdge.meta.rendering_properties = {};
+            }
+
+            if (expectedEdge.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
+                expectedEdge.edge_type = EdgeType.DIRECTED_EDGE;
             }
 
             expect(serializeGraphEdge(attrs)).toEqual(expectedEdge);

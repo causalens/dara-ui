@@ -10,7 +10,7 @@ export const MockCausalGraph: CausalGraph = {
             },
         },
         input2: {
-            target1: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} },
+            target1: { edge_type: EdgeType.BACKWARDS_DIRECTED_EDGE, meta: {} },
             target2: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} },
         },
     },

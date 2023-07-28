@@ -19,6 +19,7 @@ import {
     CausalGraphEdge,
     CausalGraphNode,
     EdgeRenderingMeta,
+    EdgeType,
     FlatEdgeRenderingMeta,
     FlatNodeRenderingMeta,
     GraphState,
@@ -75,6 +76,19 @@ export function serializeGraphEdge(attributes: SimulationEdge, source?: string, 
         output.destination = destination;
     }
 
+    // Reverse the edge if it is a backwards directed edge
+    if (output.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
+        output.edge_type = EdgeType.DIRECTED_EDGE;
+
+        if (output.source) {
+            output.source = destination;
+        }
+
+        if (output.destination) {
+            output.destination = source;
+        }
+    }
+
     return output;
 }
 
@@ -122,11 +136,20 @@ type Entries<T> = {
 export function causalGraphSerializer(state: GraphState): CausalGraph {
     const edges: CausalGraph['edges'] = state.graph.reduceEdges(
         (acc: CausalGraph['edges'], id: string, attributes: SimulationEdge, source: string, target: string) => {
-            if (!(source in acc)) {
-                acc[source] = {};
-            }
+            const serializedEdge = serializeGraphEdge(attributes);
 
-            acc[source][target] = serializeGraphEdge(attributes);
+            // if the edge is backwards, we need to swap the source and target
+            if (attributes.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
+                if (!(target in acc)) {
+                    acc[target] = {};
+                }
+                acc[target][source] = serializedEdge;
+            } else {
+                if (!(source in acc)) {
+                    acc[source] = {};
+                }
+                acc[source][target] = serializedEdge;
+            }
 
             return acc;
         },

@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 
+import { NotificationPayload } from '@darajs/ui-notifications';
+
 import { EditorMode } from '../types';
 
 /**
@@ -36,6 +38,8 @@ export interface Settings {
     editable?: boolean;
     /** Mode the graph viewer should operate in */
     editorMode?: EditorMode;
+    /** On notify handler to show a notification */
+    onNotify?: (payload: NotificationPayload) => void | Promise<void>;
     /** Whether to show verbose descriptions in the editor frame */
     verboseDescriptions?: boolean;
 }

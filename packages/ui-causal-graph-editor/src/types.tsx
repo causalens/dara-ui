@@ -115,6 +115,11 @@ export enum VariableType {
 }
 
 export enum EdgeType {
+    /**
+     * This is only used internally as a temporary representation in PAG mode, should be reversed
+     * in the serialised output.
+     */
+    BACKWARDS_DIRECTED_EDGE = '<-',
     BIDIRECTED_EDGE = '<>',
     DIRECTED_EDGE = '->',
     UNDIRECTED_EDGE = '--',

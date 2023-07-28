@@ -23,7 +23,13 @@ import { EdgeTypeEditor } from './sections';
 function PagEditor(props: EdgeEditorProps): JSX.Element {
     return (
         <>
-            <EdgeTypeEditor api={props.api} edge={props.edge} source={props.source} target={props.target} />
+            <EdgeTypeEditor
+                api={props.api}
+                edge={props.edge}
+                source={props.source}
+                state={props.state}
+                target={props.target}
+            />
         </>
     );
 }

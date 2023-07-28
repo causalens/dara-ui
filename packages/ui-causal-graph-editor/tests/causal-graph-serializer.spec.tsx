@@ -1,11 +1,11 @@
 import { causalGraphParser } from '../src/shared/parsers';
 import { causalGraphSerializer } from '../src/shared/serializer';
-import { EditorMode } from '../src/types';
+import { CausalGraphEdge, EdgeType } from '../src/types';
 import { MockCausalGraph } from './utils';
 
 describe('CausalGraphSerializer', () => {
     it('should serialize the internal structure back to the original', () => {
-        const parsedGraph = causalGraphParser(MockCausalGraph, EditorMode.DEFAULT);
+        const parsedGraph = causalGraphParser(MockCausalGraph);
 
         // Latent property is added so expectation has to be adjusted
         const expectedNodes = Object.keys(MockCausalGraph.nodes).reduce((acc, key) => {
@@ -40,7 +40,13 @@ describe('CausalGraphSerializer', () => {
             acc[sourceKey] = nestedEdges;
 
             return acc;
-        }, {});
+        }, {} as Record<string, Record<string, CausalGraphEdge>>);
+
+        // The one backwards edge needs to be swapped
+        expectedEdges.target1 = {};
+        expectedEdges.target1.input2 = expectedEdges.input2.target1;
+        delete expectedEdges.input2.target1;
+        expectedEdges.target1.input2.edge_type = EdgeType.DIRECTED_EDGE;
 
         expect(causalGraphSerializer({ graph: parsedGraph })).toEqual({
             edges: expectedEdges,

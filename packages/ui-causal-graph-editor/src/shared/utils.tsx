@@ -16,7 +16,65 @@
  */
 import { DefaultTheme } from '@darajs/styled-components';
 
-import { NodeGroup, SimulationGraph } from '../types';
+import { EdgeType, NodeGroup, SimulationGraph } from '../types';
+
+/**
+ * Check if adding an edge to the graph will create a cycle.
+ *
+ * @param graph current graph state instance
+ * @param edge edge to add
+ */
+export function willCreateCycle(graphOriginal: SimulationGraph, edge: [string, string]): boolean {
+    const graph = graphOriginal.copy();
+    // Drop the edge in both directions if they exist
+    try {
+        graph.dropEdge(edge);
+        // eslint-disable-next-line no-empty
+    } catch {}
+
+    try {
+        graph.dropEdge([edge[1], edge[0]]);
+        // eslint-disable-next-line no-empty
+    } catch {}
+
+    // Add the edge in the direction we want to check
+    graph.addEdge(edge[0], edge[1], { edge_type: EdgeType.DIRECTED_EDGE, originalMeta: {} });
+
+    // adding edge from node to itself will always create a self loop
+    if (edge[0] === edge[1]) {
+        return true;
+    }
+
+    // check that the destination node will not depend on itself after adding it
+    const checkedNodes = new Set<string>();
+    const nodesToCheck = [edge[1]];
+    let currentNode: string | undefined;
+
+    // keep traversing the graph until we have checked all nodes that are reachable from the destination node
+    while (nodesToCheck.length > 0) {
+        currentNode = nodesToCheck.pop();
+
+        // Only check this condition after first iteration; if we reach the destination node again, we have a cycle
+        if (currentNode === edge[1] && checkedNodes.size > 0) {
+            return true;
+        }
+
+        checkedNodes.add(currentNode);
+
+        // eslint-disable-next-line no-loop-func
+        graph.forEachEdge(currentNode, (_, edgeAttrs, source, target) => {
+            // only if it's an inbound directed edge, check the source node
+            if (target === currentNode && edgeAttrs.edge_type === EdgeType.DIRECTED_EDGE) {
+                nodesToCheck.push(source);
+                // check for backwards edges
+            } else if (source === currentNode && edgeAttrs.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
+                nodesToCheck.push(target);
+            }
+        });
+    }
+
+    return false;
+}
 
 /**
  * Format a given name, i.e. a snake_case label to 'Sentence case'
