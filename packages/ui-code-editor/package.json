@@ -1,6 +1,6 @@
 {
   "name": "@darajs/ui-code-editor",
-  "version": "0.2.2",
+  "version": "1.0.0-a.1",
   "description": "Code Editor for the Dara UI framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -15,9 +15,9 @@
   "license": "Apache-2.0",
   "prettier": "@darajs/prettier-config",
   "devDependencies": {
-    "@darajs/eslint-config": "^0.2.2",
-    "@darajs/prettier-config": "^0.2.2",
-    "@darajs/stylelint-config": "^0.2.2",
+    "@darajs/eslint-config": "1.0.0-a.1",
+    "@darajs/prettier-config": "1.0.0-a.1",
+    "@darajs/stylelint-config": "1.0.0-a.1",
     "@types/jest": "^25.2.3",
     "@types/react": "^18.0",
     "@types/react-dom": "^18.0",
@@ -42,7 +42,7 @@
     "@codemirror/search": "^0.19.0",
     "@codemirror/state": "^0.19.1",
     "@codemirror/view": "^0.19.1",
-    "@darajs/styled-components": "^0.2.2",
+    "@darajs/styled-components": "1.0.0-a.1",
     "react": "^18.0"
   },
   "files": [
