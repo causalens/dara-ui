@@ -5,10 +5,9 @@
   "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
   "main": "index.json",
   "files": [
-    "index.json",
-    "LICENSES"
+    "index.json"
   ],
-  "license": "BUSL-1.1",
+  "license": "Apache-2.0",
   "dependencies": {
     "@stylelint/postcss-css-in-js": "^0.37.2",
     "postcss": "^8.3.11",

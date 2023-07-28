@@ -3,11 +3,10 @@
   "version": "0.2.2",
   "description": "Dara ESLint configuration",
   "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
-  "license": "BUSL-1.1",
+  "license": "Apache-2.0",
   "main": "index.js",
   "files": [
-    "index.js",
-    "LICENSES"
+    "index.js"
   ],
   "prettier": "@darajs/prettier-config",
   "dependencies": {

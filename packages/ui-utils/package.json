@@ -13,7 +13,7 @@
     "test-watch": "jest --watch"
   },
   "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
-  "license": "BUSL-1.1",
+  "license": "Apache-2.0",
   "prettier": "@darajs/prettier-config",
   "devDependencies": {
     "@babel/core": "^7.15.5",
@@ -45,7 +45,6 @@
     "shortid": "2.2.15"
   },
   "files": [
-    "dist",
-    "LICENSES"
+    "dist"
   ]
 }

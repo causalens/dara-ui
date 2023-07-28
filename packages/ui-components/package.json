@@ -16,7 +16,7 @@
     "build-storybook": "build-storybook"
   },
   "author": "Krzysztof Bielikowicz <krzysztof@causalens.com>",
-  "license": "BUSL-1.1",
+  "license": "Apache-2.0",
   "prettier": "@darajs/prettier-config",
   "devDependencies": {
     "@babel/core": "^7.15.5",
@@ -96,7 +96,6 @@
     "tippy.js": "6.2.6"
   },
   "files": [
-    "dist",
-    "LICENSES"
+    "dist"
   ]
 }

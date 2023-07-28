@@ -1,18 +1,25 @@
 import fs from "fs/promises";
-import fsSync from "fs";
 import path from "path";
-import { Glob, globIterate } from "glob";
+import { Glob } from "glob";
 
 // Copyright header - update in every source file
 const LICENSE = `\
 /**
-* Copyright (c) 2023 by Impulse Innovations Ltd. Part of the causaLens product.
-*
-* Use of this software is governed by the Business Source License 1.1 included in the file LICENSES/BSL.txt.
-*
-* As of the Change Date specified in that file, in accordance with the Business Source License 1.1,
-* use of this software will be governed by the Apache License, Version 2.0, included in the file LICENSES/APL.txt.
-*/
+ * Copyright 2023 Impulse Innovations Limited
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 `;
 
 const files = new Glob(`./packages/*/src/**/*.{js,jsx,ts,tsx}`, {
@@ -26,11 +33,12 @@ for await (const file of files) {
   let newContent;
 
   // check if it starts with the license already
-  if (content.startsWith(LICENSE)) {
+  if (content.startsWith("/**")) {
     console.log(`Updating license in ${file}`);
     // check how many lines the block takes
     const lines = content.split("\n");
-    const end = lines.slice(1).findIndex((line) => line.startsWith("*/")) + 1;
+    const end =
+      lines.slice(1).findIndex((line) => line.trim().startsWith("*/")) + 1;
     // remove the docstring from the content
     lines.splice(0, end + 1);
     newContent = LICENSE + lines.join("\n");
@@ -45,13 +53,7 @@ for await (const file of files) {
 }
 
 // Copy LICENSES/ folder to each packages/*/ folder
-const LICENSES_PATH = "./LICENSES";
-const licensesIter = globIterate(`${LICENSES_PATH}/*`);
-const licenses = [];
-for await (const license of licensesIter) {
-  licenses.push(license);
-}
-console.log("Discovered licenses: ", licenses);
+const LICENSE_PATH = "./LICENSE";
 
 const packages = new Glob(`./packages/*/`, {
   mark: true,
@@ -60,14 +62,8 @@ const packages = new Glob(`./packages/*/`, {
 
 for await (const p of packages) {
   console.log(`Processing ${p}`);
-  // If LICENSES does not exist in that folder, create empty first
-  if (!fsSync.existsSync(path.join(p, "LICENSES"))) {
-    await fs.mkdir(`${p}/LICENSES`);
-  }
 
-  for (const license of licenses) {
-    const newPath = path.join(p, "LICENSES", license.split("/").pop());
-    console.log(`Copying ${license} to ${newPath}`);
-    await fs.copyFile(license, newPath);
-  }
+  const newPath = path.join(p, "LICENSE");
+  console.log(`Copying LICENSE to ${newPath}`);
+  await fs.copyFile(LICENSE_PATH, newPath);
 }
