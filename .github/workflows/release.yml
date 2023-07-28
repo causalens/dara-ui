@@ -68,7 +68,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": "ui-components changelog for tag ${{ steps.set-version.outputs.version }}"
+                    "text": "dara-ui changelog for tag ${{ steps.set-version.outputs.version }}"
                   }
                 },
                 ...(${{ steps.set-changelog.outputs.changelog }}.map(section => ({
@@ -82,4 +82,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: "${{ secrets.SLACK_TEAM_ENGINEERING_CHANNEL_WEBHOOK }}"
-        if: "${{ always() }}"
