@@ -20,5 +20,8 @@
     "stylelint-order": "^6.0.3",
     "stylelint-prettier": "^1.2.0",
     "stylelint-processor-styled-components": "^1.10.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
