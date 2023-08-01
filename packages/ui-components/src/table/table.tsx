@@ -17,7 +17,7 @@
 import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 import { IconDefinition, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { transparentize } from 'polished';
+import memoize from 'memoize-one';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import * as React from 'react';
 import {
@@ -50,9 +50,8 @@ import EditSelectCell from './cells/edit-select-cell';
 import { FilterContainer, HeaderIconWrapper, TextFilter, categorical, datetime, numeric } from './filters';
 import SelectHeader from './headers/select-header';
 import OptionsMenu from './options-menu';
+import RenderRow, { ROW_HEIGHT, shouldForwardProp } from './render-row';
 import { TableColumn } from './types';
-
-const ROW_HEIGHT = 40;
 
 const Wrapper = styled.div<{ $hasMaxRows: boolean }>`
     display: inline-block;
@@ -183,101 +182,12 @@ interface isSortedProp {
     isSorted: boolean;
 }
 
-// Prevents the isSorted or onClickRow prop being added to the dom element
-const shouldForwardProp = (prop: any): boolean => !['isSorted', 'onClickRow'].includes(prop);
-
 const SortIcon = styled(FontAwesomeIcon).withConfig({ shouldForwardProp })<isSortedProp>`
     color: ${(props) => (props.isSorted ? props.theme.colors.grey3 : props.theme.colors.blue3)};
 `;
 
 const TooltipIcon = styled(FontAwesomeIcon)`
     color: ${(props) => props.theme.colors.grey4};
-`;
-
-interface RowProps {
-    onClickRow?: (row: any) => void | Promise<void>;
-}
-
-const Row = styled.div.withConfig({ shouldForwardProp })<RowProps>`
-    cursor: ${(props) => (props.onClickRow ? 'pointer' : 'default')};
-    display: flex;
-
-    :hover {
-        div {
-            background-color: ${(props) => props.theme.colors.grey1};
-        }
-    }
-
-    :active,
-    focused {
-        div {
-            background-color: ${(props) => props.theme.colors.grey2};
-        }
-    }
-`;
-
-const RowPlaceholder = styled(Row)`
-    position: absolute;
-    left: 0px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const CellPlaceholder = styled.div`
-    min-width: 80px;
-    height: 0.7rem;
-    margin: 0.5rem;
-
-    background: ${(props) =>
-        `linear-gradient(to right, ${props.theme.colors.grey2}, ${transparentize(0.2, props.theme.colors.grey3)}, ${
-            props.theme.colors.grey2
-        });`};
-    background-size: 50%;
-    border-radius: 0.5rem;
-
-    animation-name: aniHorizontal;
-    animation-duration: 3.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-
-    @keyframes aniHorizontal {
-        0% {
-            background-position: -100% 0;
-        }
-
-        100% {
-            background-position: 100% 0;
-        }
-    }
-`;
-
-const Cell = styled.div`
-    display: flex !important;
-    align-items: center;
-
-    min-width: 80px;
-    height: 2.5rem;
-
-    color: ${(props) => props.theme.colors.grey6};
-
-    background-color: ${(props) => props.theme.colors.blue1};
-    border-bottom: 1px solid ${(props) => props.theme.colors.grey3};
-
-    :last-child {
-        border-right: 0;
-    }
-`;
-
-const CellContent = styled.span`
-    overflow: hidden;
-
-    width: 100%;
-    padding: 0 1rem;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
 `;
 
 /**
@@ -444,6 +354,36 @@ type TableType = React.ForwardRefExoticComponent<Props<{ [k: string]: any }> & R
 interface ColumnHeader extends HeaderGroup<object> {
     tooltip?: string;
 }
+
+// This helper function memoizes incoming props,
+// To avoid causing unnecessary re-renders pure Row components.
+const createItemData = memoize(
+    (
+        width,
+        currentEditCell,
+        headerGroups,
+        rows,
+        prepareRow,
+        getItem,
+        totalColumnsWidth,
+        onClickRow,
+        throttledClickRow,
+        backgroundColor,
+        mappedColumns
+    ) => ({
+        backgroundColor,
+        currentEditCell,
+        getItem,
+        headerGroups,
+        mappedColumns,
+        onClickRow,
+        prepareRow,
+        rows,
+        throttledClickRow,
+        totalColumnsWidth,
+        width,
+    })
+);
 
 /**
  * The Table component builds on top of the thirdparty react-table library and aims to provide a simple outward facing
@@ -693,119 +633,6 @@ const Table = forwardRef(
             );
         }, useDeepCompare([tableProps, totalColumnsWidth, headerGroups]));
 
-        const renderRow = useCallback(
-            ({
-                data: rowData,
-                index,
-                style: renderRowStyle,
-            }: {
-                data: any;
-                index: number;
-                style: React.CSSProperties;
-            }): JSX.Element => {
-                let row = rows[index];
-
-                if (getItem) {
-                    const value = getItem(index);
-
-                    // attempting to render a row which there's no data yet, make sure loading state is used
-                    if (!value) {
-                        row = null;
-                    } else {
-                        row.original = value;
-                        row.values = value;
-                    }
-                }
-                if (!row) {
-                    return (
-                        <div>
-                            {headerGroups.map((headerGroup, gidx) => (
-                                <RowPlaceholder
-                                    key={`row-${gidx}`}
-                                    style={{
-                                        height: ROW_HEIGHT,
-                                        top: (index + 1) * ROW_HEIGHT,
-                                        width: totalColumnsWidth > rowData.width ? totalColumnsWidth : '100%',
-                                    }}
-                                >
-                                    {headerGroup?.headers.map((col, cidx) => {
-                                        const headerProps = col.getHeaderProps();
-                                        // If width calc has messed up then use the raw width from the column
-                                        const width =
-                                            (headerProps.style as any).width === 'NaNpx'
-                                                ? mappedColumns[cidx].width
-                                                : (headerProps.style as any).width;
-
-                                        return (
-                                            <CellPlaceholder
-                                                key={`col-${index}-${cidx}`}
-                                                style={{
-                                                    maxWidth: col.maxWidth,
-                                                    width,
-                                                }}
-                                            />
-                                        );
-                                    })}
-                                </RowPlaceholder>
-                            ))}
-                        </div>
-                    );
-                }
-                prepareRow(row);
-                const onClick = (): void => {
-                    if (onClickRow) {
-                        throttledClickRow(row.original);
-                    }
-                };
-                const { style: rowStyle, ...restRow } = row.getRowProps({ style: renderRowStyle });
-                return (
-                    <Row
-                        {...restRow}
-                        key={`row-${index}`}
-                        onClick={onClick}
-                        onClickRow={onClickRow}
-                        style={{
-                            ...rowStyle,
-
-                            top: (index + 1) * ROW_HEIGHT,
-                            width: totalColumnsWidth > rowData.width ? totalColumnsWidth : '100%',
-                        }}
-                    >
-                        {row.cells.map((cell, colIdx) => {
-                            const cellProps = cell.getCellProps();
-                            return (
-                                <Cell
-                                    {...cellProps}
-                                    key={`cell-${index}-${colIdx}`}
-                                    style={{
-                                        ...cellProps.style,
-
-                                        backgroundColor,
-                                        justifyContent: mappedColumns[colIdx].align,
-                                        maxWidth: cell.column?.maxWidth,
-                                        width:
-                                            // If width calc has messed up then use the raw width from the column
-                                            (cellProps.style as any).width === 'NaNpx'
-                                                ? mappedColumns[colIdx].width
-                                                : (cellProps.style as any).width,
-                                    }}
-                                >
-                                    <CellContent>
-                                        {cell.render('Cell', {
-                                            colIdx,
-                                            currentEditCell: rowData.currentEditCell,
-                                            rowIdx: index,
-                                        })}
-                                    </CellContent>
-                                </Cell>
-                            );
-                        })}
-                    </Row>
-                );
-            },
-            useDeepCompare([currentEditCell, prepareRow, rows, getItem])
-        );
-
         return (
             <Wrapper
                 {...getTableProps()}
@@ -820,7 +647,19 @@ const Table = forwardRef(
                                 height={height}
                                 innerElementType={renderTable}
                                 itemCount={itemCount || rows.length}
-                                itemData={{ currentEditCell, width }}
+                                itemData={createItemData(
+                                    width,
+                                    currentEditCell,
+                                    headerGroups,
+                                    rows,
+                                    prepareRow,
+                                    getItem,
+                                    totalColumnsWidth,
+                                    onClickRow,
+                                    throttledClickRow,
+                                    backgroundColor,
+                                    mappedColumns
+                                )}
                                 itemSize={ROW_HEIGHT}
                                 key="table-list"
                                 onItemsRendered={onItemsRendered}
@@ -830,7 +669,7 @@ const Table = forwardRef(
                                 }}
                                 width={width}
                             >
-                                {renderRow}
+                                {RenderRow}
                             </StyledFixedSizeList>
                         );
                     }}
