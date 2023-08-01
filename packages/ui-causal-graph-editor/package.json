@@ -1,7 +1,7 @@
 {
   "name": "@darajs/ui-causal-graph-editor",
   "version": "1.0.0-a.1",
-  "description": "CausalGraph editor for the causaLens UI framework",
+  "description": "CausalGraph editor for the Dara UI framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "jsnext:main": "dist/index.js",
