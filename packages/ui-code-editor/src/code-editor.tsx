@@ -14,17 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { closeBrackets } from '@codemirror/closebrackets';
-import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { lineNumbers } from '@codemirror/gutter';
-import { defaultHighlightStyle } from '@codemirror/highlight';
-import { history, historyKeymap } from '@codemirror/history';
+import { closeBrackets } from '@codemirror/autocomplete';
+import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { json } from '@codemirror/lang-json';
 import { python } from '@codemirror/lang-python';
-import { bracketMatching } from '@codemirror/matchbrackets';
+import { bracketMatching, defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { searchKeymap } from '@codemirror/search';
 import { EditorState, StateField } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { useEffect, useRef } from 'react';
 
 import styled from '@darajs/styled-components';
@@ -47,7 +44,7 @@ const EditorRoot = styled.div`
     }
 `;
 
-interface CodeEditorProps {
+export interface CodeEditorProps {
     /**
      * Standard classname prop
      */
@@ -106,7 +103,7 @@ function CodeEditor({ initialScript, disabled, onChange, style, className }: Cod
                     json(),
                     bracketMatching(),
                     closeBrackets(),
-                    defaultHighlightStyle,
+                    syntaxHighlighting(defaultHighlightStyle),
                     EditorState.tabSize.of(4),
                     EditorView.editable.of(!disabled),
                     keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap, indentWithTab]),
