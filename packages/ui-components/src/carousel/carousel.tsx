@@ -147,8 +147,9 @@ const CarouselItemContainer = (props: CarouselItemContainerProps): JSX.Element =
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
+                    margin: '0rem 1rem',
                     overflow: 'auto',
-                    padding: '0rem 1rem',
+                    whiteSpace: 'normal',
                 }}
             >
                 {props.item.image && (
@@ -168,7 +169,6 @@ const CarouselItemContainer = (props: CarouselItemContainerProps): JSX.Element =
                         style={{
                             gap: `${props.item.title && props.item.subtitle ? '0.5rem' : '0'}`,
                             maxWidth: '100%',
-                            whiteSpace: 'normal',
                         }}
                     >
                         <Title>{props.item.title}</Title>
