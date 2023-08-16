@@ -95,6 +95,14 @@ const Icon = styled.div<NotificationIconsProps>`
     }
 `;
 
+const MoreDetailsButton = styled.button`
+    color: ${(props) => getStatusColor(props.status, props.theme.colors)};
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding-left: 0;
+`;
+
 const CloseBtn = styled(Cross)<NotificationIconsProps>`
     height: 1.2rem;
     color: ${(props) => getStatusColor(props.status, props.theme.colors)};
@@ -124,12 +132,28 @@ export interface NotificationProps {
  * @param props the component props
  */
 function Notification(props: NotificationProps): JSX.Element {
+    const isOverflowing = props.notification.message.length > 30;
+    console.log(props.notification.onMoreDetailsClick, isOverflowing);
+    const renderMessage: () => JSX.Element = () => {
+        if (props.notification.onMoreDetailsClick && isOverflowing) {
+            return (
+                <Body>
+                    {`${props.notification.message.slice(0, 26)}...`}
+                    <MoreDetailsButton onClick={props.notification.onMoreDetailsClick} type="button">
+                        More Details
+                    </MoreDetailsButton>
+                </Body>
+            );
+        }
+        return <Body>{props.notification.message}</Body>;
+    };
+
     return (
         <NotificationWrapper hasTitle={!!props.notification.title} status={props.notification.status}>
             <Icon status={props.notification.status}>{getIcon(props.notification.status)}</Icon>
             <Message>
                 <Heading>{props.notification.title}</Heading>
-                <Body>{props.notification.message}</Body>
+                {renderMessage()}
             </Message>
             <CloseBtn
                 asButton

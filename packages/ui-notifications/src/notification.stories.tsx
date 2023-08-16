@@ -91,3 +91,25 @@ export const ErrorNotification = Template.bind({});
 ErrorNotification.args = {
     notification: errorMessage,
 };
+
+const longNotificationMessage: NotificationPayload = {
+    key: 'test',
+    message:
+        'Duis interdum gravida metus, vel faucibus leo euismod id. Suspendisse felis enim, consequat eu' +
+        'felis imperdiet, efficitur semper turpis. Nam felis ex, viverra eu nisl ut, imperdiet varius lacus. Curabitur ' +
+        'convallis vel nibh at lobortis. Morbi eget fermentum ligula. Nullam at justo diam. Ut accumsan fringilla metus quis pretium.' +
+        ' Vestibulum magna lectus, commodo vel nibh sed, posuere ultrices nisl. Integer rutrum, augue vel interdum hendrerit,' +
+        ' est lacus interdum risus, ac feugiat enim velit id arcu. Integer maximus mi a mollis faucibus. Nulla vitae tincidunt libero, ' +
+        'et porttitor lectus. Donec eleifend turpis ut sapien cursus fringilla. Cras non diam convallis, tincidunt felis vitae, tristique mi. ' +
+        'Nulla dolor lacus, interdum sit amet ornare ut, luctus ac quam. Vestibulum sollicitudin nec leo nec vestibulum. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    onMoreDetailsClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        alert('More details clicked');
+    },
+    status: Status.WARNING,
+    title: 'Warning',
+};
+export const LongNotification = Template.bind({});
+LongNotification.args = {
+    notification: longNotificationMessage,
+};

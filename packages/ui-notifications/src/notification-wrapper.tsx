@@ -108,7 +108,12 @@ function NotificationWrapper(props: NotificationWrapperProps): JSX.Element {
     return (
         <Container style={props.style}>
             {notifications.map((notification) => (
-                <Notification key={notification.key} notification={notification} onDismiss={onDismiss} />
+                <Notification
+                    key={notification.key}
+                    notification={notification}
+                    onDismiss={onDismiss}
+                    onMoreDetailsClick={notification.onMoreDetailsClick}
+                />
             ))}
         </Container>
     );
