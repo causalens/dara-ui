@@ -40,7 +40,7 @@ const SwitchWrapper = styled.div<EnabledProp>`
     padding-right: ${(props) => (props.enabled ? '1.75rem' : '0.5rem')};
     padding-left: ${(props) => (props.enabled ? '0.5rem' : '1.75rem')};
 
-    font-size: 1rem;
+    font-size: ${(props) => props.theme.font.size};
     color: ${(props) => props.theme.colors.blue1};
 
     background-color: ${(props) => (props.enabled ? props.theme.colors.primary : props.theme.colors.secondary)};
