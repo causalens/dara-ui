@@ -94,7 +94,8 @@ ErrorNotification.args = {
 
 const longWarning: NotificationPayload = {
     key: 'test',
-    message: 'Duis interdum gravida metus, vel faucibus leo euismod id. Suspendisse felis enim, consequat eu' +
+    message:
+        'Duis interdum gravida metus, vel faucibus leo euismod id. Suspendisse felis enim, consequat eu' +
         'felis imperdiet, efficitur semper turpis. Nam felis ex, viverra eu nisl ut, imperdiet varius lacus. Curabitur ' +
         'convallis vel nibh at lobortis. Morbi eget fermentum ligula. Nullam at justo diam. Ut accumsan fringilla metus quis pretium.' +
         ' Vestibulum magna lectus, commodo vel nibh sed, posuere ultrices nisl. Integer rutrum, augue vel interdum hendrerit,' +
@@ -108,7 +109,8 @@ const longWarning: NotificationPayload = {
 export const LongWarning = Template.bind({});
 LongWarning.args = {
     notification: longWarning,
-    onMoreDetailsClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    onMoreDetailsClick: (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         notificationPayload: NotificationPayload
     ) => {
         e.preventDefault();
@@ -121,7 +123,8 @@ LongWarning.args = {
 
 const longInfo: NotificationPayload = {
     key: 'test',
-    message: 'This is quite a long notification for testing purposes. It should be long enough to overflow the container.',
+    message:
+        'This is quite a long notification for testing purposes. It should be long enough to overflow the container.',
     status: Status.CREATED,
     title: 'Information',
 };
