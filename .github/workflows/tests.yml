@@ -9,12 +9,11 @@ on:
 jobs:
   lint-and-tests:
     runs-on: ubuntu-latest
-    container:
-      image: "causalens.jfrog.io/docker-internal/causalens-base:latest"
-      credentials:
-        username: "${{ secrets.JF_USERNAME }}"
-        password: "${{ secrets.JF_PASSWORD }}"
     steps:
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -26,6 +25,9 @@ jobs:
           else
             echo "::set-output name=is_master::false"
           fi
+      - name: Set up global project deps
+        shell: bash
+        run: make deps-project
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash

@@ -8,12 +8,11 @@ on:
 jobs:
   package-and-publish:
     runs-on: ubuntu-latest
-    container:
-      image: "causalens.jfrog.io/docker-internal/causalens-base:latest"
-      credentials:
-        username: "${{ secrets.JF_USERNAME }}"
-        password: "${{ secrets.JF_PASSWORD }}"
     steps:
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -29,6 +28,9 @@ jobs:
           raw=$(git branch -r --contains ${{ github.ref }})
           echo ::set-output name=branch::${raw/origin\/}
         id: extract_branch
+      - name: Set up global project deps
+        shell: bash
+        run: make deps-project
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash

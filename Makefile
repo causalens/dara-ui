@@ -2,7 +2,6 @@
 deps-project:
 	npm install --global --force pnpm@6.32.11
 	pnpm install --frozen-lockfile
-	sed -i '$$ d' .npmrc
 
 # Preprocess resources required to test or build packages
 prepare:
