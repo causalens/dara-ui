@@ -25,9 +25,9 @@ jobs:
           else
             echo "::set-output name=is_master::false"
           fi
-      - name: Set up global project deps
+      - name: Set up global platform deps
         shell: bash
-        run: make deps-project
+        run: make deps-platform
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash

@@ -1,6 +1,9 @@
+# Install pnpm and lerna
+deps-platform:
+	npm install --global --force pnpm@6.32.11 lerna
+
 # Install JS packages
 deps-project:
-	npm install --global --force pnpm@6.32.11
 	pnpm install --frozen-lockfile
 
 # Preprocess resources required to test or build packages

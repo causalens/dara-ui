@@ -28,9 +28,9 @@ jobs:
           raw=$(git branch -r --contains ${{ github.ref }})
           echo ::set-output name=branch::${raw/origin\/}
         id: extract_branch
-      - name: Set up global project deps
+      - name: Set up global platform deps
         shell: bash
-        run: make deps-project
+        run: make deps-platform
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
