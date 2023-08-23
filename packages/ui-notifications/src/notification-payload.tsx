@@ -22,7 +22,6 @@ import { Status } from '@darajs/ui-utils';
 export interface NotificationPayload {
     key: string;
     message: string;
-    onMoreDetailsClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     status: Status;
     title?: string;
 }
