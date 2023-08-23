@@ -30,18 +30,17 @@ const SwitchWrapper = styled.div<EnabledProp>`
     cursor: pointer;
 
     position: relative;
-
     display: flex;
     align-items: center;
     justify-content: ${(props) => (props.enabled ? 'flex-start' : 'flex-end')};
 
     width: max-content;
-    height: 24px;
+    height: 1.5rem;
     padding: 0;
     padding-right: ${(props) => (props.enabled ? '1.75rem' : '0.5rem')};
     padding-left: ${(props) => (props.enabled ? '0.5rem' : '1.75rem')};
 
-    font-size: ${(props) => props.theme.font.size};
+    font-size: 1rem;
     color: ${(props) => props.theme.colors.blue1};
 
     background-color: ${(props) => (props.enabled ? props.theme.colors.primary : props.theme.colors.secondary)};
