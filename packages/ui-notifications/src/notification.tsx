@@ -101,14 +101,15 @@ const Icon = styled.div<NotificationIconsProps>`
 `;
 
 const MoreDetailsButton = styled.button`
-    color: ${() => theme.colors.primary};
+    color: ${() => theme.colors.grey4};
     border: none;
     background: transparent;
     cursor: pointer;
     display: flex;
     padding-left: 0;
-    text-decoration: underline;
-
+    :hover {
+        text-decoration: underline;
+    }
 `;
 
 const CloseBtn = styled(Cross)<NotificationIconsProps>`
@@ -156,7 +157,7 @@ function Notification(props: NotificationProps): JSX.Element {
                 <Body moreDetailsShown={showMoreDetails}>{props.notification.message}</Body>
                 {showMoreDetails && (
                     <MoreDetailsButton onClick={(e) => props.onMoreDetailsClick(e, props.notification)} type="button">
-                        More Details
+                        Details &gt;
                     </MoreDetailsButton>
                 )}
             </Message>
