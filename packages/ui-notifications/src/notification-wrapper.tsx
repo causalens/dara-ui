@@ -45,6 +45,7 @@ const Container = styled.div`
 
 interface NotificationContext {
     notifications$: Subject<NotificationPayload>;
+    onMoreDetailsClick?: (notification: NotificationPayload) => void;
     push: (notification: NotificationPayload) => void;
 }
 
@@ -53,9 +54,11 @@ const baseNotifications$ = new Subject<NotificationPayload>();
 /**
  * The main notification context, it exposes a stream of notifications to anything wanting to consume them as well as a
  * generic push method for sending a new one
+ * Additionally, it exposes a callback for when the notification is too small and more details are needed and clicked
  */
 export const NotificationContext = React.createContext({
     notifications$: baseNotifications$,
+    onMoreDetailsClick: null,
     push: (notification: NotificationPayload) => baseNotifications$.next(notification),
 });
 
@@ -75,7 +78,7 @@ interface NotificationWrapperProps {
 function NotificationWrapper(props: NotificationWrapperProps): JSX.Element {
     const [notifications, setNotifications] = useState<Array<NotificationPayload>>([]);
     const wrapSub = useSubscription();
-    const { notifications$ } = useContext(NotificationContext);
+    const { notifications$, onMoreDetailsClick } = useContext(NotificationContext);
 
     // Subscribe to the notifications stream and add them to the list of notifications to render
     useEffect(() => {
@@ -108,7 +111,12 @@ function NotificationWrapper(props: NotificationWrapperProps): JSX.Element {
     return (
         <Container style={props.style}>
             {notifications.map((notification) => (
-                <Notification key={notification.key} notification={notification} onDismiss={onDismiss} />
+                <Notification
+                    key={notification.key}
+                    notification={notification}
+                    onDismiss={onDismiss}
+                    onMoreDetailsClick={onMoreDetailsClick}
+                />
             ))}
         </Container>
     );
