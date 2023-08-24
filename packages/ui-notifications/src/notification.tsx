@@ -16,7 +16,7 @@
  */
 import { mix } from 'polished';
 
-import styled from '@darajs/styled-components';
+import styled, { theme } from '@darajs/styled-components';
 import { CircleCheck, CircleInfo, CircleXmark, Cross, TriangleExclamation } from '@darajs/ui-icons';
 import { Status, getStatusColor } from '@darajs/ui-utils';
 
@@ -29,6 +29,10 @@ interface NotificationWrapperProps {
 
 interface NotificationIconsProps {
     status: Status;
+}
+
+interface NotificationBodyProps {
+    moreDetailsShown: boolean;
 }
 
 const NotificationWrapper = styled.div<NotificationWrapperProps>`
@@ -74,15 +78,16 @@ const Heading = styled.h2`
     -webkit-line-clamp: 1;
 `;
 
-const Body = styled.span`
+const Body = styled.span<NotificationBodyProps>`
     overflow: hidden;
     display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
 
     font-weight: 400;
     text-overflow: ellipsis;
+    line-height: 1.25rem;
 
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: ${(props) => (props.moreDetailsShown ? 1 : 2)};
 `;
 
 const Icon = styled.div<NotificationIconsProps>`
@@ -92,6 +97,18 @@ const Icon = styled.div<NotificationIconsProps>`
         width: 1.5rem;
         height: 1.3125rem;
         color: ${(props) => getStatusColor(props.status, props.theme.colors)};
+    }
+`;
+
+const MoreDetailsButton = styled.button`
+    color: ${() => theme.colors.grey4};
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    padding-left: 0;
+    :hover {
+        text-decoration: underline;
     }
 `;
 
@@ -115,6 +132,11 @@ export interface NotificationProps {
     notification: NotificationPayload;
     /** Handler to trigger the dismissal of the notification */
     onDismiss: (key: string) => void | Promise<void>;
+    /** Optional handler to trigger when the more details button is clicked */
+    onMoreDetailsClick?: (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        notification: NotificationPayload
+    ) => void;
 }
 
 /**
@@ -124,12 +146,20 @@ export interface NotificationProps {
  * @param props the component props
  */
 function Notification(props: NotificationProps): JSX.Element {
+    const isOverflowing = props.notification.message.length > 30;
+    const showMoreDetails = props.onMoreDetailsClick && isOverflowing;
+
     return (
         <NotificationWrapper hasTitle={!!props.notification.title} status={props.notification.status}>
             <Icon status={props.notification.status}>{getIcon(props.notification.status)}</Icon>
             <Message>
                 <Heading>{props.notification.title}</Heading>
-                <Body>{props.notification.message}</Body>
+                <Body moreDetailsShown={showMoreDetails}>{props.notification.message}</Body>
+                {showMoreDetails && (
+                    <MoreDetailsButton onClick={(e) => props.onMoreDetailsClick(e, props.notification)} type="button">
+                        Details &gt;
+                    </MoreDetailsButton>
+                )}
             </Message>
             <CloseBtn
                 asButton

@@ -8,12 +8,11 @@ on:
 jobs:
   package-and-publish:
     runs-on: ubuntu-latest
-    container:
-      image: "causalens.jfrog.io/docker-internal/causalens-base:latest"
-      credentials:
-        username: "${{ secrets.JF_USERNAME }}"
-        password: "${{ secrets.JF_PASSWORD }}"
     steps:
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -29,6 +28,9 @@ jobs:
           raw=$(git branch -r --contains ${{ github.ref }})
           echo ::set-output name=branch::${raw/origin\/}
         id: extract_branch
+      - name: Set up global platform deps
+        shell: bash
+        run: make deps-platform
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -57,28 +59,28 @@ jobs:
         run: make publish
         env:
           NPMJS_TOKEN: "${{ secrets.NPMJS_TOKEN }}"
-      - uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          custom_payload: |
-            {
-              username: 'action-slack',
-              blocks: [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "dara-ui changelog for tag ${{ steps.set-version.outputs.version }}"
-                  }
-                },
-                ...(${{ steps.set-changelog.outputs.changelog }}.map(section => ({
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": section
-                  }
-                })))
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: "${{ secrets.SLACK_TEAM_ENGINEERING_CHANNEL_WEBHOOK }}"
+      # - uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: custom
+      #     custom_payload: |
+      #       {
+      #         username: 'action-slack',
+      #         blocks: [
+      #           {
+      #             "type": "header",
+      #             "text": {
+      #               "type": "plain_text",
+      #               "text": "dara-ui changelog for tag ${{ steps.set-version.outputs.version }}"
+      #             }
+      #           },
+      #           ...(${{ steps.set-changelog.outputs.changelog }}.map(section => ({
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": section
+      #             }
+      #           })))
+      #         ]
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: "${{ secrets.SLACK_TEAM_ENGINEERING_CHANNEL_WEBHOOK }}"

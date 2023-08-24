@@ -7,10 +7,12 @@ module.exports = {
         '@storybook/addon-essentials',
         '@storybook/addon-a11y',
         '@storybook/addon-styling',
-        '@react-theming/storybook-addon',
         'storybook-dark-mode',
     ],
     core: {
         builder: 'webpack5',
-    }
+    },
+    typescript: {
+        reactDocgen: 'react-docgen-typescript-plugin',
+    },
 };
