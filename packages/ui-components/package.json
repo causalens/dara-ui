@@ -58,7 +58,7 @@
     "eslint-plugin-jest": "^26.1.1",
     "jest": "^29.5.0",
     "jest-css-modules": "^2.1.0",
-    "jest-environment-jsdom": "^29.5.0",
+    "jest-environment-jsdom": "^29.6.4",
     "prettier": "2.4.1",
     "react-docgen-typescript-plugin": "^1.0.5",
     "react-test-renderer": "^17.0",
