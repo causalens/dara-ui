@@ -76,7 +76,7 @@ const Cell = styled.div`
     align-items: center;
 
     min-width: 80px;
-    height: 2.5rem;
+    height: 40px;
 
     color: ${(props) => props.theme.colors.grey6};
 
