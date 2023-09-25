@@ -15,14 +15,6 @@
  * limitations under the License.
  */
 import { Cull } from '@pixi-essentials/cull';
-import FontFaceObserver from 'fontfaceobserver';
-import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
-import debounce from 'lodash/debounce';
-import { Viewport } from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
-
-import { DefaultTheme } from '@darajs/styled-components';
-
 import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
 import { getNodeGroup } from '@shared/utils';
@@ -35,6 +27,13 @@ import {
     SimulationNode,
     ZoomThresholds,
 } from '@types';
+import FontFaceObserver from 'fontfaceobserver';
+import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
+import debounce from 'lodash/debounce';
+import { Viewport } from 'pixi-viewport';
+import * as PIXI from 'pixi.js';
+
+import { DefaultTheme } from '@darajs/styled-components';
 
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';
@@ -181,6 +180,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Callback executed when a drag motion is started */
     private onStartDrag?: () => void = null;
 
+    /** Callback executed when an edge needs style change */
+    private processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+
     /** Last render request ID - used to skip extra render calls */
     private renderRequestId: number = null;
 
@@ -221,7 +223,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         editorMode: EditorMode,
         theme: DefaultTheme,
         constraints?: EdgeConstraint[],
-        zoomThresholds?: ZoomThresholds
+        zoomThresholds?: ZoomThresholds,
+        processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle
     ) {
         super();
         this.graph = graph;
@@ -231,6 +234,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.theme = theme;
         this.constraints = constraints;
         this.zoomThresholds = zoomThresholds;
+        this.processEdgeStyle = processEdgeStyle;
         PIXI.Filter.defaultResolution = 3;
     }
 
@@ -814,7 +818,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * @param constraint optional attached constraint, used in edge encoder mode
      */
     private getEdgeStyle(edge: EdgeObject, attributes: SimulationEdge, constraint?: EdgeConstraint): PixiEdgeStyle {
-        return {
+        const edgeStyle = {
             accepted: attributes['meta.rendering_properties.accepted'],
             color: attributes['meta.rendering_properties.color'],
             constraint,
@@ -828,6 +832,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             thickness: attributes['meta.rendering_properties.thickness'],
             type: attributes.edge_type,
         };
+        if (this.processEdgeStyle) {
+            return this.processEdgeStyle(edgeStyle, attributes);
+        }
+        return edgeStyle;
     }
 
     /**

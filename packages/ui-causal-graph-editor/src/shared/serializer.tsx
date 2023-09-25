@@ -66,6 +66,7 @@ export function serializeGraphEdge(attributes: SimulationEdge, source?: string, 
             ...attributes.originalMeta,
             rendering_properties: unflattenedMeta,
         },
+        ...attributes.extras,
     };
 
     if (source) {
@@ -115,6 +116,7 @@ export function serializeGraphNode(attributes: SimulationNode, includeIdentifier
             rendering_properties: unflattenedMeta,
         },
         variable_type: attributes.variable_type,
+        ...attributes.extras,
     };
 
     if (includeIdentifier) {
@@ -174,6 +176,7 @@ export function causalGraphSerializer(state: GraphState): CausalGraph {
                     rendering_properties: unflattenedMeta,
                 },
                 variable_type: attributes.variable_type,
+                ...attributes.extras,
             };
 
             return acc;
@@ -185,5 +188,6 @@ export function causalGraphSerializer(state: GraphState): CausalGraph {
         edges,
         nodes,
         version: state.graph.getAttribute('version'),
+        ...state.graph.getAttribute('extras'),
     };
 }
