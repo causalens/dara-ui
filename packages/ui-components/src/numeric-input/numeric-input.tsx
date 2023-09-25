@@ -85,6 +85,11 @@ const InputWrapper = styled.div<NumericInputProps>`
             background-color: ${(props) => (props.disabled ? props.theme.colors.grey1 : props.theme.colors.grey2)};
         }
     }
+
+    // Fix: Overrides the 22ch default width of the nested regular input
+    > div:first-child {
+        width: 100%;
+    }
 `;
 
 /**

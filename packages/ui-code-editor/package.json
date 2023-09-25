@@ -1,6 +1,6 @@
 {
   "name": "@darajs/ui-code-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Code Editor for the Dara UI framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -16,9 +16,9 @@
   "license": "Apache-2.0",
   "prettier": "@darajs/prettier-config",
   "devDependencies": {
-    "@darajs/eslint-config": "^1.0.0",
-    "@darajs/prettier-config": "^1.0.0",
-    "@darajs/stylelint-config": "^1.0.0",
+    "@darajs/eslint-config": "^1.0.1",
+    "@darajs/prettier-config": "^1.0.1",
+    "@darajs/stylelint-config": "^1.0.1",
     "@storybook/addon-a11y": "^6.5.16",
     "@storybook/addon-actions": "^6.5.16",
     "@storybook/addon-essentials": "^6.5.16",
@@ -36,21 +36,21 @@
     "jest-css-modules": "^2.1.0",
     "prettier": "2.4.1",
     "rimraf": "^3.0.2",
-    "stylelint": "^13.5.0",
     "storybook-dark-mode": "^2.1.1",
+    "stylelint": "^13.5.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.0.0",
     "@codemirror/commands": "^6.0.0",
-    "@codemirror/language": "^6.0.0",
     "@codemirror/lang-json": "^6.0.0",
     "@codemirror/lang-python": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
     "@codemirror/search": "^6.0.0",
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
-    "@darajs/styled-components": "^1.0.0",
+    "@darajs/styled-components": "^1.0.1",
     "react": "^18.0"
   },
   "files": [
