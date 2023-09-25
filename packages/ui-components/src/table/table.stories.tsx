@@ -293,7 +293,6 @@ TableSmallFont.args = {
     onSort: null,
 } as Props<any>;
 
-
 export const TableInfinite = (args: Props<any>): JSX.Element => {
     const tableRef = useRef<TableHandle>();
 
