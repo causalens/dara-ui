@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where `Datepicker` in controlled mode would sometimes end up in an infinite loop
+
 ## 1.0.1
 
 -   Fixed an issue where `CarouselItem` component could overflow into next component.

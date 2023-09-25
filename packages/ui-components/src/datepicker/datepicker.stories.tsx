@@ -108,3 +108,34 @@ DatepickerSelect.args = {
     items: yearItems,
     selectedItem: yearItems[7],
 };
+
+export const ControlledRangeDatetime = (args: DatePickerProps): JSX.Element => {
+    const [value, setValue] = useState<[Date, Date]>([new Date(), new Date()]);
+    return (
+        <div>
+            <h3>Raw controlled value</h3>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>Start: {value[0]?.toISOString()}</span>
+                <span>End: {value[1]?.toISOString()}</span>
+            </div>
+            <h3>Component</h3>
+            <DatepickerComponent
+                {...args}
+                onChange={(e) => {
+                    setValue(e);
+                }}
+                value={value}
+            />
+            <div>
+                <button onClick={() => setValue([new Date(), new Date()])} type="button">
+                    Reset
+                </button>
+            </div>
+        </div>
+    );
+};
+ControlledRangeDatetime.args = {
+    selectsRange: true,
+    shouldCloseOnSelect: false,
+    showTimeInput: true,
+};

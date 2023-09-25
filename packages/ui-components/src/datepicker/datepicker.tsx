@@ -611,6 +611,10 @@ function DatePicker(props: DatePickerProps): JSX.Element {
     const [startDate, setStartDate] = useState<string>(() => getInitialDate(value, formatToApply, true));
     const [endDate, setEndDate] = useState<string>(() => getInitialDate(value, formatToApply, false));
 
+    // Keep state in refs so we can compare it in useEffect without subscribing
+    const selectedDateRef = useRef(selectedDate);
+    selectedDateRef.current = selectedDate;
+
     const datepickerRef = useRef(null);
 
     const extraProps = useMemo(() => {
@@ -712,11 +716,25 @@ function DatePicker(props: DatePickerProps): JSX.Element {
     // even if it is not the strictest way as it still keep track of its own state.
     useEffect(() => {
         const newValue = props.value ?? props.initialValue;
-        setSelectedDate(newValue || (props.selectsRange ? [null, null] : null));
-        setSelectedTime(getInitialTime(newValue, props.selectsRange));
-        setStartDate(getInitialDate(newValue, formatToApply, true));
-        setEndDate(getInitialDate(newValue, formatToApply, false));
-    }, [props.value]);
+
+        const newDate = newValue || (props.selectsRange ? [null, null] : null);
+
+        // Skip if the value is the same as the current state, this is necessary to prevent loops
+        if (JSON.stringify(newDate) === JSON.stringify(selectedDateRef.current)) {
+            return;
+        }
+
+        setSelectedDate(newDate);
+
+        const newTime = getInitialTime(newValue, props.selectsRange);
+        setSelectedTime(newTime);
+
+        const newStartDate = getInitialDate(newValue, formatToApply, true);
+        setStartDate(newStartDate);
+
+        const newEndDate = getInitialDate(newValue, formatToApply, false);
+        setEndDate(newEndDate);
+    }, [props.value, props.initialValue]);
 
     useEffect(() => {
         let time = selectedTime;
