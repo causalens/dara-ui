@@ -127,7 +127,9 @@ export const ControlledRangeDatetime = (args: DatePickerProps): JSX.Element => {
                 value={value}
             />
             <div>
-                <button onClick={() => setValue([new Date(), new Date()])}>Reset</button>
+                <button onClick={() => setValue([new Date(), new Date()])} type="button">
+                    Reset
+                </button>
             </div>
         </div>
     );
