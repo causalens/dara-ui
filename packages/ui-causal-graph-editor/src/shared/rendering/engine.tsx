@@ -15,6 +15,14 @@
  * limitations under the License.
  */
 import { Cull } from '@pixi-essentials/cull';
+import FontFaceObserver from 'fontfaceobserver';
+import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
+import debounce from 'lodash/debounce';
+import { Viewport } from 'pixi-viewport';
+import * as PIXI from 'pixi.js';
+
+import { DefaultTheme } from '@darajs/styled-components';
+
 import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
 import { getNodeGroup } from '@shared/utils';
@@ -27,13 +35,6 @@ import {
     SimulationNode,
     ZoomThresholds,
 } from '@types';
-import FontFaceObserver from 'fontfaceobserver';
-import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
-import debounce from 'lodash/debounce';
-import { Viewport } from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
-
-import { DefaultTheme } from '@darajs/styled-components';
 
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';

@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
+import { ReactElement } from 'react';
+
 import { useSettings } from '@shared/settings-context';
 import { GraphApi } from '@shared/use-causal-graph-editor';
 import { EdgeConstraintItem, GraphState } from '@types';
-import { ReactElement } from 'react';
 
 import { ColumnWrapper } from '../styled';
 import EdgeEditor from './edge-editor';

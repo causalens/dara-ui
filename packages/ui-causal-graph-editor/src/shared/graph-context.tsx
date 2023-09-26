@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
+import { createContext } from 'react';
+
 import { GraphApi } from '@shared/use-causal-graph-editor';
 import { EdgeConstraintItem, GraphState } from '@types';
-import { createContext } from 'react';
 
 interface GraphContext {
     /** Graph API */

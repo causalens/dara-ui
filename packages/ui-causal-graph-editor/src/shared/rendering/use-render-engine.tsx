@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EdgeConstraint, EditorMode, SimulationEdge, SimulationGraph, ZoomThresholds } from '@types';
 import * as PIXI from 'pixi.js';
 import * as React from 'react';
 
 import { useTheme } from '@darajs/styled-components';
+
+import { EdgeConstraint, EditorMode, SimulationEdge, SimulationGraph, ZoomThresholds } from '@types';
 
 import { GraphLayout } from '../graph-layout';
 import { DragMode } from '../use-drag-mode';
