@@ -11,7 +11,10 @@ interface RowProps {
     onClickRow?: (row: any) => void | Promise<void>;
 }
 
-export const ROW_HEIGHT = 40;
+// Get the row height from the font size of the root element to respect rem units
+const { fontSize } = window.getComputedStyle(document.documentElement);
+
+export const ROW_HEIGHT = parseFloat(fontSize) * 2.5;
 
 // Prevents the isSorted or onClickRow prop being added to the dom element
 export const shouldForwardProp = (prop: any): boolean => !['isSorted', 'onClickRow'].includes(prop);
@@ -76,7 +79,7 @@ const Cell = styled.div`
     align-items: center;
 
     min-width: 80px;
-    height: 2.5rem;
+    height: ${() => `${ROW_HEIGHT}px`};
 
     color: ${(props) => props.theme.colors.grey6};
 

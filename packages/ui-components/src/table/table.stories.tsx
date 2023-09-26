@@ -272,6 +272,27 @@ Table.args = {
     onSort: null,
 } as Props<any>;
 
+export const TableSmallFont = (args: Props<any>): JSX.Element => {
+    const tableRef = useRef<TableHandle>();
+
+    return (
+        <div style={{ fontSize: '12px', height: '100%' }}>
+            {/* eslint-disable jsx-a11y/control-has-associated-label */}
+            <button onClick={() => tableRef.current.resetFilters()} type="button">
+                Reset filters
+            </button>
+            <TableComponent ref={tableRef} {...args} />
+        </div>
+    );
+};
+
+TableSmallFont.args = {
+    columns,
+    data: sampleData,
+    onFilter: null,
+    onSort: null,
+} as Props<any>;
+
 export const TableInfinite = (args: Props<any>): JSX.Element => {
     const tableRef = useRef<TableHandle>();
 
