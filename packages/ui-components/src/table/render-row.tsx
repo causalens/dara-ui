@@ -1,3 +1,4 @@
+import { some } from 'lodash';
 import { transparentize } from 'polished';
 import * as React from 'react';
 import { HeaderGroup } from 'react-table';
@@ -100,6 +101,18 @@ const CellContent = styled.span`
     text-overflow: ellipsis;
     white-space: nowrap;
 `;
+
+/**
+ * Checks if the previous and next props are equal while also
+ * forcing a re-render if any column in any headerGroup is being resized
+ *
+ * @param {any} prevProps - The previous props.
+ * @param {any} nextProps - The next props.
+ * @returns {boolean} - Whether the props are equal.
+ */
+const arePropsEqual = (prevProps: any, nextProps: any): boolean =>
+    areEqual(prevProps, nextProps) &&
+    !some(nextProps.data?.headerGroups, (headerGroup) => some(headerGroup?.headers, 'isResizing'));
 
 const RenderRow = React.memo(
     ({
@@ -235,7 +248,7 @@ const RenderRow = React.memo(
             </Row>
         );
     },
-    areEqual
+    arePropsEqual
 );
 
 export default RenderRow;
