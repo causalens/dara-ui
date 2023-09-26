@@ -55,6 +55,9 @@ module.exports = {
         camelcase: 'off',
 
         'consistent-return': 'off',
+
+        // always require curly braces
+        curly: ['error', 'all'],
         // We often use switch with i.e. reducer so default doesn't make sense
         'default-case': 'off',
 
@@ -125,8 +128,6 @@ module.exports = {
 
         radix: ['error', 'as-needed'],
 
-        // causes issues when using `useDeepCompare` so we can't use it
-        'react-hooks/exhaustive-deps': 'off',
         'react/destructuring-assignment': 'off',
         'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
         'react/jsx-key': ['error', { checkFragmentShorthand: true }],
