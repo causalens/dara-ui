@@ -1,4 +1,3 @@
-import { some } from 'lodash';
 import { transparentize } from 'polished';
 import * as React from 'react';
 import { HeaderGroup } from 'react-table';
@@ -110,9 +109,29 @@ const CellContent = styled.span`
  * @param {any} nextProps - The next props.
  * @returns {boolean} - Whether the props are equal.
  */
-const arePropsEqual = (prevProps: any, nextProps: any): boolean =>
+const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
     areEqual(prevProps, nextProps) &&
-    !some(nextProps.data?.headerGroups, (headerGroup) => some(headerGroup?.headers, 'isResizing'));
+    !(nextProps.data?.headerGroups || []).some((headerGroup) =>
+        (headerGroup?.headers || []).some((header) => header.isResizing)
+    );
+
+type Props = {
+    data: {
+        backgroundColor: string;
+        currentEditCell: [number, string | number];
+        getItem: (index: number) => any;
+        headerGroups: Array<HeaderGroup<object>>;
+        mappedColumns: Array<TableColumn>;
+        onClickRow: (row: any) => void | Promise<void>;
+        prepareRow: (row: any) => void;
+        rows: Array<any>;
+        throttledClickRow: (row: any) => void | Promise<void>;
+        totalColumnsWidth: number;
+        width: number;
+    };
+    index: number;
+    style: React.CSSProperties;
+};
 
 const RenderRow = React.memo(
     ({
@@ -131,23 +150,7 @@ const RenderRow = React.memo(
         },
         index,
         style: renderRowStyle,
-    }: {
-        data: {
-            backgroundColor: string;
-            currentEditCell: [number, string | number];
-            getItem: (index: number) => any;
-            headerGroups: Array<HeaderGroup<object>>;
-            mappedColumns: Array<TableColumn>;
-            onClickRow: (row: any) => void | Promise<void>;
-            prepareRow: (row: any) => void;
-            rows: Array<any>;
-            throttledClickRow: (row: any) => void | Promise<void>;
-            totalColumnsWidth: number;
-            width: number;
-        };
-        index: number;
-        style: React.CSSProperties;
-    }): JSX.Element => {
+    }: Props): JSX.Element => {
         let row = rows[index];
 
         if (getItem) {
