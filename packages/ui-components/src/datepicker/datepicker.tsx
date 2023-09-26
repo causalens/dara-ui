@@ -56,7 +56,7 @@ function getYears(minDate?: Date, maxDate?: Date): Item[] {
     const minYear = minDate?.getFullYear() ?? 1900;
     const maxYear = maxDate?.getFullYear() ?? 2100;
 
-    return range(minYear, maxYear, 1).map((val) => ({ label: val.toString(), value: val }));
+    return range(minYear, maxYear + 1, 1).map((val) => ({ label: val.toString(), value: val }));
 }
 
 /**

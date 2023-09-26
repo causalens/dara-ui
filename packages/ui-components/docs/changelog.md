@@ -4,7 +4,8 @@ title: Changelog
 
 ## NEXT
 
--   Fixed an issue where `Datepicker` in controlled mode would sometimes end up in an infinite loop
+-   Fixed an issue where `Datepicker` in controlled mode would sometimes end up in an infinite loop.
+-   Fixed an issue where `Datepicker` if range was given did not show end year in the select. 
 
 ## 1.0.1
 
