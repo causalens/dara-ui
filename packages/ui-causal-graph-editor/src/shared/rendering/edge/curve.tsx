@@ -103,7 +103,6 @@ export function getPolygonFromCurve(curve: PIXI.IPointData[], distance = 6): PIX
         const b = curve[i + 1];
 
         // make sure we handle cases where the two consecutive points are the same
-        // eslint-disable-next-line no-continue
         if (a.x === b.x && a.y === b.y) {
             continue;
         }
