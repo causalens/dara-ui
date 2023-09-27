@@ -734,6 +734,7 @@ function DatePicker(props: DatePickerProps): JSX.Element {
 
         const newEndDate = getInitialDate(newValue, formatToApply, false);
         setEndDate(newEndDate);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.value, props.initialValue]);
 
     useEffect(() => {
@@ -746,6 +747,7 @@ function DatePicker(props: DatePickerProps): JSX.Element {
         // We have to typecast to make compiler happy as we don't know which type it is at this point
         const newDateTime = getNewDatetime(selectedDate, time);
         props.onChange?.(newDateTime as Date & [Date, Date]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDate, selectedTime]);
 
     return (

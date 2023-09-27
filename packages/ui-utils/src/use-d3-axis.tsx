@@ -45,7 +45,8 @@ export function useD3Axis<T>(
     domainFormatter: (domain: [any, any]) => [T, T],
     domain?: [T, T]
 ): (width?: number) => AxisProps<T> {
-    const valueScale = useMemo(() => getScale(data, domain), useDeepCompare([data, domain]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const valueScale = useMemo(() => getScale(data, domain), useDeepCompare([data, domain, getScale]));
 
     return useCallback(
         (axisSize: number): AxisProps<T> => {
@@ -57,7 +58,7 @@ export function useD3Axis<T>(
                 type: 'number',
             };
         },
-        [valueScale]
+        [domainFormatter, valueScale]
     );
 }
 

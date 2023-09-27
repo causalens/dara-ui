@@ -175,7 +175,9 @@ export function numeric(rows: Array<Row>, columnIds: Array<string>, filterValue:
     const [colId] = columnIds;
 
     // If operator not supported or there's no value to compare to, return all rows
-    if (!isValidOperator(selected) || (!value && value !== 0)) return rows;
+    if (!isValidOperator(selected) || (!value && value !== 0)) {
+        return rows;
+    }
 
     return rows.filter((row) => applyNumericOperator(selected, row.values[colId], value));
 }
@@ -192,7 +194,9 @@ export function datetime(rows: Array<Row>, columnIds: Array<string>, filterValue
     const [colId] = columnIds;
 
     // If operator not supported or there's no value to compare to, return all rows
-    if (!isValidDatetimeOperator(selected) || !value) return rows;
+    if (!isValidDatetimeOperator(selected) || !value) {
+        return rows;
+    }
 
     return rows.filter((row) => applyDatetimeOperator(selected, row.values[colId], value));
 }

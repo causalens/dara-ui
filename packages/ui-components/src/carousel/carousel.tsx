@@ -218,11 +218,13 @@ function Carousel(props: CarouselProps): JSX.Element {
                 setActiveIndex(_newIndex);
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [props.onChange, props.items, props.value]
     );
 
     useEffect(() => {
         setActiveIndex(props.value || props.initialValue || 0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.value]);
 
     return (

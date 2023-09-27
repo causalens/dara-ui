@@ -59,7 +59,7 @@ function useDimensions<T extends HTMLElement>(liveMeasure = true): UseDimensions
                 };
             }
         }
-    }, [node]);
+    }, [liveMeasure, node]);
 
     return [ref, dimensions, node];
 }

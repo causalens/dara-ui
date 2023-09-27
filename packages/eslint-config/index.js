@@ -96,8 +96,8 @@ module.exports = {
         ],
         'import/prefer-default-export': 'off',
         'jsx-a11y/anchor-is-valid': ['error', { components: [] }],
+        'no-continue': 'off',
         'no-inner-declarations': 'off',
-
         'no-param-reassign': ['error', { props: false }],
 
         'no-plusplus': 'off',

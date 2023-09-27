@@ -92,7 +92,9 @@ function getFilledButtonStyle(
     textColor?: string
 ): string {
     let color = theme.themeType === 'dark' ? theme.colors.text : theme.colors.blue1;
-    if (textColor) color = textColor;
+    if (textColor) {
+        color = textColor;
+    }
 
     return `
         color: ${color};

@@ -163,6 +163,7 @@ function ButtonBar({
     // Update selection based on value prop changes
     useEffect(() => {
         setSelected(value || initialValue || items[0]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     return (

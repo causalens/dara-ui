@@ -159,7 +159,9 @@ function Branch(props: BranchProps): JSX.Element {
     const [open, setOpen] = useState(props.open || false);
 
     const toggle = (): void => {
-        if (props.content) setOpen(!open);
+        if (props.content) {
+            setOpen(!open);
+        }
     };
 
     const select = (): void => {

@@ -86,6 +86,7 @@ function LabelEditor(props: LabelEditorProps): JSX.Element {
         (id: string, val: string) => {
             props.onLabelChange(id, val);
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [props.onLabelChange]
     );
     const debouncedUpdateLabel = useMemo(() => debounce(updateLabel, 300), [updateLabel]);

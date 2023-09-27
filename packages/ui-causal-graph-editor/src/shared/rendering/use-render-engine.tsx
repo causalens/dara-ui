@@ -118,6 +118,7 @@ export function useRenderEngine(
         return () => {
             engine.current.destroy();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // update engine theme

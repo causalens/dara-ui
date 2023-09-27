@@ -91,7 +91,7 @@ function NotificationWrapper(props: NotificationWrapperProps): JSX.Element {
                 })
             );
         }
-    }, [notifications$]);
+    }, [notifications$, wrapSub]);
 
     // Subscribe to the notifications stream delayed by 10s and remove notifications from the list
     useEffect(() => {
@@ -102,7 +102,7 @@ function NotificationWrapper(props: NotificationWrapperProps): JSX.Element {
                 },
             })
         );
-    }, [notifications$]);
+    }, [notifications$, wrapSub]);
 
     const onDismiss = useCallback((key: string) => {
         setNotifications((prev) => prev.filter((notification) => notification.key !== key));
