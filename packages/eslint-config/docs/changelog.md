@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.1.0
 
 -   Require curly braces for all if/else statements
 -   Enable React's exhaustive hook dependencies check
