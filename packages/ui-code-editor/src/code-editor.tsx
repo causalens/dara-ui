@@ -117,6 +117,8 @@ function CodeEditor({ initialScript, disabled, onChange, style, className }: Cod
 
             return () => view.destroy();
         }
+        // this is explicitly only created once
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return <EditorRoot className={className} ref={editorRef} style={style} />;

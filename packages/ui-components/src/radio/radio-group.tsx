@@ -187,6 +187,7 @@ function RadioGroup(props: RadioGroupProps): JSX.Element {
                 props.value !== undefined ? isEqual(item.value, props.value) : isEqual(item.value, props.initialValue)
             )
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.value]);
 
     return (

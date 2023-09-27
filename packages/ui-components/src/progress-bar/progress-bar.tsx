@@ -86,8 +86,12 @@ const defaultColors = [theme.colors.primary, theme.colors.success, theme.colors.
  * @typeparam T - The type of the elements in the array.
  */
 const arrayify = <T,>(input: T | T[] | undefined, defaultInput: T[]): T[] => {
-    if (typeof input === 'undefined') return defaultInput;
-    if (Array.isArray(input)) return input;
+    if (typeof input === 'undefined') {
+        return defaultInput;
+    }
+    if (Array.isArray(input)) {
+        return input;
+    }
     return [input];
 };
 

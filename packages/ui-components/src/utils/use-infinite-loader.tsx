@@ -73,6 +73,7 @@ function useInfiniteLoader<T>(
             return;
         }
         return internalData[adjustedIndex];
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, useDeepCompare([currentStartIdx, internalData]));
 
     const onItemsRendered = useCallback(
@@ -126,17 +127,20 @@ function useInfiniteLoader<T>(
                 onError?.(err);
             }
         },
-        [currentStartIdx, currentStopIdx]
+        [batchSize, currentStartIdx, currentStopIdx, onError]
     );
 
     useEffect(() => {
         onLoadRef.current = onLoadData;
         onItemsRendered(currentRange, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onLoadData]);
 
     const refresh = useCallback(() => {
         onItemsRendered(currentRange, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, useDeepCompare([currentRange]));
+
     return {
         getItem,
         itemCount,

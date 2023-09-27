@@ -85,7 +85,7 @@ function UploadDropzone(props: UploadDropzoneProps): JSX.Element {
 
         document.addEventListener('paste', handlePaste);
         return () => document.removeEventListener('paste', handlePaste);
-    }, []);
+    }, [props]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: props.accept ?? DROPZONE_ALLOWED_MIME_TYPES,

@@ -149,6 +149,7 @@ function Layer(props: LayerProps, ref: ForwardedRef<HTMLDivElement>): JSX.Elemen
         (label: string) => {
             props.onUpdateLabel(props.id, label);
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [props.id, props.onUpdateLabel]
     );
 
