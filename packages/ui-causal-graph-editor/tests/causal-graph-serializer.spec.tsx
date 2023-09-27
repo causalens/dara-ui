@@ -1,46 +1,55 @@
 import { causalGraphParser } from '../src/shared/parsers';
 import { causalGraphSerializer } from '../src/shared/serializer';
-import { CausalGraphEdge, EdgeType } from '../src/types';
+import { CausalGraph, CausalGraphEdge, EdgeType } from '../src/types';
+import { default as MockCausalGraphWithExtras } from './mocks/extras-graph';
 import { MockCausalGraph } from './utils';
 
-describe('CausalGraphSerializer', () => {
-    it('should serialize the internal structure back to the original', () => {
-        const parsedGraph = causalGraphParser(MockCausalGraph);
+const getExpectedNodes = (mockCausalGraph: CausalGraph): Record<string, any> => {
+    return Object.keys(mockCausalGraph.nodes).reduce((acc, key) => {
+        acc[key] = {
+            ...mockCausalGraph.nodes[key],
+            meta: {
+                ...mockCausalGraph.nodes[key].meta,
+                rendering_properties: {
+                    ...mockCausalGraph.nodes[key].meta.rendering_properties,
+                    latent: false,
+                },
+            },
+        };
 
-        // Latent property is added so expectation has to be adjusted
-        const expectedNodes = Object.keys(MockCausalGraph.nodes).reduce((acc, key) => {
-            acc[key] = {
-                ...MockCausalGraph.nodes[key],
+        return acc;
+    }, {});
+};
+
+const getExpectedEdges = (mockCausalGraph: CausalGraph): Record<string, Record<string, CausalGraphEdge>> => {
+    return Object.keys(mockCausalGraph.edges).reduce((acc, sourceKey) => {
+        const nestedEdges = Object.keys(mockCausalGraph.edges[sourceKey]).reduce((nestedAcc, targetKey) => {
+            nestedAcc[targetKey] = {
+                ...mockCausalGraph.edges[sourceKey][targetKey],
                 meta: {
-                    ...MockCausalGraph.nodes[key].meta,
+                    ...mockCausalGraph.edges[sourceKey][targetKey].meta,
                     rendering_properties: {
-                        ...MockCausalGraph.nodes[key].meta.rendering_properties,
-                        latent: false,
+                        ...mockCausalGraph.edges[sourceKey][targetKey].meta.rendering_properties,
                     },
                 },
             };
 
-            return acc;
+            return nestedAcc;
         }, {});
+        acc[sourceKey] = nestedEdges;
 
-        const expectedEdges = Object.keys(MockCausalGraph.edges).reduce((acc, sourceKey) => {
-            const nestedEdges = Object.keys(MockCausalGraph.edges[sourceKey]).reduce((nestedAcc, targetKey) => {
-                nestedAcc[targetKey] = {
-                    ...MockCausalGraph.edges[sourceKey][targetKey],
-                    meta: {
-                        ...MockCausalGraph.edges[sourceKey][targetKey].meta,
-                        rendering_properties: {
-                            ...MockCausalGraph.edges[sourceKey][targetKey].meta.rendering_properties,
-                        },
-                    },
-                };
+        return acc;
+    }, {} as Record<string, Record<string, CausalGraphEdge>>);
+};
 
-                return nestedAcc;
-            }, {});
-            acc[sourceKey] = nestedEdges;
+describe('CausalGraphSerializer', () => {
+    it('should serialize the structure back to the original', () => {
+        const parsedGraph = causalGraphParser(MockCausalGraph);
 
-            return acc;
-        }, {} as Record<string, Record<string, CausalGraphEdge>>);
+        // Latent property is added so expectation has to be adjusted
+        const expectedNodes = getExpectedNodes(MockCausalGraph);
+
+        const expectedEdges = getExpectedEdges(MockCausalGraph);
 
         // The one backwards edge needs to be swapped
         expectedEdges.target1 = {};
@@ -52,6 +61,23 @@ describe('CausalGraphSerializer', () => {
             edges: expectedEdges,
             nodes: expectedNodes,
             version: MockCausalGraph.version,
+        });
+    });
+
+    it('should serialize the structure containing extras back to the original', () => {
+        const mockCausalGraph = MockCausalGraphWithExtras as CausalGraph;
+        const parsedGraph = causalGraphParser(mockCausalGraph);
+
+        // Latent property is added so expectation has to be adjusted
+        const expectedNodes = getExpectedNodes(mockCausalGraph);
+
+        const expectedEdges = getExpectedEdges(mockCausalGraph);
+
+        expect(causalGraphSerializer({ graph: parsedGraph })).toEqual({
+            defaults: MockCausalGraphWithExtras.defaults,
+            edges: expectedEdges,
+            nodes: expectedNodes,
+            version: MockCausalGraphWithExtras.version,
         });
     });
 });
