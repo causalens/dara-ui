@@ -79,6 +79,13 @@ interface RemoveNodeAction {
     type: GraphActionType.REMOVE_NODE;
 }
 
+interface UpdateEdgeAction {
+    extras: Record<string, any>;
+    source: string;
+    target: string;
+    type: GraphActionType.UPDATE_EDGE;
+}
+
 interface UpdateEdgeTypeAction {
     edge_type: EdgeType;
     source: string;
@@ -94,6 +101,7 @@ interface UpdateEdgeNoteAction {
 }
 
 interface UpdateNodeAction {
+    extras: Record<string, any>;
     node: string;
     type: GraphActionType.UPDATE_NODE;
 }
@@ -107,6 +115,7 @@ export type GraphAction =
     | RemoveEdgeAction
     | ReverseEdgeAction
     | RemoveNodeAction
+    | UpdateEdgeAction
     | UpdateEdgeTypeAction
     | UpdateNodeAction
     | UpdateEdgeNoteAction;
@@ -210,6 +219,14 @@ export const GraphReducer: Reducer<GraphState, GraphAction> = (state, action) =>
             break;
         }
 
+        case GraphActionType.UPDATE_EDGE: {
+            draft.graph.updateEdgeAttribute(action.source, action.target, 'extras', () => {
+                return action.extras;
+            });
+
+            break;
+        }
+
         case GraphActionType.UPDATE_EDGE_TYPE: {
             draft.graph.setEdgeAttribute(action.source, action.target, 'edge_type', action.edge_type);
 
@@ -223,6 +240,12 @@ export const GraphReducer: Reducer<GraphState, GraphAction> = (state, action) =>
                 'meta.rendering_properties.description',
                 action.note
             );
+            break;
+        }
+
+        case GraphActionType.UPDATE_NODE: {
+            draft.graph.setNodeAttribute(action.node, 'extras', action.extras);
+
             break;
         }
     }
@@ -240,6 +263,12 @@ const addEdge = (edge: [string, string]): AddEdgeAction => ({
     source: edge[0],
     target: edge[1],
     type: GraphActionType.ADD_EDGE,
+});
+const updateEdge = (edge: [string, string], extras: Record<string, any>): UpdateEdgeAction => ({
+    extras,
+    source: edge[0],
+    target: edge[1],
+    type: GraphActionType.UPDATE_EDGE,
 });
 const updateEdgeType = (edge: [string, string], symbol: string): UpdateEdgeTypeAction => ({
     edge_type: symbol as EdgeType,
@@ -268,6 +297,11 @@ const acceptEdge = ([source, target]: [string, string]): AcceptEdgeAction => ({
     target,
     type: GraphActionType.ACCEPT_EDGE,
 });
+const updateNode = (node: string, extras: Record<string, any>): UpdateNodeAction => ({
+    extras,
+    node,
+    type: GraphActionType.UPDATE_NODE,
+});
 
 export const GraphActionCreators = {
     acceptEdge,
@@ -277,6 +311,8 @@ export const GraphActionCreators = {
     removeNode,
     renameNode,
     reverseEdge,
+    updateEdge,
     updateEdgeNote,
     updateEdgeType,
+    updateNode,
 };

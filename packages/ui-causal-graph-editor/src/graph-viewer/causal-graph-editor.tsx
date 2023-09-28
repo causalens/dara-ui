@@ -47,11 +47,14 @@ import {
     EdgeConstraint,
     EdgeType,
     EditorMode,
+    SimulationEdge,
     ZoomThresholds,
 } from '@types';
 
+import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
 import PointerContext from '../shared/pointer-context';
+import { PixiEdgeStyle } from '../shared/rendering/edge';
 import { useRenderEngine } from '../shared/rendering/use-render-engine';
 import { causalGraphSerializer, serializeGraphEdge, serializeGraphNode } from '../shared/serializer';
 import { Settings, SettingsProvider } from '../shared/settings-context';
@@ -69,12 +72,16 @@ export interface CausalGraphEditorProps extends Settings {
     availableInputs?: string[];
     /** Standard class name prop */
     className?: string;
+    /** Any extra sections to display in the side panel on edge click */
+    edgeExtrasContent?: React.ReactElement;
     /** The backend data */
     graphData?: CausalGraph;
     /** Graph layout to use */
     graphLayout: GraphLayout;
     /** Optional initial constraints to show in edge encoder mode */
     initialConstraints?: EdgeConstraint[];
+    /** Any extra sections to display in the side panel on node click */
+    nodeExtrasContent?: React.ReactElement;
     /** Array of node names that cannot be removed */
     nonRemovableNodes?: Array<string>;
     /** Event handler for clicking on an edge */
@@ -85,6 +92,8 @@ export interface CausalGraphEditorProps extends Settings {
     onEdgeConstraintsUpdate?: (constraints: EdgeConstraint[]) => void | Promise<void>;
     /** onUpdate handler for live updating the edited graph */
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
+    /** Optional handler to process the edge style */
+    processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
     /** Pass through of the native style prop */
     style?: React.CSSProperties;
     /** Optional parameter to force a tooltip to use a particular font size */
@@ -128,6 +137,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.editable,
         props.editorMode,
         props.initialConstraints,
+        props.processEdgeStyle,
         props.zoomThresholds
     );
 
@@ -590,25 +600,40 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                             }
                             validContentSelected={contentSelected}
                         >
-                            {selectedEdge && (
-                                <EdgeInfoContent
-                                    api={api}
-                                    key={selectedEdge.join('-')}
-                                    onConfirmDirection={confirmDirection}
-                                    onUpdateConstraint={updateConstraint}
-                                    selectedConstraint={selectedConstraint}
-                                    selectedEdge={selectedEdge}
-                                    state={state}
-                                />
-                            )}
-                            {selectedNode && (
-                                <NodeInfoContent
-                                    api={api}
-                                    key={selectedNode}
-                                    selectedNode={selectedNode}
-                                    state={state}
-                                />
-                            )}
+                            <GraphContext.Provider
+                                value={{
+                                    api,
+                                    constraints,
+                                    editable: props.editable,
+                                    graphState: state,
+                                    onUpdateConstraint: updateConstraint,
+                                    selectedEdge,
+                                    selectedNode,
+                                    verboseDescriptions: props.verboseDescriptions,
+                                }}
+                            >
+                                {selectedEdge && (
+                                    <EdgeInfoContent
+                                        api={api}
+                                        extraSections={props.edgeExtrasContent}
+                                        key={selectedEdge.join('-')}
+                                        onConfirmDirection={confirmDirection}
+                                        onUpdateConstraint={updateConstraint}
+                                        selectedConstraint={selectedConstraint}
+                                        selectedEdge={selectedEdge}
+                                        state={state}
+                                    />
+                                )}
+                                {selectedNode && (
+                                    <NodeInfoContent
+                                        api={api}
+                                        extraSections={props.nodeExtrasContent}
+                                        key={selectedNode}
+                                        selectedNode={selectedNode}
+                                        state={state}
+                                    />
+                                )}
+                            </GraphContext.Provider>
                         </Overlay>
                         <div ref={canvasParentRef} style={{ height: '100%', width: '100%' }} />
                         <Tooltip
