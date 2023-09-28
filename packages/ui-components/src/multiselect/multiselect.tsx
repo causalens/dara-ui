@@ -122,7 +122,6 @@ const Input = styled.input<InputProps>`
     overflow: hidden;
     flex: 1 1 auto;
 
-    height: 100%;
     margin-right: 0.5rem;
     padding: 0rem;
 
@@ -154,6 +153,7 @@ const TagWrapper = styled.div<TagWrapperProps>`
     align-items: center;
 
     width: 100%;
+    height: 100%;
     max-height: ${(props) => props.maxRows * (tagHeight + tagTopMargin) - 0.25}rem;
 `;
 
