@@ -23,6 +23,8 @@ import LabelEditor from './label-editor';
 export interface NodeInfoContentProps {
     /** Graph API */
     api: GraphApi;
+    /** Optional extra sections to show */
+    extraSections?: React.ReactElement;
     /** Currently selected node */
     selectedNode: string;
     /** Graph data  */
@@ -38,6 +40,7 @@ function NodeInfoContent(props: NodeInfoContentProps): JSX.Element {
     return (
         <ColumnWrapper>
             <LabelEditor node={nodeAttributes} onLabelChange={props.api.renameNode} />
+            {props.extraSections}
         </ColumnWrapper>
     );
 }

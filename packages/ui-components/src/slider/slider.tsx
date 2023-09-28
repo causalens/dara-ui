@@ -248,12 +248,14 @@ function BaseSlider<T extends string | number | React.ReactNode>({
         }
 
         return computeStep(domain[1] - domain[0]);
-    }, [step]);
+    }, [domain, step]);
 
     const [sliderValues, setSliderValues] = useState(
         values?.map((v) => mapToClosestStep(v, adjustedStep)) ||
             initialValue?.map((v) => mapToClosestStep(v, adjustedStep)) || [domain[0]]
     );
+    const currSliderValues = useRef(sliderValues);
+    currSliderValues.current = sliderValues;
 
     const isFirstRender = useRef(true);
 
@@ -261,7 +263,7 @@ function BaseSlider<T extends string | number | React.ReactNode>({
         if (values !== undefined) {
             const mappedValues = values.map((v) => mapToClosestStep(v, adjustedStep));
 
-            if (!isEqual(mappedValues, sliderValues)) {
+            if (!isEqual(mappedValues, currSliderValues.current)) {
                 setSliderValues(mappedValues);
             }
         }
@@ -271,7 +273,7 @@ function BaseSlider<T extends string | number | React.ReactNode>({
 
     const precision = useMemo(
         () => (Math.floor(adjustedStep) === adjustedStep ? 0 : adjustedStep.toString().split('.')[1].length || 0),
-        [step]
+        [adjustedStep]
     );
 
     // Get the error message for inputs when value is out of domain range
@@ -316,13 +318,14 @@ function BaseSlider<T extends string | number | React.ReactNode>({
             const formattedValues = sliderValues.map(getValueLabel);
             onChange?.(formattedValues);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, useDeepCompare([sliderValues]));
 
     const onSliderChange = useCallback(
         (value: Array<number>): void => {
             setSliderValues(value.map((val) => parseFloat(val.toFixed(precision))));
         },
-        [setSliderValues]
+        [precision]
     );
 
     const tickProps = typeof ticks === 'number' ? { count: ticks } : { values: ticks };

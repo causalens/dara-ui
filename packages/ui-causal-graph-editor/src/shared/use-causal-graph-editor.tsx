@@ -33,7 +33,8 @@ const actionNames = Object.keys(GraphActionCreators) as ActionName[];
  * Graph API object containing all available methods to modify the graph
  */
 export type GraphApi = {
-    [k in ActionName]: (...args: Parameters<typeof GraphActionCreators[k]>) => void;
+    // eslint-disable-next-line prettier/prettier
+    [k in ActionName]: (...args: Parameters<(typeof GraphActionCreators)[k]>) => void;
 };
 
 /**
@@ -83,6 +84,7 @@ export default function useCausalGraphEditor(
         }
 
         lastParentData.current = graphData;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [graphData]);
 
     return {

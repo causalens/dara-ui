@@ -39,9 +39,10 @@ export function useThrottle(
     useEffect(() => {
         cbRef.current = cb;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return useCallback(
         throttle((...args: Array<any>) => cbRef.current(...args), delay, options),
-        [delay]
+        [delay, options]
     );
 }
 

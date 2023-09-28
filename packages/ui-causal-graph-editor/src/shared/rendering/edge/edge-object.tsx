@@ -138,7 +138,9 @@ export class EdgeObject extends PIXI.utils.EventEmitter<typeof MOUSE_EVENTS[numb
      * @param textureCache texture cache instance
      */
     static updateEdgeStyle(edgeGfx: PIXI.Container, edgeStyle: PixiEdgeStyle, textureCache: TextureCache): void {
-        if (edgeStyle.points) return;
+        if (edgeStyle.points) {
+            return;
+        }
 
         let edgeLineSprite = edgeGfx.getChildByName<PIXI.TilingSprite>(EDGE_LINE_SPRITE);
         const edgeLineGfx = edgeGfx.getChildByName<SmoothGraphics>(EDGE_LINE_GFX);
@@ -467,7 +469,9 @@ export class EdgeObject extends PIXI.utils.EventEmitter<typeof MOUSE_EVENTS[numb
         targetBoundPosition: PIXI.IPointData,
         viewport: Viewport
     ): void {
-        if (!edgeStyle.points) return;
+        if (!edgeStyle.points) {
+            return;
+        }
 
         edgeStyle.color ??= edgeStyle.theme.colors.grey5;
 
@@ -607,7 +611,9 @@ export class EdgeObject extends PIXI.utils.EventEmitter<typeof MOUSE_EVENTS[numb
      * @param textureCache texture cache instance
      */
     updateStyle(edgeStyle: PixiEdgeStyle, textureCache: TextureCache): void {
-        if (edgeStyle.points) return;
+        if (edgeStyle.points) {
+            return;
+        }
 
         EdgeObject.updateEdgeStyle(this.edgeGfx, edgeStyle, textureCache);
         EdgeObject.updateEdgeSymbolsStyle(this.edgeGfx, this.edgeSymbolsGfx, edgeStyle, textureCache);

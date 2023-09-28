@@ -167,6 +167,7 @@ export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
 
     useEffect(() => {
         updateInitialGraph(nodeNumber);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nodeNumber, useStrenghts]);
 
     function onUpdate(data): void {

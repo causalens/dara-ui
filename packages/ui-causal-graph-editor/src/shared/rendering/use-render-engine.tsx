@@ -19,10 +19,11 @@ import * as React from 'react';
 
 import { useTheme } from '@darajs/styled-components';
 
-import { EdgeConstraint, EditorMode, SimulationGraph, ZoomThresholds } from '@types';
+import { EdgeConstraint, EditorMode, SimulationEdge, SimulationGraph, ZoomThresholds } from '@types';
 
 import { GraphLayout } from '../graph-layout';
 import { DragMode } from '../use-drag-mode';
+import { PixiEdgeStyle } from './edge';
 import { ENGINE_EVENTS, Engine, EngineEvents } from './engine';
 
 interface UseRenderEngineApi {
@@ -94,6 +95,7 @@ export function useRenderEngine(
     editable: boolean,
     editorMode: EditorMode,
     constraints?: EdgeConstraint[],
+    processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle,
     zoomThresholds?: ZoomThresholds
 ): UseRenderEngineApi {
     const theme = useTheme();
@@ -101,7 +103,16 @@ export function useRenderEngine(
     const listeners = React.useRef<Partial<EngineEvents>>({});
 
     if (!engine.current) {
-        engine.current = new Engine(graph, layout, editable, editorMode, theme, constraints, zoomThresholds);
+        engine.current = new Engine(
+            graph,
+            layout,
+            editable,
+            editorMode,
+            theme,
+            constraints,
+            zoomThresholds,
+            processEdgeStyle
+        );
     }
 
     // Start engine after first render, stop it on destroy
@@ -118,6 +129,7 @@ export function useRenderEngine(
         return () => {
             engine.current.destroy();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // update engine theme

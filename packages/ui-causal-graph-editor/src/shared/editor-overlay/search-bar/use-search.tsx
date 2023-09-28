@@ -92,6 +92,7 @@ function useSearch({ graph, setSelectedNode }: UseSearchInput): UseSearchOutput 
 
     useEffect(() => {
         updateSearchResults(false)(searchValue);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [graph]);
 
     return {

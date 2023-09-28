@@ -274,12 +274,16 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             ...('selectedItems' in props && { selectedItems: props.selectedItems }),
         });
 
-    const onTermChange = useCallback((term: string) => {
-        setInputValue(term);
-        if (props.onTermChange) {
-            props.onTermChange(term);
-        }
-    }, []);
+    const onTermChange = useCallback(
+        (term: string) => {
+            setInputValue(term);
+            if (props.onTermChange) {
+                props.onTermChange(term);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [props.onTermChange]
+    );
 
     // If there is a term change function passed in then don't filter locally
     const filteredItems = props.onTermChange

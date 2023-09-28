@@ -137,12 +137,14 @@ function NodeHierarchyBuilder<T extends string | Node>(props: NodeHierarchyBuild
     const layersWrapperRef = useRef<HTMLDivElement | null>(null);
     const layersRef = useRef<Array<HTMLDivElement>>([]);
 
+    const currentHierarchy = useRef(hierarchy);
+    currentHierarchy.current = hierarchy;
     useEffect(() => {
         // Reset internal state if the outside prop changes - diverges from the internally stored hierarchy
-        if (!isEqual(props.nodes, parseLayerItems(hierarchy, returnStrings as any))) {
+        if (!isEqual(props.nodes, parseLayerItems(currentHierarchy.current, returnStrings as any))) {
             setHierarchy(parseNodes(props.nodes));
         }
-    }, [props.nodes, returnStrings]);
+    }, [props.nodes, returnStrings, setHierarchy]);
 
     useUpdateEffect(() => {
         props.onUpdate?.(parseLayerItems(hierarchy, returnStrings as any) as T[][]);
@@ -150,14 +152,16 @@ function NodeHierarchyBuilder<T extends string | Node>(props: NodeHierarchyBuild
 
     useEffect(() => {
         debouncedSetSearchQuery(searchInput);
-    }, [searchInput]);
+    }, [debouncedSetSearchQuery, searchInput]);
 
+    const currentHierarchyData = useRef(hierarchyData);
+    currentHierarchyData.current = hierarchyData;
     useEffect(() => {
         if (layersRef.current && layersWrapperRef.current && searchQuery !== '') {
             let anySelectedVisible = false;
             let firstSelectedLayer = null;
 
-            for (const [idx, layer] of hierarchyData.entries()) {
+            for (const [idx, layer] of currentHierarchyData.current.entries()) {
                 // Layer with some selected nodes
                 if (layer.nodes.some((node) => node.selected)) {
                     if (!firstSelectedLayer) {
@@ -187,7 +191,9 @@ function NodeHierarchyBuilder<T extends string | Node>(props: NodeHierarchyBuild
      * @param position position - whether to add above or below the reference layer
      */
     const onAddLayer = (reference: string, position: NewLayerPosition): void => {
-        if (props.viewOnly) return;
+        if (props.viewOnly) {
+            return;
+        }
 
         setHierarchy((draft) => {
             const index = draft.findIndex((layer) => layer.id === reference);
@@ -197,10 +203,14 @@ function NodeHierarchyBuilder<T extends string | Node>(props: NodeHierarchyBuild
     };
 
     const onDeleteLayer = (layerIndex: number): void => {
-        if (props.viewOnly) return;
+        if (props.viewOnly) {
+            return;
+        }
 
         // Disallow removing last remaining layer
-        if (hierarchy.length === 1) return;
+        if (hierarchy.length === 1) {
+            return;
+        }
 
         // In case of last layer move to previous layer, otherwise move nodes down
         const moveToIndex = layerIndex === hierarchy.length - 1 ? layerIndex - 1 : layerIndex;
@@ -212,7 +222,9 @@ function NodeHierarchyBuilder<T extends string | Node>(props: NodeHierarchyBuild
     };
 
     const onUpdateLabel = (layerId: string, label: string): void => {
-        if (props.viewOnly) return;
+        if (props.viewOnly) {
+            return;
+        }
 
         setHierarchy((draft) => {
             const layerIndex = draft.findIndex((l) => l.id === layerId);

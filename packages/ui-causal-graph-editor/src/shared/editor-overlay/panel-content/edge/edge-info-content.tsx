@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { ReactElement } from 'react';
+
 import { useSettings } from '@shared/settings-context';
 import { GraphApi } from '@shared/use-causal-graph-editor';
 import { EdgeConstraintItem, GraphState } from '@types';
@@ -26,6 +29,8 @@ import DirectionEditor from './sections/direction-editor';
 export interface EdgeInfoContentProps {
     /** Graph API */
     api: GraphApi;
+    /** Optional extra sections to show */
+    extraSections?: ReactElement;
     /** Handler to confirm/reverse currently selected edge */
     onConfirmDirection: (reverse: boolean) => void;
     /** Handler to update a given constraint */
@@ -73,6 +78,7 @@ function EdgeInfoContent(props: EdgeInfoContentProps): JSX.Element {
                         target={target}
                     />
                 )}
+                {props.extraSections}
             </ColumnWrapper>
         </>
     );

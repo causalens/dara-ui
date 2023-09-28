@@ -2,7 +2,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { causalGraphParser } from '../src/shared/parsers';
 import { serializeGraphEdge, serializeGraphNode } from '../src/shared/serializer';
-import { EdgeType } from '../src/types';
+import { CausalGraph, EdgeType } from '../src/types';
+import { default as MockCausalGraphWithExtras } from './mocks/extras-graph';
 import { MockCausalGraph } from './utils';
 
 describe('CausalGraphParser', () => {
@@ -40,6 +41,39 @@ describe('CausalGraphParser', () => {
 
             expect(serializeGraphNode(attrs)).toEqual(expectedNode);
         });
+    });
+
+    it('should check that extras in graph are parsed correctly', () => {
+        const parsedGraph = causalGraphParser(MockCausalGraphWithExtras as CausalGraph);
+
+        const { defaults, edges, nodes } = MockCausalGraphWithExtras;
+
+        // Checks that the extras are parsed correctly to Nodes
+        for (const node of parsedGraph.nodes()) {
+            expect(parsedGraph.getNodeAttributes(node).extras).toEqual({
+                erased: nodes[node].erased,
+                redacted: nodes[node].redacted,
+            });
+        }
+
+        // Checks that the extras are parsed correctly to Edges
+        parsedGraph.edges().forEach((edge, index) => {
+            // list all the edge source nodes
+            const edgesKeys = Object.keys(edges);
+            // based on the index of parsedGraph edge get the corresponding source node
+            const edgeAttributes = edges[edgesKeys[index]];
+            // get the target node of the edge
+            const targetNode = Object.keys(edgeAttributes)[0];
+            // get the extra "erased" of the target node
+            const { erased } = edgeAttributes[targetNode];
+
+            expect(parsedGraph.getEdgeAttributes(edge).extras).toEqual({
+                erased,
+            });
+        });
+
+        // Check that any extras in top level go to base extras
+        expect(parsedGraph.getAttributes().extras).toEqual({ defaults });
     });
 
     it('should mark latent nodes when available inputs is present', () => {

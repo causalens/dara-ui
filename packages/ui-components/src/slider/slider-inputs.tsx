@@ -106,8 +106,12 @@ const SliderInputs: FunctionComponent<SliderInputsProps> = ({
         <InputWrapper firstInputVisible={firstInputVisible} lastInputVisible={lastInputVisible}>
             {sliderValues.map((value, index) => {
                 let inputRef = null;
-                if (index === 0) inputRef = firstInputRef;
-                if (index === sliderValues.length - 1) inputRef = lastInputRef;
+                if (index === 0) {
+                    inputRef = firstInputRef;
+                }
+                if (index === sliderValues.length - 1) {
+                    inputRef = lastInputRef;
+                }
                 return (
                     <div key={index} ref={inputRef}>
                         <NumericInput

@@ -109,7 +109,9 @@ function LayerLabelEditor(props: LayerLabelEditorProps): JSX.Element {
     }
 
     function onEnableEditing(): void {
-        if (props.viewOnly) return;
+        if (props.viewOnly) {
+            return;
+        }
 
         setEditEnabled(true);
     }

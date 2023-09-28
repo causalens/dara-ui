@@ -181,6 +181,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Callback executed when a drag motion is started */
     private onStartDrag?: () => void = null;
 
+    /** Callback executed when an edge needs style change */
+    private processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+
     /** Last render request ID - used to skip extra render calls */
     private renderRequestId: number = null;
 
@@ -221,7 +224,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         editorMode: EditorMode,
         theme: DefaultTheme,
         constraints?: EdgeConstraint[],
-        zoomThresholds?: ZoomThresholds
+        zoomThresholds?: ZoomThresholds,
+        processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle
     ) {
         super();
         this.graph = graph;
@@ -231,6 +235,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.theme = theme;
         this.constraints = constraints;
         this.zoomThresholds = zoomThresholds;
+        this.processEdgeStyle = processEdgeStyle;
         PIXI.Filter.defaultResolution = 3;
     }
 
@@ -814,7 +819,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * @param constraint optional attached constraint, used in edge encoder mode
      */
     private getEdgeStyle(edge: EdgeObject, attributes: SimulationEdge, constraint?: EdgeConstraint): PixiEdgeStyle {
-        return {
+        const edgeStyle = {
             accepted: attributes['meta.rendering_properties.accepted'],
             color: attributes['meta.rendering_properties.color'],
             constraint,
@@ -828,6 +833,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             thickness: attributes['meta.rendering_properties.thickness'],
             type: attributes.edge_type,
         };
+        if (this.processEdgeStyle) {
+            return this.processEdgeStyle(edgeStyle, attributes);
+        }
+        return edgeStyle;
     }
 
     /**

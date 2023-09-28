@@ -167,6 +167,7 @@ function ComponentSelectList(props: ComponentSelectListProps): JSX.Element {
             setSelectedCards(updatedSelectedCards);
             props.onSelect?.(updatedSelectedCards);
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [props.items, props.multiSelect, selectedCards, setSelectedCards]
     );
 

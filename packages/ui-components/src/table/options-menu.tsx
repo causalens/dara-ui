@@ -95,13 +95,17 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     };
 
     const clickOutsideOptionsHandler = (): void => {
-        if (showOptions) toggleOptions();
+        if (showOptions) {
+            toggleOptions();
+        }
     };
 
     useOnClickOutside(popperElement, clickOutsideOptionsHandler);
 
     useEffect(() => {
-        if (showOptions) update();
+        if (showOptions) {
+            update();
+        }
     }, [showOptions, update]);
 
     const resetFunctions: ListSection = useMemo(() => {
@@ -125,7 +129,9 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
                 label: 'Show All Columns',
                 onClick: () => {
                     allColumns.forEach((column) => {
-                        if (!column.isVisible) column.toggleHidden();
+                        if (!column.isVisible) {
+                            column.toggleHidden();
+                        }
                     });
                 },
                 value: 'showAllColumns',
@@ -148,7 +154,8 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
                 })),
             label: 'Columns',
         };
-    }, [allColumns, allowColumnHiding]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allColumns, allowColumnHiding, numVisibleColumns]);
 
     return (
         <HeaderOptions ref={setOptionsElement}>
