@@ -57,7 +57,6 @@ const InputWrapper = styled.div<NumericInputProps>`
     }
 
     input {
-        width: calc(100% - 1.25rem);
         height: calc(2.5rem - 2px);
         border: none;
         border-radius: 0.25rem;
@@ -97,6 +96,7 @@ const InputWrapper = styled.div<NumericInputProps>`
     // Fix: Overrides the 22ch default width of the nested regular input
     > div:first-child {
         width: 100%;
+        height: auto;
     }
 `;
 
@@ -256,7 +256,12 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
 
         return (
             <div>
-                <InputWrapper disabled={props.disabled} errorMsg={props.errorMsg} stepper={props.stepper}>
+                <InputWrapper
+                    disabled={props.disabled}
+                    errorMsg={props.errorMsg}
+                    stepper={props.stepper}
+                    style={props.style}
+                >
                     <Input
                         autoFocus={props.autoFocus}
                         className={props.className}
@@ -270,7 +275,6 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                         onKeyDown={onKeyDown}
                         placeholder={props.placeholder}
                         ref={ref}
-                        style={props.style}
                         value={input}
                     />
                     {props.stepper && <InputStepper disabled={props.disabled} step={step} stepSkip={props.stepSkip} />}

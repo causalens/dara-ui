@@ -75,6 +75,9 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
     display: flex;
     flex-direction: ${(props) => (props.inline ? 'column' : 'row')};
     align-items: ${(props) => (props.inline ? 'baseline' : 'center')};
+
+    width: 8.5rem;
+
     color: ${(props) => props.theme.colors.text};
 
     .react-datepicker-popper {
