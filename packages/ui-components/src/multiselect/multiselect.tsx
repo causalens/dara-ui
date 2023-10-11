@@ -377,6 +377,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             onFocus={openMenu}
                             placeholder={props.placeholder}
                             size={props.size}
+                            style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
                     <ChevronButton {...getToggleButtonProps()}>
