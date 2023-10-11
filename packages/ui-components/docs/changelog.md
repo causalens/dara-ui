@@ -2,6 +2,15 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where `NumericInput` width could not be changed.
+-   Fixed an issue where `NumericInput` overflowed when hovered.
+-   Fixed an issue where `NumericInput` input did not take full space available to it.
+-   Fixed an issue where `Datepicker` could be overlapped by other components in a horizontal container.
+-   Fixed an issue where `Multiselect`'s input took too much space
+
+
 ## 1.1.0
 
 -   Fixed an issue where `Datepicker` in controlled mode would sometimes end up in an infinite loop.
