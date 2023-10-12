@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.2.1
 
 -   Fixed an issue where `NumericInput` width could not be changed.
 -   Fixed an issue where `NumericInput` overflowed when hovered.
