@@ -60,13 +60,16 @@ export function serializeGraphEdge(attributes: SimulationEdge, source?: string, 
             })
     );
 
+    const { meta: newMeta, ...restExtras } = attributes.extras;
+
     const output: CausalGraphEdge = {
         edge_type: attributes.edge_type,
         meta: {
             ...attributes.originalMeta,
+            ...newMeta,
             rendering_properties: unflattenedMeta,
         },
-        ...attributes.extras,
+        ...restExtras,
     };
 
     if (source) {
@@ -109,14 +112,16 @@ export function serializeGraphNode(attributes: SimulationNode, includeIdentifier
                 return [newKey, val];
             })
     );
+    const { meta: newMeta, ...restExtras } = attributes.extras;
 
     const output: CausalGraphNode = {
         meta: {
             ...attributes.originalMeta,
+            ...newMeta,
             rendering_properties: unflattenedMeta,
         },
         variable_type: attributes.variable_type,
-        ...attributes.extras,
+        ...restExtras,
     };
 
     if (includeIdentifier) {
@@ -170,13 +175,16 @@ export function causalGraphSerializer(state: GraphState): CausalGraph {
                     })
             );
 
+            const { meta: newMeta, ...restExtras } = attributes.extras;
+
             acc[id] = {
                 meta: {
                     ...attributes.originalMeta,
+                    ...newMeta,
                     rendering_properties: unflattenedMeta,
                 },
                 variable_type: attributes.variable_type,
-                ...attributes.extras,
+                ...restExtras,
             };
 
             return acc;

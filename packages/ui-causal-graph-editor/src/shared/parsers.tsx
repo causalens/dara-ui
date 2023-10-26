@@ -228,10 +228,8 @@ export function causalGraphParser(
     availableInputs?: string[],
     initialGraph?: SimulationGraph
 ): SimulationGraph {
-    let resultGraph = initialGraph;
-
     // use graph provided or a new one
-    resultGraph ??= new DirectedGraph<SimulationNode, SimulationEdge, SimulationAttributes>();
+    const resultGraph = initialGraph ?? new DirectedGraph<SimulationNode, SimulationEdge, SimulationAttributes>();
 
     // get array of nodes
     const newNodes = Object.keys(data.nodes);
