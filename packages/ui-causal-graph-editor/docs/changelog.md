@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## Next
+## NEXT
 
 -   Updated serializers to support setting metadata in extra attributes.
 
