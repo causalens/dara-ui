@@ -6,7 +6,7 @@ export const MockCausalGraph: CausalGraph = {
             target1: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} },
             target2: {
                 edge_type: EdgeType.DIRECTED_EDGE,
-                meta: { rendering_properties: { color: '#7510F7', thickness: 10 } },
+                meta: { original: 'metadata', rendering_properties: { color: '#7510F7', thickness: 10 } },
             },
         },
         input2: {
@@ -17,6 +17,7 @@ export const MockCausalGraph: CausalGraph = {
     nodes: {
         input1: {
             meta: {
+                original: 'metadata',
                 rendering_properties: {
                     label: 'input1 label',
                 },

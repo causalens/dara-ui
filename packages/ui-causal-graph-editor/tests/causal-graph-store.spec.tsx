@@ -35,15 +35,15 @@ const linkedState = (): GraphState => ({
             {
                 attributes: {
                     edge_type: EdgeType.DIRECTED_EDGE,
-                    originalMeta: { original: 'metadata' },
+                    originalMeta: {},
                 },
                 source: 'node1',
                 target: 'node2',
             },
         ],
         nodes: [
-            { attributes: { ...DEFAULT_NODE('node1'), originalMeta: { original: 'metadata' } }, key: 'node1' },
-            { attributes: { ...DEFAULT_NODE('node2'), originalMeta: { original: 'metadata' } }, key: 'node2' },
+            { attributes: DEFAULT_NODE('node1'), key: 'node1' },
+            { attributes: DEFAULT_NODE('node2'), key: 'node2' },
         ],
     }),
 });
@@ -145,39 +145,6 @@ describe('CausalGraphStore', () => {
             const state = GraphReducer(modifiedState, actions.removeNode('node2'));
             expect(state.graph.edges().length).toEqual(0);
             expect(state.graph?.nodes()).toEqual(['node1', 'node3']);
-        });
-    });
-    describe('Update extra metadata', () => {
-        it('should serialize metadata after updating a renamed node', () => {
-            const localState = GraphReducer(linkedState(), actions.renameNode('node2', 'target'));
-            const state = GraphReducer(localState, actions.updateNode('node2', { meta: { extra_meta: 'extra_meta' } }));
-
-            expect(causalGraphSerializer({ graph: state.graph }).nodes.node2.meta).toMatchInlineSnapshot(`
-                {
-                  "extra_meta": "extra_meta",
-                  "original": "metadata",
-                  "rendering_properties": {
-                    "label": "target",
-                  },
-                }
-            `);
-        });
-        it('should serialize metadata after updating an accepted edge', () => {
-            const localState = GraphReducer(linkedState(), actions.acceptEdge(['node1', 'node2']));
-            const state = GraphReducer(
-                localState,
-                actions.updateEdge(['node1', 'node2'], { meta: { extra_meta: 'extra_meta' } })
-            );
-
-            expect(causalGraphSerializer({ graph: state.graph }).edges.node1.node2.meta).toMatchInlineSnapshot(`
-                {
-                  "extra_meta": "extra_meta",
-                  "original": "metadata",
-                  "rendering_properties": {
-                    "accepted": true,
-                  },
-                }
-            `);
         });
     });
 });

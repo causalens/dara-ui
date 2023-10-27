@@ -1,6 +1,7 @@
+import { GraphActionCreators, GraphReducer } from '../src/shared/causal-graph-store';
 import { causalGraphParser } from '../src/shared/parsers';
 import { causalGraphSerializer } from '../src/shared/serializer';
-import { CausalGraph, CausalGraphEdge, EdgeType } from '../src/types';
+import { CausalGraph, CausalGraphEdge, EdgeType, EditorMode } from '../src/types';
 import { default as MockCausalGraphWithExtras } from './mocks/extras-graph';
 import { MockCausalGraph } from './utils';
 
@@ -79,5 +80,46 @@ describe('CausalGraphSerializer', () => {
             nodes: expectedNodes,
             version: MockCausalGraphWithExtras.version,
         });
+    });
+});
+
+const actions = GraphActionCreators;
+
+describe('Update extra metadata', () => {
+    it('should serialize metadata after updating a node', () => {
+        const parsedGraph = causalGraphParser(MockCausalGraph);
+        const state = GraphReducer(
+            { editorMode: EditorMode.DEFAULT, graph: parsedGraph },
+            actions.updateNode('input1', { meta: { extra_meta: 'extra_meta' } })
+        );
+
+        expect(causalGraphSerializer({ graph: state.graph }).nodes.input1.meta).toMatchInlineSnapshot(`
+            {
+              "extra_meta": "extra_meta",
+              "original": "metadata",
+              "rendering_properties": {
+                "label": "input1 label",
+                "latent": false,
+              },
+            }
+        `);
+    });
+    it('should serialize metadata for an updated edge', () => {
+        const parsedGraph = causalGraphParser(MockCausalGraph);
+        const state = GraphReducer(
+            { editorMode: EditorMode.DEFAULT, graph: parsedGraph },
+            actions.updateEdge(['input1', 'target2'], { meta: { extra_meta: 'extra_meta' } })
+        );
+
+        expect(causalGraphSerializer({ graph: state.graph }).edges.input1.target2.meta).toMatchInlineSnapshot(`
+            {
+              "extra_meta": "extra_meta",
+              "original": "metadata",
+              "rendering_properties": {
+                "color": "#7510F7",
+                "thickness": 10,
+              },
+            }
+        `);
     });
 });
