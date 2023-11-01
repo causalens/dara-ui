@@ -2,9 +2,9 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.2.3
 
--   Fixed an issue where when `RadioGroup`'s state was updated twice.
+-   Fixed an issue where `RadioGroup`'s state was updated twice.
 
 ## 1.2.1
 
