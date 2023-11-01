@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where when `RadioGroup` was controlled and started with an `undefined` value it didn't trigger change events.
+
 ## 1.2.1
 
 -   Fixed an issue where `NumericInput` width could not be changed.
