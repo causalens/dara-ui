@@ -118,4 +118,19 @@ describe('RadioGroup', () => {
         expect(radioButtons[1]).toBeChecked();
         expect(radioButtons[2]).not.toBeChecked();
     });
+
+    it('should not update in controlled mode if onchange is not passed', () => {
+        const { container } = render(<RenderRadioGroup items={mockItems} value={null} />);
+
+        // expect to see 3 radio buttons with the correct labels
+        const radioButtons = container.querySelectorAll('input[type="radio"]');
+
+        // click on the first radio button
+        userEvent.click(radioButtons[0]);
+
+        // expect the state to not have changed as it is in controlled mode and value was not updated
+        expect(radioButtons[0]).not.toBeChecked();
+        expect(radioButtons[1]).not.toBeChecked();
+        expect(radioButtons[2]).not.toBeChecked();
+    });
 });

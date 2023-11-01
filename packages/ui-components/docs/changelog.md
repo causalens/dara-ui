@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where when `RadioGroup`'s state was updated twice.
+
 ## 1.2.1
 
 -   Fixed an issue where `NumericInput` width could not be changed.
