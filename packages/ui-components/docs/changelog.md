@@ -4,7 +4,7 @@ title: Changelog
 
 ## NEXT
 
--   Fixed an issue where when `RadioGroup` was controlled and started with an `undefined` value it didn't trigger change events.
+-   Fixed an issue where when `RadioGroup`'s state was updated twice.
 
 ## 1.2.1
 
