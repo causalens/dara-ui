@@ -174,11 +174,7 @@ function RadioGroup(props: RadioGroupProps): JSX.Element {
         const target = event.target as HTMLInputElement;
         const chosenIndex = Number(target.value);
         setCurrentSelected(chosenIndex);
-        if (props.value !== undefined) {
-            props.onChange?.(props.items[chosenIndex], event);
-        } else {
-            setCurrentSelected(chosenIndex);
-        }
+        props.onChange?.(props.items[chosenIndex], event);
     };
 
     useEffect(() => {
