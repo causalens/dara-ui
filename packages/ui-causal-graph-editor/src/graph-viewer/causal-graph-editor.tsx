@@ -14,6 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
+import { useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
+import { GetReferenceClientRect } from 'tippy.js';
+
+import { useTheme } from '@darajs/styled-components';
+import { Tooltip } from '@darajs/ui-components';
+import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { ConfirmationModal } from '@darajs/ui-widgets';
+
 import {
     AddNodeButton,
     CenterGraphButton,
@@ -28,7 +39,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
-import { getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
     CausalGraphEdge,
@@ -39,16 +50,6 @@ import {
     SimulationEdge,
     ZoomThresholds,
 } from '@types';
-import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
-import { useEffect, useMemo, useState } from 'react';
-import * as React from 'react';
-import { GetReferenceClientRect } from 'tippy.js';
-
-import { useTheme } from '@darajs/styled-components';
-import { Tooltip } from '@darajs/ui-components';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
-import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
@@ -61,7 +62,6 @@ import { Center, Graph, Wrapper } from '../shared/styles';
 import useCausalGraphEditor from '../shared/use-causal-graph-editor';
 import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
-import { isDag } from '../shared/utils';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
 
@@ -121,8 +121,6 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     );
 
     const editorMode = props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
-
-    console.log('CALLING', isDag(state.graph), editorMode);
 
     const {
         getCenterPosition,
