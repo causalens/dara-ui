@@ -51,16 +51,6 @@ const constraintItems: IconItem[] = [
     },
     {
         label: (
-            <Tooltip content="Directed">
-                <span>
-                    <ArrowRightLong size="lg" />
-                </span>
-            </Tooltip>
-        ),
-        value: EdgeConstraintType.SOFT_DIRECTED,
-    },
-    {
-        label: (
             <Tooltip content="Forbidden">
                 <span>
                     <Ban size="lg" />
