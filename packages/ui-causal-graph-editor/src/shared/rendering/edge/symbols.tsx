@@ -55,7 +55,10 @@ export function createSideSymbol(
 
         if (style.editorMode === EditorMode.EDGE_ENCODER) {
             // Encoder - only show arrow for directed constraint
-            if (style.constraint?.type !== EdgeConstraintType.DIRECTED) {
+            if (
+                style.constraint?.type !== EdgeConstraintType.HARD_DIRECTED &&
+                style.constraint?.type !== EdgeConstraintType.SOFT_DIRECTED
+            ) {
                 return gfx;
             }
         }

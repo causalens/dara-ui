@@ -32,7 +32,8 @@ export function parseConstraints(constraints: EdgeConstraint[]): EdgeConstraintI
 
         switch (constraintType) {
             // These are handled fine, leave as-is
-            case EdgeConstraintType.DIRECTED:
+            case EdgeConstraintType.HARD_DIRECTED:
+            case EdgeConstraintType.SOFT_DIRECTED:
             case EdgeConstraintType.FORBIDDEN:
             case EdgeConstraintType.UNDIRECTED:
                 break;

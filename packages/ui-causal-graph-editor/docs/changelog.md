@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Updated `EdgeConstraintType` to comply to `0.3.0` of `cai-causal-graph`.
+
 ## 1.2.2
 
 -   Updated serializers to support setting metadata in extra attributes.

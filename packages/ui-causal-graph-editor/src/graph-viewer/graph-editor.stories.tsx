@@ -663,7 +663,7 @@ VisualEdgeEncoder.args = {
         {
             source: 'first node',
             target: 'second node',
-            type: EdgeConstraintType.DIRECTED,
+            type: EdgeConstraintType.HARD_DIRECTED,
         },
     ],
 };
