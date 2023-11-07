@@ -200,7 +200,7 @@ export type SimulationGraph = AbstractGraph<SimulationNode, SimulationEdge, Simu
 /**
  * Type of an edge constraint that can be encoded
  *
- * Int values from cl_interfaces.EdgeConstraint
+ * str values from cai_causal_graph.EdgeConstraint
  */
 export enum EdgeConstraintType {
     FORBIDDEN = 'forbidden',
