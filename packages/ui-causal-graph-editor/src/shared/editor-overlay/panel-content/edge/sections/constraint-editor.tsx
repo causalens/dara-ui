@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { EdgeConstraintItem, EdgeConstraintType } from '@types';
+
 import { ButtonBar, Item, Tooltip } from '@darajs/ui-components';
 import { ArrowRightLong, ArrowsHorizontal, Ban } from '@darajs/ui-icons';
-
-import { EdgeConstraintItem, EdgeConstraintType } from '@types';
 
 import { ColumnWrapper, SectionTitle } from '../../styled';
 
@@ -47,7 +47,17 @@ const constraintItems: IconItem[] = [
                 </span>
             </Tooltip>
         ),
-        value: EdgeConstraintType.DIRECTED,
+        value: EdgeConstraintType.HARD_DIRECTED,
+    },
+    {
+        label: (
+            <Tooltip content="Directed">
+                <span>
+                    <ArrowRightLong size="lg" />
+                </span>
+            </Tooltip>
+        ),
+        value: EdgeConstraintType.SOFT_DIRECTED,
     },
     {
         label: (

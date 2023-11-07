@@ -203,11 +203,10 @@ export type SimulationGraph = AbstractGraph<SimulationNode, SimulationEdge, Simu
  * Int values from cl_interfaces.EdgeConstraint
  */
 export enum EdgeConstraintType {
-    DIRECTED = 2,
-    /** Backward directed - unsupported */
-    BACKWARD_DIRECTED = 3,
-    FORBIDDEN = 4,
-    UNDIRECTED = 1,
+    FORBIDDEN = 'forbidden',
+    HARD_DIRECTED = 'hard_directed',
+    SOFT_DIRECTED = 'soft_directed',
+    UNDIRECTED = 'hard_undirected',
 }
 
 /**
