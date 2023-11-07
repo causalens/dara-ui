@@ -124,6 +124,20 @@ const causalGraph: CausalGraph = {
     version: '2.0',
 };
 
+const pagCausalGraph = {
+    ...causalGraph,
+    edges: {
+        ...causalGraph.edges,
+        input1: {
+            ...causalGraph.edges.input1,
+            input4: {
+                ...causalGraph.edges.input1.input4,
+                edge_type: EdgeType.UNDIRECTED_EDGE,
+            },
+        },
+    },
+};
+
 export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
     const [nodeNumber, setNodeNumber] = useState(3);
     const [useStrenghts, setUseStrengths] = useState(false);
@@ -205,14 +219,12 @@ export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
 };
 Interactive.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphLayout: PlanarLayout.Builder.build(),
 };
 
 export const MarketingBottom = Template.bind({});
 MarketingBottom.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: MarketingLayout.Builder.build(),
     zoomThresholds: {
@@ -226,7 +238,6 @@ MarketingBottom.args = {
 export const MarketingCenter = Template.bind({});
 MarketingCenter.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: MarketingLayout.Builder.targetLocation('center').build(),
 };
@@ -234,7 +245,6 @@ MarketingCenter.args = {
 export const PlanarVertical = Template.bind({});
 PlanarVertical.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: { ...causalGraph, edges: { input2: causalGraph.edges.input2 } },
     graphLayout: PlanarLayout.Builder.orientation('vertical').build(),
 };
@@ -242,7 +252,6 @@ PlanarVertical.args = {
 export const PlanarHorizontal = Template.bind({});
 PlanarHorizontal.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: SHIPPED_UNITS,
     graphLayout: PlanarLayout.Builder.build(),
 };
@@ -250,7 +259,6 @@ PlanarHorizontal.args = {
 export const Spring = Template.bind({});
 Spring.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: SpringLayout.Builder.build(),
 };
@@ -258,7 +266,6 @@ Spring.args = {
 export const Circular = Template.bind({});
 Circular.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: CircularLayout.Builder.build(),
 };
@@ -266,8 +273,7 @@ Circular.args = {
 export const Pag = Template.bind({});
 Pag.args = {
     editable: true,
-    editorMode: EditorMode.PAG_VIEWER,
-    graphData: causalGraph,
+    graphData: pagCausalGraph,
     graphLayout: FcoseLayout.Builder.build(),
 };
 
@@ -412,7 +418,6 @@ export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
 };
 RandomClusters.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphLayout: FcoseLayout.Builder.nodeRepulsion(100_000_000).nodeSeparation(20).build(),
 };
 
@@ -444,7 +449,6 @@ const singleLetterGraph: CausalGraph = {
 export const SingleLetter = Template.bind({});
 SingleLetter.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: singleLetterGraph,
     graphLayout: SpringLayout.Builder.nodeFontSize(80).build(),
 };
@@ -478,7 +482,6 @@ const longWordGraph: CausalGraph = {
 export const LongWord = Template.bind({});
 LongWord.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: longWordGraph,
     graphLayout: SpringLayout.Builder.build(),
 };
@@ -487,7 +490,6 @@ LongWord.args = {
 export const Fcose = Template.bind({});
 Fcose.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: SHIPPED_UNITS,
     // graphData: FRAUD,
     graphLayout: FcoseLayout.Builder.build(),
@@ -496,7 +498,6 @@ Fcose.args = {
 export const ForceAtlas = Template.bind({});
 ForceAtlas.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: FRAUD,
     graphLayout: ForceAtlasLayout.Builder.build(),
 };
@@ -619,7 +620,6 @@ Object.entries(predefinedLayout.layout).forEach(([nodeKey, position]) => {
 export const PredefinedPositions = Template.bind({});
 PredefinedPositions.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: PredefinedGraph,
     graphLayout: FcoseLayout.Builder.build(),
 };
@@ -627,7 +627,6 @@ PredefinedPositions.args = {
 export const CustomPositions = Template.bind({});
 CustomPositions.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: PredefinedGraph,
     graphLayout: CustomLayout.Builder.build(),
 };
@@ -636,7 +635,6 @@ CustomPositions.args = {
 export const CustomLayoutNoPositions = Template.bind({});
 CustomLayoutNoPositions.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: SHIPPED_UNITS,
     graphLayout: CustomLayout.Builder.build(),
 };

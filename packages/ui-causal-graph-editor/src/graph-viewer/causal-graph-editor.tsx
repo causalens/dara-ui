@@ -14,17 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
-import { useEffect, useMemo, useState } from 'react';
-import * as React from 'react';
-import { GetReferenceClientRect } from 'tippy.js';
-
-import { useTheme } from '@darajs/styled-components';
-import { Tooltip } from '@darajs/ui-components';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
-import { ConfirmationModal } from '@darajs/ui-widgets';
-
 import {
     AddNodeButton,
     CenterGraphButton,
@@ -50,6 +39,16 @@ import {
     SimulationEdge,
     ZoomThresholds,
 } from '@types';
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
+import { useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
+import { GetReferenceClientRect } from 'tippy.js';
+
+import { useTheme } from '@darajs/styled-components';
+import { Tooltip } from '@darajs/ui-components';
+import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
@@ -62,6 +61,7 @@ import { Center, Graph, Wrapper } from '../shared/styles';
 import useCausalGraphEditor from '../shared/use-causal-graph-editor';
 import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
+import { isDag } from '../shared/utils';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
 
@@ -120,6 +120,10 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.graphLayout.requiresPosition
     );
 
+    const editorMode = props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
+
+    console.log('CALLING', isDag(state.graph), editorMode);
+
     const {
         getCenterPosition,
         useEngineEvent,
@@ -135,7 +139,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         state.graph,
         props.graphLayout,
         props.editable,
-        props.editorMode,
+        editorMode,
         props.initialConstraints,
         props.processEdgeStyle,
         props.zoomThresholds
@@ -194,7 +198,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         useEdgeConstraintEncoder(props.initialConstraints, props.onEdgeConstraintsUpdate);
 
     const selectedConstraint = useMemo(() => {
-        if (props.editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
+        if (editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
             const [source, target] = selectedEdge;
 
             // Find constraint with either matching or reversed source/target
@@ -202,7 +206,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 (c) => (c.source === source && c.target === target) || (c.source === target && c.target === source)
             );
         }
-    }, [props.editorMode, selectedEdge, constraints]);
+    }, [editorMode, selectedEdge, constraints]);
 
     // deletion
 
@@ -218,7 +222,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
 
     function onConfirmRemoveEdge(): void {
         // In encoder mode, remove related constraint
-        if (props.editorMode === EditorMode.EDGE_ENCODER) {
+        if (editorMode === EditorMode.EDGE_ENCODER) {
             onRemoveConstraint();
         }
 
@@ -270,7 +274,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             return;
         }
 
-        if (props.editorMode === EditorMode.EDGE_ENCODER) {
+        if (editorMode === EditorMode.EDGE_ENCODER) {
             const [source, target] = edge;
             addConstraint(source, target);
         }
@@ -319,7 +323,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         api.updateEdgeType(selectedEdge, EdgeType.DIRECTED_EDGE);
 
         if (reverse) {
-            if (props.editorMode === EditorMode.EDGE_ENCODER) {
+            if (editorMode === EditorMode.EDGE_ENCODER) {
                 onReverseConstraint();
             }
 
@@ -388,7 +392,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         const sourceLabel = sourceNodeAttributes['meta.rendering_properties.label'] ?? sourceNodeAttributes.id;
         const targetLabel = targetNodeAttributes['meta.rendering_properties.label'] ?? targetNodeAttributes.id;
 
-        const tooltipArrow = props.editorMode === EditorMode.DEFAULT ? '➜' : '-';
+        const tooltipArrow = editorMode === EditorMode.DEFAULT ? '➜' : '-';
 
         const edgeTooltipContent = getTooltipContent(
             `${sourceLabel} ${tooltipArrow} ${targetLabel}`,
@@ -532,7 +536,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     if (selectedEdge) {
         contentSelected = state.graph.hasEdge(selectedEdge[0], selectedEdge[1]);
         panelTitle = 'Edge';
-    } else if (selectedNode && state.editorMode !== EditorMode.EDGE_ENCODER) {
+    } else if (selectedNode && editorMode !== EditorMode.EDGE_ENCODER) {
         contentSelected = state.graph.hasNode(selectedNode);
         panelTitle = 'Node';
     }
@@ -554,7 +558,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 disableLatentNodeAdd: props.disableLatentNodeAdd,
                 disableNodeRemoval: props.disableNodeRemoval,
                 editable: props.editable,
-                editorMode: props.editorMode,
+                editorMode,
                 onNotify: props.onNotify,
                 verboseDescriptions: props.verboseDescriptions,
             }}
@@ -576,7 +580,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
-                            bottomLeft={<Legend listItems={getLegendData(state.editorMode, props.additionalLegends)} />}
+                            bottomLeft={<Legend listItems={getLegendData(editorMode, props.additionalLegends)} />}
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}
