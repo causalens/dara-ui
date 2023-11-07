@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EdgeConstraintItem, EdgeConstraintType } from '@types';
 
 import { ButtonBar, Item, Tooltip } from '@darajs/ui-components';
 import { ArrowRightLong, ArrowsHorizontal, Ban } from '@darajs/ui-icons';
+
+import { EdgeConstraintItem, EdgeConstraintType } from '@types';
 
 import { ColumnWrapper, SectionTitle } from '../../styled';
 
