@@ -39,7 +39,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
-import { getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
     CausalGraphEdge,
@@ -120,6 +120,10 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.graphLayout.requiresPosition
     );
 
+    const [editorMode] = useState(
+        () => props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER)
+    );
+
     const {
         getCenterPosition,
         useEngineEvent,
@@ -135,7 +139,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         state.graph,
         props.graphLayout,
         props.editable,
-        props.editorMode,
+        editorMode,
         props.initialConstraints,
         props.processEdgeStyle,
         props.zoomThresholds
@@ -194,7 +198,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         useEdgeConstraintEncoder(props.initialConstraints, props.onEdgeConstraintsUpdate);
 
     const selectedConstraint = useMemo(() => {
-        if (props.editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
+        if (editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
             const [source, target] = selectedEdge;
 
             // Find constraint with either matching or reversed source/target
@@ -202,7 +206,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 (c) => (c.source === source && c.target === target) || (c.source === target && c.target === source)
             );
         }
-    }, [props.editorMode, selectedEdge, constraints]);
+    }, [editorMode, selectedEdge, constraints]);
 
     // deletion
 
@@ -218,7 +222,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
 
     function onConfirmRemoveEdge(): void {
         // In encoder mode, remove related constraint
-        if (props.editorMode === EditorMode.EDGE_ENCODER) {
+        if (editorMode === EditorMode.EDGE_ENCODER) {
             onRemoveConstraint();
         }
 
@@ -270,7 +274,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             return;
         }
 
-        if (props.editorMode === EditorMode.EDGE_ENCODER) {
+        if (editorMode === EditorMode.EDGE_ENCODER) {
             const [source, target] = edge;
             addConstraint(source, target);
         }
@@ -319,7 +323,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         api.updateEdgeType(selectedEdge, EdgeType.DIRECTED_EDGE);
 
         if (reverse) {
-            if (props.editorMode === EditorMode.EDGE_ENCODER) {
+            if (editorMode === EditorMode.EDGE_ENCODER) {
                 onReverseConstraint();
             }
 
@@ -388,7 +392,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         const sourceLabel = sourceNodeAttributes['meta.rendering_properties.label'] ?? sourceNodeAttributes.id;
         const targetLabel = targetNodeAttributes['meta.rendering_properties.label'] ?? targetNodeAttributes.id;
 
-        const tooltipArrow = props.editorMode === EditorMode.DEFAULT ? '➜' : '-';
+        const tooltipArrow = editorMode === EditorMode.DEFAULT ? '➜' : '-';
 
         const edgeTooltipContent = getTooltipContent(
             `${sourceLabel} ${tooltipArrow} ${targetLabel}`,
@@ -532,7 +536,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     if (selectedEdge) {
         contentSelected = state.graph.hasEdge(selectedEdge[0], selectedEdge[1]);
         panelTitle = 'Edge';
-    } else if (selectedNode && state.editorMode !== EditorMode.EDGE_ENCODER) {
+    } else if (selectedNode && editorMode !== EditorMode.EDGE_ENCODER) {
         contentSelected = state.graph.hasNode(selectedNode);
         panelTitle = 'Node';
     }
@@ -554,7 +558,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 disableLatentNodeAdd: props.disableLatentNodeAdd,
                 disableNodeRemoval: props.disableNodeRemoval,
                 editable: props.editable,
-                editorMode: props.editorMode,
+                editorMode,
                 onNotify: props.onNotify,
                 verboseDescriptions: props.verboseDescriptions,
             }}
@@ -576,7 +580,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
-                            bottomLeft={<Legend listItems={getLegendData(state.editorMode, props.additionalLegends)} />}
+                            bottomLeft={<Legend listItems={getLegendData(editorMode, props.additionalLegends)} />}
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}

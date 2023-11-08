@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { hasCycle } from 'graphology-dag';
+
 import { DefaultTheme } from '@darajs/styled-components';
 
 import { EdgeType, NodeGroup, SimulationGraph } from '../types';
@@ -151,4 +153,24 @@ export function getNodeGroup(graph: SimulationGraph, id: string, isLatent?: bool
     }
 
     return group;
+}
+
+/**
+ * Defines if a Graph is a DAG (directed acyclic graph). Two criteria must be met for this, the first it must not have cyclews and the second is that all edges must be directed.
+ *
+ * @param graph current graph state instance
+ */
+export function isDag(graph: SimulationGraph): boolean {
+    // check that there are no cycles
+    if (hasCycle(graph)) {
+        return false;
+    }
+    // check that all edges are directed
+    const isDirected = graph.everyEdge((edge, attributes) => {
+        if (attributes.edge_type !== EdgeType.DIRECTED_EDGE) {
+            return false;
+        }
+        return true;
+    });
+    return isDirected;
 }
