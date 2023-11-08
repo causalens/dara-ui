@@ -120,9 +120,8 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.graphLayout.requiresPosition
     );
 
-    const editorMode = useMemo(
-        () => props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER),
-        [state.graph, props.editorMode]
+    const [editorMode] = useState(
+        () => props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER)
     );
 
     const {
