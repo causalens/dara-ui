@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.3.0
 
 -   Updated `EdgeConstraintType` to comply to `0.3.0` of `cai-causal-graph`.
 -   Updated so that if no `EditorMode` is passed to `CausalGraphEditor`, then it checks if graph is DAG, if so `EditorMode` defaults to `DEFAULT`, else defaults to `PAG_VIEWER`.
