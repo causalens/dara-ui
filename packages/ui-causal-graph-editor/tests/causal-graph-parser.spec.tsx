@@ -45,7 +45,7 @@ describe('CausalGraphParser', () => {
             // No available inputs provided - all nodes are not latent
             expectedNode.meta.rendering_properties.latent = false;
 
-            expect(serializeGraphNode(attrs, true)).toEqual(expectedNode);
+            expect(serializeGraphNode(attrs)).toEqual(expectedNode);
         });
     });
 

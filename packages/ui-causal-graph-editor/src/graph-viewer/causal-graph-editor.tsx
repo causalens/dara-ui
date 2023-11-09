@@ -14,17 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
-import { useEffect, useMemo, useState } from 'react';
-import * as React from 'react';
-import { GetReferenceClientRect } from 'tippy.js';
-
-import { useTheme } from '@darajs/styled-components';
-import { Tooltip } from '@darajs/ui-components';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
-import { ConfirmationModal } from '@darajs/ui-widgets';
-
 import {
     AddNodeButton,
     CenterGraphButton,
@@ -50,6 +39,16 @@ import {
     SimulationEdge,
     ZoomThresholds,
 } from '@types';
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
+import { useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
+import { GetReferenceClientRect } from 'tippy.js';
+
+import { useTheme } from '@darajs/styled-components';
+import { Tooltip } from '@darajs/ui-components';
+import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
@@ -168,7 +167,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             let serializedNode: CausalGraphNode = null;
 
             if (selectedNode) {
-                serializedNode = serializeGraphNode(state.graph.getNodeAttributes(selectedNode), true);
+                serializedNode = serializeGraphNode(state.graph.getNodeAttributes(selectedNode));
             }
 
             props.onClickNode(serializedNode);
@@ -188,8 +187,8 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 const [source, target] = selectedEdge;
                 serializedEdge = serializeGraphEdge(
                     state.graph.getEdgeAttributes(source, target),
-                    serializeGraphNode(state.graph.getNodeAttributes(source), true),
-                    serializeGraphNode(state.graph.getNodeAttributes(target), true)
+                    serializeGraphNode(state.graph.getNodeAttributes(source)),
+                    serializeGraphNode(state.graph.getNodeAttributes(target))
                 );
             }
 

@@ -100,7 +100,7 @@ export function serializeGraphEdge(
  * @param attributes simulation node data
  * @param includeIdentifier whether to include data to identify the node
  */
-export function serializeGraphNode(attributes: SimulationNode, includeIdentifier = false): CausalGraphNode {
+export function serializeGraphNode(attributes: SimulationNode): CausalGraphNode {
     const entries = Object.entries(attributes) as Entries<SimulationNode>;
     const unflattenedMeta: NodeRenderingMeta = Object.fromEntries(
         entries
@@ -120,11 +120,8 @@ export function serializeGraphNode(attributes: SimulationNode, includeIdentifier
         },
         variable_type: attributes.variable_type,
         ...restExtras,
+        identifier: attributes.id,
     };
-
-    if (includeIdentifier) {
-        output.identifier = attributes.id;
-    }
 
     return output;
 }
@@ -161,6 +158,7 @@ export function causalGraphSerializer(state: GraphState): CausalGraph {
                 },
                 variable_type: attributes.variable_type,
                 ...restExtras,
+                identifier: attributes.id,
             };
 
             return acc;

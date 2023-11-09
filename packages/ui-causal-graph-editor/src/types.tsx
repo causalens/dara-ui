@@ -96,7 +96,7 @@ export interface CausalGraph {
 
 export interface CausalGraphNode {
     extras?: Record<string, any>;
-    identifier?: string;
+    identifier: string;
     meta: CausalGraphNodeMeta;
     node_class?: string;
     variable_type: string;
