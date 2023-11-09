@@ -23,16 +23,19 @@ const getExpectedNodes = (mockCausalGraph: CausalGraph): Record<string, any> => 
 };
 
 const getExpectedEdges = (mockCausalGraph: CausalGraph): Record<string, Record<string, CausalGraphEdge>> => {
+    const expectedNodes = getExpectedNodes(mockCausalGraph);
     return Object.keys(mockCausalGraph.edges).reduce((acc, sourceKey) => {
         const nestedEdges = Object.keys(mockCausalGraph.edges[sourceKey]).reduce((nestedAcc, targetKey) => {
             nestedAcc[targetKey] = {
                 ...mockCausalGraph.edges[sourceKey][targetKey],
+                destination: expectedNodes[targetKey],
                 meta: {
                     ...mockCausalGraph.edges[sourceKey][targetKey].meta,
                     rendering_properties: {
                         ...mockCausalGraph.edges[sourceKey][targetKey].meta.rendering_properties,
                     },
                 },
+                source: expectedNodes[sourceKey],
             };
 
             return nestedAcc;
@@ -57,6 +60,8 @@ describe('CausalGraphSerializer', () => {
         expectedEdges.target1.input2 = expectedEdges.input2.target1;
         delete expectedEdges.input2.target1;
         expectedEdges.target1.input2.edge_type = EdgeType.DIRECTED_EDGE;
+        expectedEdges.target1.input2.source = expectedNodes.target1;
+        expectedEdges.target1.input2.destination = expectedNodes.input2;
 
         expect(causalGraphSerializer({ graph: parsedGraph })).toEqual({
             edges: expectedEdges,
@@ -121,5 +126,21 @@ describe('Update extra metadata', () => {
               },
             }
         `);
+    });
+});
+
+describe('Edge source/destination', () => {
+    it('should populate edge source/destination after removing and adding an edge', () => {
+        const parsedGraph = causalGraphParser(MockCausalGraph);
+        const initialState = GraphReducer(
+            { editorMode: EditorMode.DEFAULT, graph: parsedGraph },
+            actions.removeEdge(['input1', 'target1'])
+        );
+        const state = GraphReducer(initialState, actions.addEdge(['input1', 'target1']));
+
+        const expectedEdges = getExpectedEdges(MockCausalGraph);
+        const serializedGraph = causalGraphSerializer({ graph: state.graph });
+
+        expect(serializedGraph.edges.input1.target1).toEqual(expectedEdges.input1.target1);
     });
 });

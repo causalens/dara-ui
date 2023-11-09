@@ -186,7 +186,11 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
 
             if (selectedEdge) {
                 const [source, target] = selectedEdge;
-                serializedEdge = serializeGraphEdge(state.graph.getEdgeAttributes(source, target), source, target);
+                serializedEdge = serializeGraphEdge(
+                    state.graph.getEdgeAttributes(source, target),
+                    serializeGraphNode(state.graph.getNodeAttributes(source), true),
+                    serializeGraphNode(state.graph.getNodeAttributes(target), true)
+                );
             }
 
             props.onClickEdge(serializedEdge);
