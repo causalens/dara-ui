@@ -74,15 +74,9 @@ export function serializeGraphEdge(
             rendering_properties: unflattenedMeta,
         },
         ...restExtras,
+        destination,
+        source,
     };
-
-    if (source) {
-        output.source = source;
-    }
-
-    if (destination) {
-        output.destination = destination;
-    }
 
     // Reverse the edge if it is a backwards directed edge
     if (output.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
