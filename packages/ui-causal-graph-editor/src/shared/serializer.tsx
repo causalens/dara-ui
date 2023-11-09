@@ -49,7 +49,11 @@ function removeNodePrefix<T extends keyof FlatNodeRenderingMeta>(key: T): keyof 
  * @param source optional source to include in output data
  * @param destination optional destination to include in output data
  */
-export function serializeGraphEdge(attributes: SimulationEdge, source?: CausalGraphNode, destination?: CausalGraphNode): CausalGraphEdge {
+export function serializeGraphEdge(
+    attributes: SimulationEdge,
+    source?: CausalGraphNode,
+    destination?: CausalGraphNode
+): CausalGraphEdge {
     const entries = Object.entries(attributes) as Entries<SimulationEdge>;
     const unflattenedMeta: EdgeRenderingMeta = Object.fromEntries(
         entries
