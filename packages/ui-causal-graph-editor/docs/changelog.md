@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Added support for edge `source`/`destination` fields for `CausalGraphEditor`.
+
 ## 1.3.0
 
 -   Updated `EdgeConstraintType` to comply to `0.3.0` of `cai-causal-graph`.
