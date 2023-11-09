@@ -51,8 +51,8 @@ function removeNodePrefix<T extends keyof FlatNodeRenderingMeta>(key: T): keyof 
  */
 export function serializeGraphEdge(
     attributes: SimulationEdge,
-    source?: CausalGraphNode,
-    destination?: CausalGraphNode
+    source: CausalGraphNode,
+    destination: CausalGraphNode
 ): CausalGraphEdge {
     const entries = Object.entries(attributes) as Entries<SimulationEdge>;
     const unflattenedMeta: EdgeRenderingMeta = Object.fromEntries(
@@ -183,6 +183,9 @@ export function causalGraphSerializer(state: GraphState): CausalGraph {
                 if (!(target in acc)) {
                     acc[target] = {};
                 }
+                const temp = serializedEdge.destination;
+                serializedEdge.destination = serializedEdge.source;
+                serializedEdge.source = temp;
                 acc[target][source] = serializedEdge;
             } else {
                 if (!(source in acc)) {

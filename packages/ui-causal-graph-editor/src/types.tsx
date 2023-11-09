@@ -103,11 +103,11 @@ export interface CausalGraphNode {
 }
 
 export interface CausalGraphEdge {
-    destination?: CausalGraphNode;
+    destination: CausalGraphNode;
     edge_type: EdgeType;
     extras?: Record<string, any>;
     meta: CausalGraphEdgeMeta;
-    source?: CausalGraphNode;
+    source: CausalGraphNode;
 }
 
 export enum VariableType {

@@ -60,8 +60,6 @@ describe('CausalGraphSerializer', () => {
         expectedEdges.target1.input2 = expectedEdges.input2.target1;
         delete expectedEdges.input2.target1;
         expectedEdges.target1.input2.edge_type = EdgeType.DIRECTED_EDGE;
-        expectedEdges.target1.input2.source = expectedNodes.target1;
-        expectedEdges.target1.input2.destination = expectedNodes.input2;
 
         expect(causalGraphSerializer({ graph: parsedGraph })).toEqual({
             edges: expectedEdges,

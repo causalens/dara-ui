@@ -45,7 +45,7 @@ describe('CausalGraphParser', () => {
             // No available inputs provided - all nodes are not latent
             expectedNode.meta.rendering_properties.latent = false;
 
-            expect(serializeGraphNode(attrs)).toEqual(expectedNode);
+            expect(serializeGraphNode(attrs, true)).toEqual(expectedNode);
         });
     });
 
@@ -58,6 +58,7 @@ describe('CausalGraphParser', () => {
         for (const node of parsedGraph.nodes()) {
             expect(parsedGraph.getNodeAttributes(node).extras).toEqual({
                 erased: nodes[node].erased,
+                identifier: nodes[node].identifier,
                 redacted: nodes[node].redacted,
             });
         }
@@ -74,7 +75,9 @@ describe('CausalGraphParser', () => {
             const { erased } = edgeAttributes[targetNode];
 
             expect(parsedGraph.getEdgeAttributes(edge).extras).toEqual({
+                destination: edgeAttributes[targetNode].destination,
                 erased,
+                source: edgeAttributes[targetNode].source,
             });
         });
 
