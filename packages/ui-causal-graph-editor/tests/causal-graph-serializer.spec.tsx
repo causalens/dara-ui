@@ -23,16 +23,19 @@ const getExpectedNodes = (mockCausalGraph: CausalGraph): Record<string, any> => 
 };
 
 const getExpectedEdges = (mockCausalGraph: CausalGraph): Record<string, Record<string, CausalGraphEdge>> => {
+    const expectedNodes = getExpectedNodes(mockCausalGraph);
     return Object.keys(mockCausalGraph.edges).reduce((acc, sourceKey) => {
         const nestedEdges = Object.keys(mockCausalGraph.edges[sourceKey]).reduce((nestedAcc, targetKey) => {
             nestedAcc[targetKey] = {
                 ...mockCausalGraph.edges[sourceKey][targetKey],
+                destination: expectedNodes[targetKey],
                 meta: {
                     ...mockCausalGraph.edges[sourceKey][targetKey].meta,
                     rendering_properties: {
                         ...mockCausalGraph.edges[sourceKey][targetKey].meta.rendering_properties,
                     },
                 },
+                source: expectedNodes[sourceKey],
             };
 
             return nestedAcc;
@@ -121,5 +124,21 @@ describe('Update extra metadata', () => {
               },
             }
         `);
+    });
+});
+
+describe('Edge source/destination', () => {
+    it('should populate edge source/destination after removing and adding an edge', () => {
+        const parsedGraph = causalGraphParser(MockCausalGraph);
+        const initialState = GraphReducer(
+            { editorMode: EditorMode.DEFAULT, graph: parsedGraph },
+            actions.removeEdge(['input1', 'target1'])
+        );
+        const state = GraphReducer(initialState, actions.addEdge(['input1', 'target1']));
+
+        const expectedEdges = getExpectedEdges(MockCausalGraph);
+        const serializedGraph = causalGraphSerializer({ graph: state.graph });
+
+        expect(serializedGraph.edges.input1.target1).toEqual(expectedEdges.input1.target1);
     });
 });

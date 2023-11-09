@@ -49,7 +49,11 @@ function removeNodePrefix<T extends keyof FlatNodeRenderingMeta>(key: T): keyof 
  * @param source optional source to include in output data
  * @param destination optional destination to include in output data
  */
-export function serializeGraphEdge(attributes: SimulationEdge, source?: string, destination?: string): CausalGraphEdge {
+export function serializeGraphEdge(
+    attributes: SimulationEdge,
+    source: CausalGraphNode,
+    destination: CausalGraphNode
+): CausalGraphEdge {
     const entries = Object.entries(attributes) as Entries<SimulationEdge>;
     const unflattenedMeta: EdgeRenderingMeta = Object.fromEntries(
         entries
@@ -70,15 +74,9 @@ export function serializeGraphEdge(attributes: SimulationEdge, source?: string, 
             rendering_properties: unflattenedMeta,
         },
         ...restExtras,
+        destination,
+        source,
     };
-
-    if (source) {
-        output.source = source;
-    }
-
-    if (destination) {
-        output.destination = destination;
-    }
 
     // Reverse the edge if it is a backwards directed edge
     if (output.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
@@ -102,7 +100,7 @@ export function serializeGraphEdge(attributes: SimulationEdge, source?: string, 
  * @param attributes simulation node data
  * @param includeIdentifier whether to include data to identify the node
  */
-export function serializeGraphNode(attributes: SimulationNode, includeIdentifier = false): CausalGraphNode {
+export function serializeGraphNode(attributes: SimulationNode): CausalGraphNode {
     const entries = Object.entries(attributes) as Entries<SimulationNode>;
     const unflattenedMeta: NodeRenderingMeta = Object.fromEntries(
         entries
@@ -122,11 +120,8 @@ export function serializeGraphNode(attributes: SimulationNode, includeIdentifier
         },
         variable_type: attributes.variable_type,
         ...restExtras,
+        identifier: attributes.id,
     };
-
-    if (includeIdentifier) {
-        output.identifier = attributes.id;
-    }
 
     return output;
 }
@@ -141,28 +136,6 @@ type Entries<T> = {
  * @param graph internal graph representation
  */
 export function causalGraphSerializer(state: GraphState): CausalGraph {
-    const edges: CausalGraph['edges'] = state.graph.reduceEdges(
-        (acc: CausalGraph['edges'], id: string, attributes: SimulationEdge, source: string, target: string) => {
-            const serializedEdge = serializeGraphEdge(attributes);
-
-            // if the edge is backwards, we need to swap the source and target
-            if (attributes.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
-                if (!(target in acc)) {
-                    acc[target] = {};
-                }
-                acc[target][source] = serializedEdge;
-            } else {
-                if (!(source in acc)) {
-                    acc[source] = {};
-                }
-                acc[source][target] = serializedEdge;
-            }
-
-            return acc;
-        },
-        {}
-    );
-
     const nodes: CausalGraph['nodes'] = state.graph.reduceNodes(
         (acc: CausalGraph['nodes'], id: string, attributes: SimulationNode) => {
             const entries = Object.entries(attributes) as Entries<SimulationNode>;
@@ -185,7 +158,33 @@ export function causalGraphSerializer(state: GraphState): CausalGraph {
                 },
                 variable_type: attributes.variable_type,
                 ...restExtras,
+                identifier: attributes.id,
             };
+
+            return acc;
+        },
+        {}
+    );
+
+    const edges: CausalGraph['edges'] = state.graph.reduceEdges(
+        (acc: CausalGraph['edges'], id: string, attributes: SimulationEdge, source: string, target: string) => {
+            const serializedEdge = serializeGraphEdge(attributes, nodes[source], nodes[target]);
+
+            // if the edge is backwards, we need to swap the source and target
+            if (attributes.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
+                if (!(target in acc)) {
+                    acc[target] = {};
+                }
+                const temp = serializedEdge.destination;
+                serializedEdge.destination = serializedEdge.source;
+                serializedEdge.source = temp;
+                acc[target][source] = serializedEdge;
+            } else {
+                if (!(source in acc)) {
+                    acc[source] = {};
+                }
+                acc[source][target] = serializedEdge;
+            }
 
             return acc;
         },
