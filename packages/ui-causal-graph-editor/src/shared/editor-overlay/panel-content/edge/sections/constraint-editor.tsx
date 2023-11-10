@@ -18,6 +18,7 @@
 import { ButtonBar, Item, Tooltip } from '@darajs/ui-components';
 import { ArrowRightLong, ArrowsHorizontal, Ban } from '@darajs/ui-icons';
 
+import { SoftEdgeArrowButton } from '@shared/editor-overlay/buttons';
 import { EdgeConstraintItem, EdgeConstraintType } from '@types';
 
 import { ColumnWrapper, SectionTitle } from '../../styled';
@@ -32,6 +33,26 @@ interface IconItem {
 const constraintItems: IconItem[] = [
     {
         label: (
+            <Tooltip content="Hard Directed">
+                <span>
+                    <ArrowRightLong size="lg" />
+                </span>
+            </Tooltip>
+        ),
+        value: EdgeConstraintType.HARD_DIRECTED,
+    },
+    {
+        label: (
+            <Tooltip content="Soft Directed">
+                <span style={{ alignItems: 'center', display: 'flex' }}>
+                    <SoftEdgeArrowButton />
+                </span>
+            </Tooltip>
+        ),
+        value: EdgeConstraintType.SOFT_DIRECTED,
+    },
+    {
+        label: (
             <Tooltip content="Undirected">
                 <span>
                     <ArrowsHorizontal size="lg" />
@@ -39,16 +60,6 @@ const constraintItems: IconItem[] = [
             </Tooltip>
         ),
         value: EdgeConstraintType.UNDIRECTED,
-    },
-    {
-        label: (
-            <Tooltip content="Directed">
-                <span>
-                    <ArrowRightLong size="lg" />
-                </span>
-            </Tooltip>
-        ),
-        value: EdgeConstraintType.HARD_DIRECTED,
     },
     {
         label: (

@@ -54,11 +54,18 @@ export function createSideSymbol(
         }
 
         if (style.editorMode === EditorMode.EDGE_ENCODER) {
+            // Edge encoder - shows semi-circle tip for soft directed constraint
+            if (style.constraint?.type === EdgeConstraintType.SOFT_DIRECTED) {
+                gfx.lineStyle({
+                    cap: PIXI.LINE_CAP.ROUND,
+                    color,
+                    width: 2,
+                });
+                gfx.arc(0, 0, 8, 0, Math.PI, false);
+                return gfx;
+            }
             // Encoder - only show arrow for directed constraint
-            if (
-                style.constraint?.type !== EdgeConstraintType.HARD_DIRECTED &&
-                style.constraint?.type !== EdgeConstraintType.SOFT_DIRECTED
-            ) {
+            if (style.constraint?.type !== EdgeConstraintType.HARD_DIRECTED) {
                 return gfx;
             }
         }
