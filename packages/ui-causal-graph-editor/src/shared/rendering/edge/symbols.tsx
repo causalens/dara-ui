@@ -64,10 +64,7 @@ export function createSideSymbol(
                 return gfx;
             }
             // Encoder - only show arrow for directed constraint
-            if (
-                style.constraint?.type !== EdgeConstraintType.HARD_DIRECTED
-                // style.constraint?.type !== EdgeConstraintType.SOFT_DIRECTED
-            ) {
+            if (style.constraint?.type !== EdgeConstraintType.HARD_DIRECTED) {
                 return gfx;
             }
         }
