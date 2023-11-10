@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Added a differentiated arrow for `EdgeConstraintType.SOFT_DIRECTED` 
+
 ## 1.3.0
 
 -   Updated `EdgeConstraintType` to comply to `0.3.0` of `cai-causal-graph`.
