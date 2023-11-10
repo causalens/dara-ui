@@ -57,6 +57,7 @@ export function createSideSymbol(
             // Edge encoder - shows semi-circle tip for soft directed constraint
             if (style.constraint?.type === EdgeConstraintType.SOFT_DIRECTED) {
                 gfx.lineStyle({
+                    cap: PIXI.LINE_CAP.ROUND,
                     color,
                     width: 2,
                 });
