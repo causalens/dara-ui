@@ -5,6 +5,7 @@ title: Changelog
 ## NEXT
 
 -   Added a differentiated arrow for `EdgeConstraintType.SOFT_DIRECTED` 
+-   Added support for edge `source`/`destination` fields for `CausalGraphEditor`.
 
 ## 1.3.0
 

@@ -25,9 +25,15 @@ describe('CausalGraphParser', () => {
 
             if (expectedEdge.edge_type === EdgeType.BACKWARDS_DIRECTED_EDGE) {
                 expectedEdge.edge_type = EdgeType.DIRECTED_EDGE;
+                // Flip backwards edge source/destination
+                const temp = expectedEdge.destination;
+                expectedEdge.destination = expectedEdge.source;
+                expectedEdge.source = temp;
             }
 
-            expect(serializeGraphEdge(attrs)).toEqual(expectedEdge);
+            expect(serializeGraphEdge(attrs, MockCausalGraph.nodes[source], MockCausalGraph.nodes[target])).toEqual(
+                expectedEdge
+            );
         });
 
         parsedGraph.forEachNode((id, attrs) => {
@@ -52,6 +58,7 @@ describe('CausalGraphParser', () => {
         for (const node of parsedGraph.nodes()) {
             expect(parsedGraph.getNodeAttributes(node).extras).toEqual({
                 erased: nodes[node].erased,
+                identifier: nodes[node].identifier,
                 redacted: nodes[node].redacted,
             });
         }
@@ -68,7 +75,9 @@ describe('CausalGraphParser', () => {
             const { erased } = edgeAttributes[targetNode];
 
             expect(parsedGraph.getEdgeAttributes(edge).extras).toEqual({
+                destination: edgeAttributes[targetNode].destination,
                 erased,
+                source: edgeAttributes[targetNode].source,
             });
         });
 

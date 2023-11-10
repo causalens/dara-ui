@@ -96,17 +96,18 @@ export interface CausalGraph {
 
 export interface CausalGraphNode {
     extras?: Record<string, any>;
-    identifier?: string;
+    identifier: string;
     meta: CausalGraphNodeMeta;
+    node_class?: string;
     variable_type: string;
 }
 
 export interface CausalGraphEdge {
-    destination?: string;
+    destination: CausalGraphNode;
     edge_type: EdgeType;
     extras?: Record<string, any>;
     meta: CausalGraphEdgeMeta;
-    source?: string;
+    source: CausalGraphNode;
 }
 
 export enum VariableType {
