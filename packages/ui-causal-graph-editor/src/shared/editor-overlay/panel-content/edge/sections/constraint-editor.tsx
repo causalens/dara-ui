@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { SoftEdgeArrowButton } from '@shared/editor-overlay/buttons';
-import { EdgeConstraintItem, EdgeConstraintType } from '@types';
-
 import { ButtonBar, Item, Tooltip } from '@darajs/ui-components';
 import { ArrowRightLong, ArrowsHorizontal, Ban } from '@darajs/ui-icons';
+
+import { SoftEdgeArrowButton } from '@shared/editor-overlay/buttons';
+import { EdgeConstraintItem, EdgeConstraintType } from '@types';
 
 import { ColumnWrapper, SectionTitle } from '../../styled';
 
