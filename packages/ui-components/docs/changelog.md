@@ -1,6 +1,9 @@
 ---
 title: Changelog
 ---
+## 1.2.4
+-   Exposed the Tippyjs delay prop on the `Tooltip` component.
+
 
 ## 1.2.3
 
@@ -18,7 +21,7 @@ title: Changelog
 ## 1.1.0
 
 -   Fixed an issue where `Datepicker` in controlled mode would sometimes end up in an infinite loop.
--   Fixed an issue where `Datepicker` if range was given did not show end year in the select. 
+-   Fixed an issue where `Datepicker` if range was given did not show end year in the select.
 -   Fixed an issue where `Table` column resizing would not affect cell width.
 -   Fixed an issue where `Multiselect` items would overflow when fixed height was given.
 
