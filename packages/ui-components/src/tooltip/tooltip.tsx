@@ -161,6 +161,8 @@ export interface TooltipProps {
     styling?: 'default' | 'error';
     /** Optional parameter that sets tooltip visibility to be in controlled mode */
     visible?: boolean;
+    /** Optional parameter to delay the appearance of the tooltip, defaults to 0 */
+    delay?: number;
 }
 
 /**
@@ -183,10 +185,12 @@ function Tooltip({
     followCursor = false,
     hidden = false,
     style,
+    delay = 0,
     onClickOutside = () => false,
 }: TooltipProps): JSX.Element {
     return (
         <Tippy
+            delay={delay}
             appendTo={appendTo}
             arrow
             disabled={disabled}
