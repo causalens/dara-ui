@@ -135,6 +135,8 @@ export interface TooltipProps {
     className?: string;
     /** The content to render in the tooltip, can be any react renderable content */
     content: React.ReactNode;
+    /** Optional parameter to delay the appearance of the tooltip, defaults to 0 */
+    delay?: number;
     /** Optional parameter to determine whether the display of the tooltip is disabled or not */
     disabled?: boolean;
     /** Whether the tooltip should follow the mouse cursor; or control how it will be followed */
@@ -157,12 +159,10 @@ export interface TooltipProps {
      * Standard react styling property
      */
     style?: React.CSSProperties;
-    /** Optional parameter to determine the style preset, options are default and error */
-    styling?: 'default' | 'error';
     /** Optional parameter that sets tooltip visibility to be in controlled mode */
     visible?: boolean;
-    /** Optional parameter to delay the appearance of the tooltip, defaults to 0 */
-    delay?: number;
+    /** Optional parameter to determine the style preset, options are default and error */
+    styling?: 'default' | 'error';
 }
 
 /**
@@ -190,9 +190,9 @@ function Tooltip({
 }: TooltipProps): JSX.Element {
     return (
         <Tippy
-            delay={delay}
             appendTo={appendTo}
             arrow
+            delay={delay}
             disabled={disabled}
             followCursor={followCursor}
             getReferenceClientRect={getReferenceClientRect}
