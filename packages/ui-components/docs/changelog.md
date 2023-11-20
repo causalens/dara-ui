@@ -1,7 +1,7 @@
 ---
 title: Changelog
 ---
-## 1.2.4
+## NEXT
 -   Exposed the Tippyjs delay prop on the `Tooltip` component.
 
 
