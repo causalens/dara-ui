@@ -41,24 +41,33 @@ export interface UseNotificationsInterface {
 export function useNotifications(): UseNotificationsInterface {
     const { push } = useContext(NotificationContext);
 
-    const notificationFromError = React.useCallback(
-        (status: Status): CurriedFunction2<string, any, void> => {
-            return curry((title: string, err: AnyError): void => {
-                const message = err?.status ? `${err.status}: ${err.message}` : err.message;
-                push({
-                    key: title,
-                    message,
-                    status,
-                    title: `${Status.Error.toUpperCase()}: ${title}`,
-                });
+    const pushErrorNotification = React.useCallback(() => {
+        return curry((title: string, err: AnyError): void => {
+            const message = err?.status ? `${err.status}: ${err.message}` : err.message;
+            push({
+                key: title,
+                message,
+                status: Status.ERROR,
+                title: `${Status.ERROR.toUpperCase()}: ${title}`,
             });
-        },
-        [push]
-    );
+        });
+    }, [push]);
+
+    const pushWarningNotification = React.useCallback(() => {
+        return curry((title: string, err: AnyError): void => {
+            const message = err?.status ? `${err.status}: ${err.message}` : err.message;
+            push({
+                key: title,
+                message,
+                status: Status.WARNING,
+                title: `${Status.WARNING.toUpperCase()}: ${title}`,
+            });
+        });
+    }, [push]);
 
     return {
-        pushErrorNotification: notificationFromError(Status.ERROR),
+        pushErrorNotification,
         pushNotification: push,
-        pushWarningNotification: notificationFromError(Status.WARNING),
+        pushWarningNotification,
     };
 }
