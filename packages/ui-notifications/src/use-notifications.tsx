@@ -42,7 +42,7 @@ export function useNotifications(): UseNotificationsInterface {
     const { push } = useContext(NotificationContext);
 
     const notificationFromError = React.useCallback(
-        (status: Status) => {
+        (status: Status): CurriedFunction2<string, any, void> => {
             return curry((title: string, err: AnyError): void => {
                 const message = err?.status ? `${err.status}: ${err.message}` : err.message;
                 push({
