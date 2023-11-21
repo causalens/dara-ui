@@ -57,8 +57,8 @@ export function useNotifications(): UseNotificationsInterface {
     );
 
     return {
-        pushErrorNotification: notificationFromError(Status.Error),
+        pushErrorNotification: notificationFromError(Status.ERROR),
         pushNotification: push,
-        pushWarningNotification: notificationFromError(Status.Warning),
+        pushWarningNotification: notificationFromError(Status.WARNING),
     };
 }
