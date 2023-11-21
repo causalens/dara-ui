@@ -16,7 +16,7 @@
  */
 import { CurriedFunction2 } from 'lodash';
 import curry from 'lodash/curry';
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 
 import { Status } from '@darajs/ui-utils';
 
@@ -52,9 +52,12 @@ export function useNotifications(): UseNotificationsInterface {
             });
         });
 
+    const errorNotification = notificationFromError(Status.ERROR);
+    const warningNotification = notificationFromError(Status.WARNING);
+
     return {
-        pushErrorNotification: notificationFromError(Status.ERROR),
+        pushErrorNotification: React.useCallback(errorNotification, [errorNotification]),
         pushNotification: push,
-        pushWarningNotification: notificationFromError(Status.WARNING),
+        pushWarningNotification: React.useCallback(warningNotification, [warningNotification]),
     };
 }
