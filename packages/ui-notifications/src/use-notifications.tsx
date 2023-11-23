@@ -16,7 +16,7 @@
  */
 import { CurriedFunction2 } from 'lodash';
 import curry from 'lodash/curry';
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 
 import { Status } from '@darajs/ui-utils';
 
@@ -41,20 +41,26 @@ export interface UseNotificationsInterface {
 export function useNotifications(): UseNotificationsInterface {
     const { push } = useContext(NotificationContext);
 
-    const notificationFromError = (status: Status): CurriedFunction2<string, any, void> =>
-        curry((title: string, err: AnyError): void => {
-            const message = err?.status ? `${err.status}: ${err.message}` : err.message;
-            push({
-                key: title,
-                message,
-                status,
-                title: `${status.toUpperCase()}: ${title}`,
-            });
-        });
+    const curriedPush = React.useCallback(
+        (status: Status) =>
+            curry((title: string, err: AnyError): void => {
+                const message = err?.status ? `${err.status}: ${err.message}` : err.message;
+                push({
+                    key: title,
+                    message,
+                    status,
+                    title: `${status.toUpperCase()}: ${title}`,
+                });
+            }),
+        [push]
+    );
+
+    const pushErrorNotification = React.useMemo(() => curriedPush(Status.ERROR), [curriedPush]);
+    const pushWarningNotification = React.useMemo(() => curriedPush(Status.WARNING), [curriedPush]);
 
     return {
-        pushErrorNotification: notificationFromError(Status.ERROR),
+        pushErrorNotification,
         pushNotification: push,
-        pushWarningNotification: notificationFromError(Status.WARNING),
+        pushWarningNotification,
     };
 }
