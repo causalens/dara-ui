@@ -1,9 +1,14 @@
 ---
 title: Changelog
 ---
-## 1.4.1
--   Exposed the Tippyjs delay prop on the `Tooltip` component.
 
+## 1.4.3
+
+-   Pinned fortawesome to `~6.4.0`
+
+## 1.4.1
+
+-   Exposed the Tippyjs delay prop on the `Tooltip` component.
 
 ## 1.2.3
 
@@ -16,7 +21,6 @@ title: Changelog
 -   Fixed an issue where `NumericInput` input did not take full space available to it.
 -   Fixed an issue where `Datepicker` could be overlapped by other components in a horizontal container.
 -   Fixed an issue where `Multiselect`'s input took too much space
-
 
 ## 1.1.0
 
