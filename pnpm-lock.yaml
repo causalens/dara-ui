@@ -383,8 +383,8 @@ importers:
       '@darajs/stylelint-config': ^1.4.2
       '@darajs/ui-icons': ^1.4.2
       '@darajs/ui-utils': ^1.4.2
-      '@fortawesome/free-regular-svg-icons': ^6.3.0
-      '@fortawesome/free-solid-svg-icons': ^6.3.0
+      '@fortawesome/free-regular-svg-icons': ~6.4.0
+      '@fortawesome/free-solid-svg-icons': ~6.4.0
       '@fortawesome/react-fontawesome': ^0.2.0
       '@popperjs/core': 2.4.0
       '@storybook/addon-a11y': ^6.5.16
