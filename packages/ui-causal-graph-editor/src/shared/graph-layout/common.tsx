@@ -50,6 +50,7 @@ export abstract class GraphLayoutBuilder<T> {
 
 export interface TiersConfig {
     group: string;
+    order_nodes_by?: string;
     rank?: string[];
 }
 

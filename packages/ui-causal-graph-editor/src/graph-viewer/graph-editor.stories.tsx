@@ -400,7 +400,7 @@ Fcose.args = {
 export const FcoseTiers = Template.bind({});
 
 const layout = FcoseLayout.Builder.build();
-layout.tiers = { group: 'meta.rendering_properties.another', rank: ['group3', 'group1'] };
+layout.tiers = { group: 'meta.rendering_properties.another', order_nodes_by: 'order', rank: ['group3', 'group1'] };
 // layout.tiers = nodeTiersList;
 layout.orientation = 'vertical';
 

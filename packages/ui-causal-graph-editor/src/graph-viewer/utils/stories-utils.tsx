@@ -198,6 +198,7 @@ export const nodeTiersCausalGraph = {
                 },
                 test: 'group2',
             },
+            order: 0,
         },
         input2: {
             ...causalGraph.nodes.input2,
@@ -210,6 +211,7 @@ export const nodeTiersCausalGraph = {
                 },
                 test: 'group2',
             },
+            order: 1,
         },
         input3: {
             ...causalGraph.nodes.input3,
@@ -222,6 +224,7 @@ export const nodeTiersCausalGraph = {
                 },
                 test: 'group1',
             },
+            order: 3,
         },
         input4: {
             ...causalGraph.nodes.input4,
@@ -230,10 +233,11 @@ export const nodeTiersCausalGraph = {
                 ...causalGraph.nodes.input4.meta,
                 rendering_properties: {
                     ...causalGraph.nodes.input4.meta.rendering_properties,
-                    // another: 'group3',
+                    another: 'group3',
                 },
                 test: 'group1',
             },
+            order: 2,
         },
 
         target: {
