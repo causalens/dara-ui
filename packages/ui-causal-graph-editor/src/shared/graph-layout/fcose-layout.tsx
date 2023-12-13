@@ -446,8 +446,6 @@ export default class FcoseLayout extends GraphLayout {
                 })),
             ];
 
-            console.log(tiersPlacement);
-
             cytoscape({
                 elements,
                 headless: true,
