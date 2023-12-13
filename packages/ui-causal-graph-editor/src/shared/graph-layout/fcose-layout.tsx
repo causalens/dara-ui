@@ -161,6 +161,10 @@ class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> implements Tier
  *  */
 function getPathInNodeAttribute(attributes: Record<string, any>, path: string): any {
     let searchablePath = path;
+    // If attribute becomes undefined we have a non valid path within the node
+    if (attributes === undefined) {
+        throw new Error('Could not find path for rank or group within Node');
+    }
     // If path is in meta change it to originalMeta
     if (searchablePath === 'meta') {
         searchablePath = 'originalMeta';
@@ -328,7 +332,7 @@ interface TiersProperties {
  * @param orientation the orientation of the graph
  * @param tierSeparation tier separation
  *  */
-function getTieredLayoutProperties(
+export function getTieredLayoutProperties(
     graph: SimulationGraph,
     tiers: GraphTiers,
     orientation: DirectionType,
@@ -356,7 +360,7 @@ function getTieredLayoutProperties(
             });
 
             if (missingGroups.length > 0) {
-                throw new Error(`Groups ${missingGroups.join(', ')} defined in rank not found within any Nodes`);
+                throw new Error(`Group(s) ${missingGroups.join(', ')} defined in rank not found within any Nodes`);
             }
         } else {
             tiersArray = Object.values(tieredNodes);
@@ -441,6 +445,8 @@ export default class FcoseLayout extends GraphLayout {
                     group: 'edges',
                 })),
             ];
+
+            console.log(tiersPlacement);
 
             cytoscape({
                 elements,

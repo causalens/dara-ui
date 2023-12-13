@@ -1,5 +1,79 @@
 import { CausalGraph, EdgeType, VariableType } from '../../src/types';
 
+export const SIMPLE: CausalGraph = {
+    edges: {
+        A: {
+            B: {
+                destination: {
+                    identifier: 'B',
+                    meta: {},
+                    variable_type: VariableType.UNSPECIFIED,
+                },
+                edge_type: EdgeType.DIRECTED_EDGE,
+                meta: {},
+                source: {
+                    identifier: 'A',
+                    meta: {},
+                    variable_type: VariableType.UNSPECIFIED,
+                },
+            },
+        },
+        B: {
+            C: {
+                destination: {
+                    identifier: 'C',
+                    meta: {},
+                    variable_type: VariableType.UNSPECIFIED,
+                },
+                edge_type: EdgeType.DIRECTED_EDGE,
+                meta: {},
+                source: {
+                    identifier: 'B',
+                    meta: {},
+                    variable_type: VariableType.UNSPECIFIED,
+                },
+            },
+            D: {
+                destination: {
+                    identifier: 'D',
+                    meta: {},
+                    variable_type: VariableType.UNSPECIFIED,
+                },
+                edge_type: EdgeType.DIRECTED_EDGE,
+                meta: {},
+                source: {
+                    identifier: 'B',
+                    meta: {},
+                    variable_type: VariableType.UNSPECIFIED,
+                },
+            },
+        },
+    },
+    nodes: {
+        A: {
+            identifier: 'A',
+            meta: {},
+            variable_type: VariableType.UNSPECIFIED,
+        },
+        B: {
+            identifier: 'B',
+            meta: {},
+            variable_type: VariableType.UNSPECIFIED,
+        },
+        C: {
+            identifier: 'C',
+            meta: {},
+            variable_type: VariableType.UNSPECIFIED,
+        },
+        D: {
+            identifier: 'D',
+            meta: {},
+            variable_type: VariableType.UNSPECIFIED,
+        },
+    },
+    version: '2',
+};
+
 export const FRAUD: CausalGraph = {
     edges: {
         Age: {
@@ -478,18 +552,18 @@ export const FRAUD: CausalGraph = {
         },
         'Location Value=EC': {
             identifier: 'Location Value=EC',
-            meta: { group: 'a' },
+            meta: { group: 'a', order: 1 },
             variable_type: VariableType.UNSPECIFIED,
         },
         'Location Value=SE': {
             identifier: 'Location Value=SE',
-            meta: { group: 'a' },
+            meta: { group: 'a', order: 2 },
 
             variable_type: VariableType.UNSPECIFIED,
         },
         'Location Value=SW': {
             identifier: 'Location Value=SW',
-            meta: { group: 'a' },
+            meta: { group: 'a', order: 3 },
             variable_type: VariableType.UNSPECIFIED,
         },
         'Marital Status Value=Married': {
