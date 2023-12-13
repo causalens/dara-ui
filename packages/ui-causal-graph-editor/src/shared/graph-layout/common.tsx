@@ -18,6 +18,8 @@ import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
 
+export type DirectionType = 'horizontal' | 'vertical';
+
 export abstract class GraphLayoutBuilder<T> {
     _nodeSize = 64;
 
@@ -44,6 +46,22 @@ export abstract class GraphLayoutBuilder<T> {
     }
 
     abstract build(): T;
+}
+
+export interface TiersConfig {
+    group: string;
+    order_nodes_by?: string;
+    rank?: string[];
+}
+
+export type GraphTiers = string[][] | TiersConfig;
+
+/**
+ * Defines necessary properties that need to be implemented by graph layouts to support tiered layouts
+ */
+export interface TieredGraphLayoutBuilder {
+    orientation: DirectionType;
+    tiers: GraphTiers;
 }
 
 /**

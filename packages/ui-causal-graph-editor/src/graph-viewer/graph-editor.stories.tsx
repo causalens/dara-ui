@@ -21,8 +21,6 @@ import deepCopy from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import { useEffect, useState } from 'react';
 
-import { NotificationWrapper, useNotifications } from '@darajs/ui-notifications';
-
 import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import {
     CircularLayout,
@@ -35,108 +33,12 @@ import {
 } from '../shared/graph-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
+import { Template, causalGraph, pagCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
     title: 'CausalGraphEditor/GraphEditor',
 } as Meta;
-
-const Template = (args: CausalGraphEditorProps): JSX.Element => {
-    const { pushNotification } = useNotifications();
-
-    return (
-        <>
-            <CausalGraphViewerComponent {...args} onNotify={pushNotification} style={{ margin: 0 }} />
-            <NotificationWrapper style={{ bottom: 0 }} />
-        </>
-    );
-};
-
-const causalGraph: CausalGraph = {
-    edges: {
-        input1: {
-            input4: {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {
-                    rendering_properties: {
-                        color: 'red',
-                        description:
-                            'my super long description text that spans a few lines, is super descriptive and goes in depth into the explanation of why this edge exists in the first place and this is some extra text that will be behind a scrollbar',
-                        tooltip: {
-                            key1: 'some value 1',
-                            key2: 'some value 2',
-                        },
-                    },
-                },
-            },
-            target: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} },
-        },
-        input2: {
-            target: {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {
-                    rendering_properties: {
-                        description:
-                            'my super long description text that spans a few lines, is super descriptive and goes in depth into the explanation of why this edge exists in the first place. It is actually so long that it does not fit by default and triggers overflow to scroll because of the max-height set to 5 lines',
-                        tooltip: 'some plaintext description',
-                    },
-                },
-            },
-        },
-        input3: { target: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} } },
-        input4: {
-            target: {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: { rendering_properties: {} },
-            },
-        },
-    },
-    nodes: {
-        input1: {
-            meta: {
-                rendering_properties: {
-                    label: 'input1 renamed',
-                },
-            },
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        input2: {
-            meta: {
-                rendering_properties: {
-                    label: 'input2 renamed multi word node name',
-                },
-            },
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        input3: {
-            meta: {},
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        input4: {
-            meta: {},
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        target: {
-            meta: {},
-            variable_type: VariableType.UNSPECIFIED,
-        },
-    },
-    version: '2.0',
-};
-
-const pagCausalGraph = {
-    ...causalGraph,
-    edges: {
-        ...causalGraph.edges,
-        input1: {
-            ...causalGraph.edges.input1,
-            input4: {
-                ...causalGraph.edges.input1.input4,
-                edge_type: EdgeType.UNDIRECTED_EDGE,
-            },
-        },
-    },
-};
 
 export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
     const [nodeNumber, setNodeNumber] = useState(3);
@@ -493,6 +395,21 @@ Fcose.args = {
     graphData: SHIPPED_UNITS,
     // graphData: FRAUD,
     graphLayout: FcoseLayout.Builder.build(),
+};
+
+export const FcoseTiers = Template.bind({});
+
+const layout = FcoseLayout.Builder.build();
+layout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
+layout.tierSeparation = 300;
+layout.nodeRepulsion = 10000000;
+
+layout.orientation = 'vertical';
+
+FcoseTiers.args = {
+    editable: true,
+    graphData: FRAUD,
+    graphLayout: layout,
 };
 
 export const ForceAtlas = Template.bind({});
