@@ -430,7 +430,9 @@ export default class FcoseLayout extends GraphLayout {
         return new Promise((resolve) => {
             const hasPositions = graph.getNodeAttribute(graph.nodes()[0], 'x');
             const size = graph.getAttribute('size');
-            const tiersPlacement = getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation);
+            const tiersPlacement = this.tiers
+                ? getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation)
+                : { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
 
             const elements = [
                 ...graph.mapNodes<ElementDefinition>((id, attrs) => ({
