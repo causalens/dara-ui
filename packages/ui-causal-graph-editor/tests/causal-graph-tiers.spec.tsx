@@ -33,6 +33,29 @@ const groupE = ['Fraud'];
 
 const tieredFraud = [groupD, groupA, groupC, groupB, groupE];
 
+const invalidOrderGraph = {
+    ...SIMPLE,
+    nodes: {
+        ...SIMPLE.nodes,
+        A: {
+            ...SIMPLE.nodes.A,
+            meta: {
+                ...SIMPLE.nodes.A.meta,
+                group: 'group1',
+                order: 'foo',
+            },
+        },
+        B: {
+            ...SIMPLE.nodes.B,
+            meta: {
+                ...SIMPLE.nodes.B.meta,
+                group: 'group1',
+                order: 2,
+            },
+        },
+    },
+};
+
 describe('CausalGraphTiers', () => {
     describe('Fcose Layout', () => {
         it('Tier of tiers produces correct relative placements horizontal', () => {
@@ -56,6 +79,13 @@ describe('CausalGraphTiers', () => {
                 { bottom: 'B', gap: 100, top: 'A' },
                 { bottom: 'C', gap: 100, top: 'B' },
             ]);
+        });
+        it('Throws an error if a value for node order cannot be converted to a number', () => {
+            const parsedGraph = causalGraphParser(invalidOrderGraph);
+            const tiers = { group: 'meta.group', order_nodes_by: 'meta.order' };
+            expect(() => getTieredLayoutProperties(parsedGraph, tiers, 'horizontal', 100)).toThrow(
+                'Non-numeric order value encountered for nodes'
+            );
         });
         it('Accepts group of tiers config and produces correct tiers', () => {
             const parsedGraph = causalGraphParser(FRAUD);
