@@ -33,7 +33,7 @@ import {
 } from '../shared/graph-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, causalGraph, nodeTiersCausalGraph, nodeTiersList, pagCausalGraph } from './utils/stories-utils';
+import { Template, causalGraph, pagCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
@@ -400,13 +400,15 @@ Fcose.args = {
 export const FcoseTiers = Template.bind({});
 
 const layout = FcoseLayout.Builder.build();
-layout.tiers = { group: 'meta.rendering_properties.another', order_nodes_by: 'order', rank: ['group3', 'group1'] };
-// layout.tiers = nodeTiersList;
+layout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
+layout.tierSeparation = 300;
+layout.nodeRepulsion = 10000000;
+
 layout.orientation = 'vertical';
 
 FcoseTiers.args = {
     editable: true,
-    graphData: nodeTiersCausalGraph,
+    graphData: FRAUD,
     graphLayout: layout,
 };
 

@@ -346,7 +346,7 @@ function getTieredLayoutProperties(
         const { group, order_nodes_by, rank } = tiers;
         const nodes = graph.nodes();
         const tieredNodes = getNodeGroups(nodes, group, graph);
-        nodesOrder = getNodeOrder(nodes, order_nodes_by, graph);
+        nodesOrder = order_nodes_by ? getNodeOrder(nodes, order_nodes_by, graph) : undefined;
 
         // if rank is defined use it to order the tiers
         if (rank) {

@@ -198,7 +198,7 @@ export const nodeTiersCausalGraph = {
                 },
                 test: 'group2',
             },
-            order: 0,
+            order: 2,
         },
         input2: {
             ...causalGraph.nodes.input2,
@@ -211,7 +211,7 @@ export const nodeTiersCausalGraph = {
                 },
                 test: 'group2',
             },
-            order: 1,
+            order: 7,
         },
         input3: {
             ...causalGraph.nodes.input3,
