@@ -156,10 +156,10 @@ class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> implements Tier
 
 /**
  * Based on a node attribute checks if the path is in the attribute or in extras, if not found returns undefined
- * @param path path to the attribute
  * @param attributes node object or a sub attribute of the node object
+ * @param path path to the attribute
  *  */
-function getPathInNodeAttribute(path: string, attributes: any): any {
+function getPathInNodeAttribute(attributes: Record<string, any>, path: string): any {
     let searchablePath = path;
     // If path is in meta change it to originalMeta
     if (searchablePath === 'meta') {
@@ -277,9 +277,7 @@ function getNodeGroups(nodes: string[], group: string, graph: SimulationGraph): 
         const nodeAttributes = graph.getNodeAttributes(node);
         // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
         // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
-        const nodeGroup = attributePathArray.reduce((attributeAccumulator, path) => {
-            return getPathInNodeAttribute(path, attributeAccumulator);
-        }, nodeAttributes);
+        const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
 
         // If it is not undefined at this point i.e. node group was found
         if (nodeGroup !== undefined) {
@@ -308,9 +306,7 @@ function getNodeOrder(nodes: string[], orderPath: string, graph: SimulationGraph
         const nodeAttributes = graph.getNodeAttributes(node);
         // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
         // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
-        const nodeOrder = attributePathArray.reduce((attributeAccumulator, path) => {
-            return getPathInNodeAttribute(path, attributeAccumulator);
-        }, nodeAttributes);
+        const nodeOrder = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
 
         // If it is not undefined at this point i.e. node order was found
         if (nodeOrder !== undefined) {
@@ -321,7 +317,7 @@ function getNodeOrder(nodes: string[], orderPath: string, graph: SimulationGraph
     }, {});
 }
 
-interface tiersProperties {
+interface TiersProperties {
     alignmentConstraint?: string[][];
     relativePlacementConstraint?: FcoseRelativePlacementConstraint[];
 }
@@ -337,7 +333,7 @@ function getTieredLayoutProperties(
     tiers: GraphTiers,
     orientation: DirectionType,
     tierSeparation: number
-): tiersProperties {
+): TiersProperties {
     let tiersArray: string[][] = Array.isArray(tiers) ? tiers : [];
     let nodesOrder: Record<string, string>;
 
