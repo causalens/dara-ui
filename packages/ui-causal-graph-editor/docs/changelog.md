@@ -5,6 +5,7 @@ title: Changelog
 ## NEXT
 
 -   Fix an issue where dragging nodes too quickly would cause the node drag to stop working
+-   Added support for tiered layout in `Fcose`. It allows for nodes to be placed on tiers following some hierarchy and to further define requirements of nodes positions within that tier.
 
 ## 1.4.0
 

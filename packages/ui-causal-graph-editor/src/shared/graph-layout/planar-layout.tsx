@@ -19,9 +19,7 @@ import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
 import { DagNodeData, dagGraphParser } from '../parsers';
-import { GraphLayout, GraphLayoutBuilder } from './common';
-
-export type DirectionType = 'horizontal' | 'vertical';
+import { DirectionType, GraphLayout, GraphLayoutBuilder } from './common';
 
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
