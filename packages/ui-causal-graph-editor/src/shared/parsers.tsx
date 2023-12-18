@@ -48,12 +48,16 @@ export function dagGraphParser(graph: SimulationGraph): Dag<DagNode<DagNodeData>
     const nodes: DagNodeData[] = graph.mapNodes((id: string, attributes: SimulationNode) => {
         const parentIds = graph.inboundNeighbors(id);
 
+        // const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
+
         return {
             ...attributes,
             group: 'latent',
             parentIds,
         };
     });
+
+    console.log('nodes', nodes);
 
     return dagStratify<DagNodeData>()(nodes);
 }

@@ -158,6 +158,16 @@ PlanarHorizontal.args = {
     graphLayout: PlanarLayout.Builder.build(),
 };
 
+export const PlanarTiers = Template.bind({});
+const planarLayout = PlanarLayout.Builder.build();
+planarLayout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
+
+PlanarTiers.args = {
+    editable: true,
+    graphData: FRAUD,
+    graphLayout: planarLayout,
+};
+
 export const Spring = Template.bind({});
 Spring.args = {
     editable: true,

@@ -19,7 +19,7 @@ import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
 import { DagNodeData, dagGraphParser } from '../parsers';
-import { DirectionType, GraphLayout, GraphLayoutBuilder } from './common';
+import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
 
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
@@ -44,8 +44,10 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
  * The Planar layout utilises the sugiyama algorithm to lay out nodes in a way that minimises
  * edge crossings.
  */
-export default class PlanarLayout extends GraphLayout {
+export default class PlanarLayout extends GraphLayout implements TieredGraphLayoutBuilder {
     public orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     constructor(builder: PlanarLayoutBuilder) {
         super(builder);
@@ -74,6 +76,7 @@ export default class PlanarLayout extends GraphLayout {
             newLayout: LayoutMapping<XYPosition>;
             onAddNode?: () => void | Promise<void>;
         } => {
+            console.log(this.tiers);
             const dag = dagGraphParser(currentGraph);
 
             /**
