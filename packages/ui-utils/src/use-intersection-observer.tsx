@@ -42,11 +42,17 @@ function useIntersectionObserver<T extends Element>(
         if (ref.current) {
             observer.observe(ref.current);
         }
+
+        const currentRef = ref.current;
+
         return () => {
-            if (ref.current) observer.unobserve(ref.current);
-            else observer.disconnect();
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            } else {
+                observer.disconnect();
+            }
         };
-    }, []);
+    }, [ref, rootMargin, threshold]);
     return isIntersecting;
 }
 

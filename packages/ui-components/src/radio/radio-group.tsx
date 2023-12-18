@@ -173,9 +173,10 @@ function RadioGroup(props: RadioGroupProps): JSX.Element {
     const onChangeValue = (event: React.FormEvent<HTMLInputElement>): void => {
         const target = event.target as HTMLInputElement;
         const chosenIndex = Number(target.value);
-        setCurrentSelected(chosenIndex);
+        // controlled mode
         if (props.value !== undefined) {
             props.onChange?.(props.items[chosenIndex], event);
+            // uncontrolled mode
         } else {
             setCurrentSelected(chosenIndex);
         }
@@ -187,6 +188,7 @@ function RadioGroup(props: RadioGroupProps): JSX.Element {
                 props.value !== undefined ? isEqual(item.value, props.value) : isEqual(item.value, props.initialValue)
             )
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.value]);
 
     return (

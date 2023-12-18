@@ -80,7 +80,7 @@ describe('CausalGraphStore', () => {
             modifiedState.editorMode = EditorMode.RESOLVER;
 
             const state = GraphReducer(modifiedState, actions.addEdge(['node2', 'node1']));
-            expect(state.graph?.getEdgeAttribute('node2', 'node1', 'edge_type')).toEqual(EdgeType.DIRECTED_EDGE);  
+            expect(state.graph?.getEdgeAttribute('node2', 'node1', 'edge_type')).toEqual(EdgeType.DIRECTED_EDGE);
         });
         it('should leave the existing edges intact', () => {
             const modifiedState = initialState();
@@ -146,5 +146,4 @@ describe('CausalGraphStore', () => {
             expect(state.graph?.nodes()).toEqual(['node1', 'node3']);
         });
     });
-
 });

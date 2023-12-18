@@ -49,7 +49,7 @@ function useDragMode(
         }
 
         return false;
-    }, [dragMode, editMode, allowEdgeAdd]);
+    }, [dragMode, editMode, allowEdgeAdd, allowNodeDrag]);
 
     useEffect(() => {
         if (!dragEnabled) {
@@ -57,6 +57,7 @@ function useDragMode(
         } else {
             onDragModeChange(dragMode);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dragMode, dragEnabled]);
 
     // Register listener to switch modes in edit mode
@@ -82,7 +83,7 @@ function useDragMode(
                 document.removeEventListener('keyup', cmdHandler);
             }
         };
-    }, [dragMode]);
+    }, [allowEdgeAdd, allowNodeDrag, dragMode, editMode]);
 
     return { dragEnabled, dragMode, setDragMode };
 }

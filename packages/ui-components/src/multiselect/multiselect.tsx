@@ -122,7 +122,6 @@ const Input = styled.input<InputProps>`
     overflow: hidden;
     flex: 1 1 auto;
 
-    height: 100%;
     margin-right: 0.5rem;
     padding: 0rem;
 
@@ -154,6 +153,7 @@ const TagWrapper = styled.div<TagWrapperProps>`
     align-items: center;
 
     width: 100%;
+    height: 100%;
     max-height: ${(props) => props.maxRows * (tagHeight + tagTopMargin) - 0.25}rem;
 `;
 
@@ -274,12 +274,16 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             ...('selectedItems' in props && { selectedItems: props.selectedItems }),
         });
 
-    const onTermChange = useCallback((term: string) => {
-        setInputValue(term);
-        if (props.onTermChange) {
-            props.onTermChange(term);
-        }
-    }, []);
+    const onTermChange = useCallback(
+        (term: string) => {
+            setInputValue(term);
+            if (props.onTermChange) {
+                props.onTermChange(term);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [props.onTermChange]
+    );
 
     // If there is a term change function passed in then don't filter locally
     const filteredItems = props.onTermChange
@@ -373,6 +377,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             onFocus={openMenu}
                             placeholder={props.placeholder}
                             size={props.size}
+                            style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
                     <ChevronButton {...getToggleButtonProps()}>

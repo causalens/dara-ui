@@ -103,6 +103,17 @@ export function nodesToLayout(nodes: SimulationNode[]): LayoutMapping<XYPosition
 }
 
 /**
+ * Gets any extra fields passed to a Node in a CausalGraph
+ * @param nodeData
+ *  */
+function getExtraNodeFields(nodeData: CausalGraphNode): Record<string, any> {
+    // Destructure the fields to exclude, and collect all other fields into a rest object
+    const { meta, variable_type, ...extras } = nodeData;
+
+    return extras;
+}
+
+/**
  * Parse a causal graph node into a simulation node
  *
  * @param nodeKey node id
@@ -135,9 +146,14 @@ export function parseGraphNode(
     );
     meta['meta.rendering_properties.latent'] ??= isLatent;
 
+    // any extra fields that are not part of the meta object
+    const extras = getExtraNodeFields(nodeData);
+
     const attributes: SimulationNode = {
+        extras,
         id: nodeKey,
         originalMeta: nodeData.meta,
+
         variable_type: nodeData.variable_type,
         // Copy over meta.x/y to use as initial positions
         x: meta['meta.rendering_properties.x'],
@@ -146,6 +162,17 @@ export function parseGraphNode(
     };
 
     return attributes;
+}
+
+/**
+ * Gets any extra fields passed to a Node in a CausalGraph
+ * @param edgeData
+ *  */
+function getExtraEdgeFields(edgeData: CausalGraphEdge): Record<string, any> {
+    // Destructure the fields to exclude, and collect all other fields into a rest object
+    const { meta, edge_type, ...extras } = edgeData;
+
+    return extras;
 }
 
 /**
@@ -167,6 +194,7 @@ export function parseGraphEdge(edgeData: CausalGraphEdge): SimulationEdge {
 
     const attributes: SimulationEdge = {
         edge_type: edgeData.edge_type,
+        extras: getExtraEdgeFields(edgeData),
         originalMeta: edgeData.meta,
         ...meta,
     };
@@ -179,6 +207,17 @@ type Entries<T> = {
 }[keyof T][];
 
 /**
+ * Gets any extra fields passed to a CausalGraph
+ * @param graphData
+ *  */
+function getExtraGraphFields(graphData: CausalGraph): Record<string, any> {
+    // Destructure the fields to exclude, and collect all other fields into a rest object
+    const { edges, nodes, version, ...extras } = graphData;
+
+    return extras;
+}
+
+/**
  * Parses CausalGraph structure into a SimulationGraph representation
  *
  * @param data input CausalGraph structure
@@ -189,11 +228,10 @@ export function causalGraphParser(
     availableInputs?: string[],
     initialGraph?: SimulationGraph
 ): SimulationGraph {
-    let resultGraph = initialGraph;
-
     // use graph provided or a new one
-    resultGraph ??= new DirectedGraph<SimulationNode, SimulationEdge, SimulationAttributes>();
+    const resultGraph = initialGraph ?? new DirectedGraph<SimulationNode, SimulationEdge, SimulationAttributes>();
 
+    // get array of nodes
     const newNodes = Object.keys(data.nodes);
 
     // Remove nodes which no longer exist
@@ -210,12 +248,12 @@ export function causalGraphParser(
 
         try {
             const existingAttributes = resultGraph.getNodeAttributes(nodeKey);
-            const { x, y, ...existingAttributesWithoutPosition } = existingAttributes;
+            const { x, y, extras, ...existingAttributesWithoutPosition } = existingAttributes;
 
-            // Check if attributes changed (not x,y)
+            // Check if attributes changed (not x,y,extras)
             if (!isEqual(existingAttributesWithoutPosition, attributes)) {
-                // keep previous positions
-                resultGraph.updateNode(nodeKey, () => ({ ...attributes, x, y }));
+                // keep previous positions and extras
+                resultGraph.updateNode(nodeKey, () => ({ ...attributes, extras, x, y }));
             }
         } catch {
             // Error - no node exists, add it first
@@ -251,6 +289,17 @@ export function causalGraphParser(
 
     resultGraph.updateAttribute('version', () => data.version);
     resultGraph.updateAttribute('uid', () => generate());
+
+    // TODO: check if this can be simplified
+    try {
+        const existingGraphAttributes = resultGraph.getAttributes();
+        const { extras } = existingGraphAttributes;
+        if (Object.keys(extras).length === 0) {
+            resultGraph.updateAttribute('extras', () => getExtraGraphFields(data));
+        }
+    } catch {
+        resultGraph.updateAttribute('extras', () => getExtraGraphFields(data));
+    }
 
     return resultGraph;
 }

@@ -39,7 +39,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
-import { getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
     CausalGraphEdge,
@@ -47,11 +47,14 @@ import {
     EdgeConstraint,
     EdgeType,
     EditorMode,
+    SimulationEdge,
     ZoomThresholds,
 } from '@types';
 
+import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
 import PointerContext from '../shared/pointer-context';
+import { PixiEdgeStyle } from '../shared/rendering/edge';
 import { useRenderEngine } from '../shared/rendering/use-render-engine';
 import { causalGraphSerializer, serializeGraphEdge, serializeGraphNode } from '../shared/serializer';
 import { Settings, SettingsProvider } from '../shared/settings-context';
@@ -69,12 +72,16 @@ export interface CausalGraphEditorProps extends Settings {
     availableInputs?: string[];
     /** Standard class name prop */
     className?: string;
+    /** Any extra sections to display in the side panel on edge click */
+    edgeExtrasContent?: React.ReactElement;
     /** The backend data */
     graphData?: CausalGraph;
     /** Graph layout to use */
     graphLayout: GraphLayout;
     /** Optional initial constraints to show in edge encoder mode */
     initialConstraints?: EdgeConstraint[];
+    /** Any extra sections to display in the side panel on node click */
+    nodeExtrasContent?: React.ReactElement;
     /** Array of node names that cannot be removed */
     nonRemovableNodes?: Array<string>;
     /** Event handler for clicking on an edge */
@@ -85,6 +92,8 @@ export interface CausalGraphEditorProps extends Settings {
     onEdgeConstraintsUpdate?: (constraints: EdgeConstraint[]) => void | Promise<void>;
     /** onUpdate handler for live updating the edited graph */
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
+    /** Optional handler to process the edge style */
+    processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
     /** Pass through of the native style prop */
     style?: React.CSSProperties;
     /** Optional parameter to force a tooltip to use a particular font size */
@@ -111,6 +120,10 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.graphLayout.requiresPosition
     );
 
+    const [editorMode] = useState(
+        () => props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER)
+    );
+
     const {
         getCenterPosition,
         useEngineEvent,
@@ -126,8 +139,9 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         state.graph,
         props.graphLayout,
         props.editable,
-        props.editorMode,
+        editorMode,
         props.initialConstraints,
+        props.processEdgeStyle,
         props.zoomThresholds
     );
 
@@ -154,7 +168,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             let serializedNode: CausalGraphNode = null;
 
             if (selectedNode) {
-                serializedNode = serializeGraphNode(state.graph.getNodeAttributes(selectedNode), true);
+                serializedNode = serializeGraphNode(state.graph.getNodeAttributes(selectedNode));
             }
 
             props.onClickNode(serializedNode);
@@ -172,7 +186,11 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
 
             if (selectedEdge) {
                 const [source, target] = selectedEdge;
-                serializedEdge = serializeGraphEdge(state.graph.getEdgeAttributes(source, target), source, target);
+                serializedEdge = serializeGraphEdge(
+                    state.graph.getEdgeAttributes(source, target),
+                    serializeGraphNode(state.graph.getNodeAttributes(source)),
+                    serializeGraphNode(state.graph.getNodeAttributes(target))
+                );
             }
 
             props.onClickEdge(serializedEdge);
@@ -184,7 +202,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         useEdgeConstraintEncoder(props.initialConstraints, props.onEdgeConstraintsUpdate);
 
     const selectedConstraint = useMemo(() => {
-        if (props.editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
+        if (editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
             const [source, target] = selectedEdge;
 
             // Find constraint with either matching or reversed source/target
@@ -192,7 +210,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 (c) => (c.source === source && c.target === target) || (c.source === target && c.target === source)
             );
         }
-    }, [props.editorMode, selectedEdge, constraints]);
+    }, [editorMode, selectedEdge, constraints]);
 
     // deletion
 
@@ -208,7 +226,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
 
     function onConfirmRemoveEdge(): void {
         // In encoder mode, remove related constraint
-        if (props.editorMode === EditorMode.EDGE_ENCODER) {
+        if (editorMode === EditorMode.EDGE_ENCODER) {
             onRemoveConstraint();
         }
 
@@ -260,7 +278,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             return;
         }
 
-        if (props.editorMode === EditorMode.EDGE_ENCODER) {
+        if (editorMode === EditorMode.EDGE_ENCODER) {
             const [source, target] = edge;
             addConstraint(source, target);
         }
@@ -309,7 +327,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         api.updateEdgeType(selectedEdge, EdgeType.DIRECTED_EDGE);
 
         if (reverse) {
-            if (props.editorMode === EditorMode.EDGE_ENCODER) {
+            if (editorMode === EditorMode.EDGE_ENCODER) {
                 onReverseConstraint();
             }
 
@@ -378,7 +396,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         const sourceLabel = sourceNodeAttributes['meta.rendering_properties.label'] ?? sourceNodeAttributes.id;
         const targetLabel = targetNodeAttributes['meta.rendering_properties.label'] ?? targetNodeAttributes.id;
 
-        const tooltipArrow = props.editorMode === EditorMode.DEFAULT ? '➜' : '-';
+        const tooltipArrow = editorMode === EditorMode.DEFAULT ? '➜' : '-';
 
         const edgeTooltipContent = getTooltipContent(
             `${sourceLabel} ${tooltipArrow} ${targetLabel}`,
@@ -446,26 +464,33 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         }
     }
 
+    const updateStateRef = React.useRef(updateState);
+    updateStateRef.current = updateState;
+
     useEffect(() => {
-        updateState();
+        updateStateRef.current();
+
+        const updateFunction = (): void => {
+            updateStateRef.current();
+        };
 
         // Attach listeners so each graph update will send an update
-        state.graph.on('nodeAdded', updateState);
-        state.graph.on('edgeAdded', updateState);
-        state.graph.on('edgeDropped', updateState);
-        state.graph.on('nodeDropped', updateState);
-        state.graph.on('edgeAttributesUpdated', updateState);
-        state.graph.on('nodeAttributesUpdated', updateState);
+        state.graph.on('nodeAdded', updateFunction);
+        state.graph.on('edgeAdded', updateFunction);
+        state.graph.on('edgeDropped', updateFunction);
+        state.graph.on('nodeDropped', updateFunction);
+        state.graph.on('edgeAttributesUpdated', updateFunction);
+        state.graph.on('nodeAttributesUpdated', updateFunction);
 
         isMounted.current = true;
 
         return () => {
-            state.graph.off('nodeAdded', updateState);
-            state.graph.off('edgeAdded', updateState);
-            state.graph.off('edgeDropped', updateState);
-            state.graph.off('nodeDropped', updateState);
-            state.graph.off('edgeAttributesUpdated', updateState);
-            state.graph.off('nodeAttributesUpdated', updateState);
+            state.graph.off('nodeAdded', updateFunction);
+            state.graph.off('edgeAdded', updateFunction);
+            state.graph.off('edgeDropped', updateFunction);
+            state.graph.off('nodeDropped', updateFunction);
+            state.graph.off('edgeAttributesUpdated', updateFunction);
+            state.graph.off('nodeAttributesUpdated', updateFunction);
         };
     }, [state.graph]);
 
@@ -477,6 +502,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     });
     useEffect(() => {
         onSearchResults(searchResults);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchResults]);
 
     const [showFrameButtons, setShowFrameButtons] = useState(false);
@@ -514,7 +540,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     if (selectedEdge) {
         contentSelected = state.graph.hasEdge(selectedEdge[0], selectedEdge[1]);
         panelTitle = 'Edge';
-    } else if (selectedNode && state.editorMode !== EditorMode.EDGE_ENCODER) {
+    } else if (selectedNode && editorMode !== EditorMode.EDGE_ENCODER) {
         contentSelected = state.graph.hasNode(selectedNode);
         panelTitle = 'Node';
     }
@@ -536,7 +562,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 disableLatentNodeAdd: props.disableLatentNodeAdd,
                 disableNodeRemoval: props.disableNodeRemoval,
                 editable: props.editable,
-                editorMode: props.editorMode,
+                editorMode,
                 onNotify: props.onNotify,
                 verboseDescriptions: props.verboseDescriptions,
             }}
@@ -558,7 +584,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
-                            bottomLeft={<Legend listItems={getLegendData(state.editorMode, props.additionalLegends)} />}
+                            bottomLeft={<Legend listItems={getLegendData(editorMode, props.additionalLegends)} />}
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}
@@ -582,25 +608,40 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                             }
                             validContentSelected={contentSelected}
                         >
-                            {selectedEdge && (
-                                <EdgeInfoContent
-                                    api={api}
-                                    key={selectedEdge.join('-')}
-                                    onConfirmDirection={confirmDirection}
-                                    onUpdateConstraint={updateConstraint}
-                                    selectedConstraint={selectedConstraint}
-                                    selectedEdge={selectedEdge}
-                                    state={state}
-                                />
-                            )}
-                            {selectedNode && (
-                                <NodeInfoContent
-                                    api={api}
-                                    key={selectedNode}
-                                    selectedNode={selectedNode}
-                                    state={state}
-                                />
-                            )}
+                            <GraphContext.Provider
+                                value={{
+                                    api,
+                                    constraints,
+                                    editable: props.editable,
+                                    graphState: state,
+                                    onUpdateConstraint: updateConstraint,
+                                    selectedEdge,
+                                    selectedNode,
+                                    verboseDescriptions: props.verboseDescriptions,
+                                }}
+                            >
+                                {selectedEdge && (
+                                    <EdgeInfoContent
+                                        api={api}
+                                        extraSections={props.edgeExtrasContent}
+                                        key={selectedEdge.join('-')}
+                                        onConfirmDirection={confirmDirection}
+                                        onUpdateConstraint={updateConstraint}
+                                        selectedConstraint={selectedConstraint}
+                                        selectedEdge={selectedEdge}
+                                        state={state}
+                                    />
+                                )}
+                                {selectedNode && (
+                                    <NodeInfoContent
+                                        api={api}
+                                        extraSections={props.nodeExtrasContent}
+                                        key={selectedNode}
+                                        selectedNode={selectedNode}
+                                        state={state}
+                                    />
+                                )}
+                            </GraphContext.Provider>
                         </Overlay>
                         <div ref={canvasParentRef} style={{ height: '100%', width: '100%' }} />
                         <Tooltip

@@ -89,21 +89,25 @@ export interface CausalGraphEdgeMeta {
 /** Target structure for parsers/serialisers */
 export interface CausalGraph {
     edges: Record<string, Record<string, CausalGraphEdge>>;
+    extras?: Record<string, any>;
     nodes: Record<string, CausalGraphNode>;
     version: string;
 }
 
 export interface CausalGraphNode {
-    identifier?: string;
+    extras?: Record<string, any>;
+    identifier: string;
     meta: CausalGraphNodeMeta;
+    node_class?: string;
     variable_type: string;
 }
 
 export interface CausalGraphEdge {
-    destination?: string;
+    destination: CausalGraphNode;
     edge_type: EdgeType;
+    extras?: Record<string, any>;
     meta: CausalGraphEdgeMeta;
-    source?: string;
+    source: CausalGraphNode;
 }
 
 export enum VariableType {
@@ -142,16 +146,21 @@ export interface GraphState {
 export type NodeGroup = 'latent' | 'target' | 'other';
 
 export interface SimulationNode extends FlatNodeRenderingMeta {
+    /** extra properties of a node */
+    extras?: Record<string, any>;
+    /** Whether node is currently hovered */
     hovered?: boolean;
+    /** The node id */
     id: string;
+    /** The original meta information of the node */
     originalMeta: CausalGraphNodeMeta;
-    // Some layouts need the node size on the node data itself
+    /** The node size,  some layouts need the node size on the node data itself */
     size?: number;
 
     variable_type: string;
-
-    // Current position
+    /** The x coordinate of the node */
     x?: number;
+    /** The y coordinate of the node */
     y?: number;
 }
 
@@ -159,10 +168,14 @@ export interface SimulationNode extends FlatNodeRenderingMeta {
 export type SimulationNodeWithGroup = SimulationNode & { group: NodeGroup };
 
 export interface SimulationEdge extends FlatEdgeRenderingMeta {
+    /** Thetype of the edge */
     edge_type: EdgeType;
+    /** Any extra properties of the edge */
+    extras?: Record<string, any>;
+    /** Original meta information of that edge */
     originalMeta: CausalGraphEdgeMeta;
 
-    // optional list of positions the edge should be curved through
+    /**  optional list of positions the edge should be curved through */
     points?: XYPosition[];
 }
 
@@ -175,6 +188,7 @@ export interface D3SimulationEdge extends SimulationEdge {
 }
 
 export interface SimulationAttributes {
+    extras?: Record<string, any>;
     /**
      * Generic node size param based on layout; can be used for layout approximation
      */
@@ -187,20 +201,20 @@ export type SimulationGraph = AbstractGraph<SimulationNode, SimulationEdge, Simu
 /**
  * Type of an edge constraint that can be encoded
  *
- * Int values from cl_interfaces.EdgeConstraint
+ * str values from cai_causal_graph.EdgeConstraint
  */
 export enum EdgeConstraintType {
-    DIRECTED = 2,
-    /** Backward directed - unsupported */
-    BACKWARD_DIRECTED = 3,
-    FORBIDDEN = 4,
-    UNDIRECTED = 1,
+    FORBIDDEN = 'forbidden',
+    HARD_DIRECTED = 'hard_directed',
+    SOFT_DIRECTED = 'soft_directed',
+    UNDIRECTED = 'hard_undirected',
 }
 
 /**
  * Encodes domain-knowledge as edge constraint
  */
 export interface EdgeConstraint {
+    extras?: Record<string, any>;
     source: string;
     target: string;
     type: EdgeConstraintType;

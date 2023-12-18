@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 import cytoscape, { ElementDefinition, NodeSingular } from 'cytoscape';
-import fcose, { FcoseLayoutOptions } from 'cytoscape-fcose';
+import fcose, { FcoseLayoutOptions, FcoseRelativePlacementConstraint } from 'cytoscape-fcose';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
-import { GraphLayout, GraphLayoutBuilder } from './common';
+import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
 
 cytoscape.use(fcose);
 
-class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> {
+class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> implements TieredGraphLayoutBuilder {
     _edgeElasticity = 0.45;
 
     _edgeLength = 3;
@@ -41,6 +41,12 @@ class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> {
     _nodeRepulsion = 6500;
 
     _nodeSeparation = 75;
+
+    _tierSeparation = 200;
+
+    orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     /**
      * Set edge elasticity
@@ -132,10 +138,244 @@ class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> {
         return this;
     }
 
+    /**
+     * Set tier separation
+     *
+     * @param separation separation
+     */
+    tierSeparation(separation: number): this {
+        this._tierSeparation = separation;
+        return this;
+    }
+
     build(): FcoseLayout {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new FcoseLayout(this);
     }
+}
+
+/**
+ * Based on a node attribute checks if the path is in the attribute or in extras, if not found returns undefined
+ * @param attributes node object or a sub attribute of the node object
+ * @param path path to the attribute
+ *  */
+function getPathInNodeAttribute(attributes: Record<string, any>, path: string): any {
+    let searchablePath = path;
+    // If attribute becomes undefined we have a non valid path within the node
+    if (attributes === undefined) {
+        throw new Error('Could not find path for rank or group within Node');
+    }
+    // If path is in meta change it to originalMeta
+    if (searchablePath === 'meta') {
+        searchablePath = 'originalMeta';
+    }
+    // Check if path is in node attributes
+    if (Object.prototype.hasOwnProperty.call(attributes, searchablePath)) {
+        return attributes[searchablePath];
+    }
+    // If not check if it has been moved to extras
+    if (attributes?.extras && searchablePath in attributes.extras) {
+        return attributes.extras[searchablePath];
+    }
+    // If not found the node does not have that attribute
+    return undefined;
+}
+
+/**
+ * Creates an array of relative placements for a given tier given a certain order of nodes and orientation
+ * @param tier tier to be placed
+ * @param orientation the orientation of the graph
+ * @param tierSeparation tier separation
+ * @param nodesOrder nodes order
+ *  */
+function createPositionedArray(
+    tier: string[],
+    orientation: 'horizontal' | 'vertical',
+    tierSeparation: number,
+    nodesOrder: Record<string, string>
+): FcoseRelativePlacementConstraint[] {
+    // Filter out any nodes that do not have an order defined in nodesOrder
+    const validNodes = tier.filter((node) => node in nodesOrder);
+
+    // sort tier based on nodesOrder
+    const sortedArray = validNodes.sort((a, b) => {
+        const orderA = nodesOrder[a];
+        const orderB = nodesOrder[b];
+
+        const parsedA = parseInt(orderA);
+        const parsedB = parseInt(orderB);
+
+        if (Number.isNaN(parsedA) || Number.isNaN(parsedB)) {
+            throw new Error(`Non-numeric order value encountered for nodes`);
+        }
+
+        return parsedA - parsedB;
+    });
+    // if horizontal we place nodes to the left of each other, if vertical we place nodes to the top of each other
+    if (orientation === 'horizontal') {
+        return sortedArray.slice(0, -1).map((item, index) => ({
+            bottom: sortedArray[index + 1],
+            gap: tierSeparation,
+            top: item,
+        }));
+    } // orientation === 'vertical'
+    return sortedArray.slice(0, -1).map((item, index) => ({
+        gap: tierSeparation,
+        left: item,
+        right: sortedArray[index + 1],
+    }));
+}
+
+/**
+ * Gets relative placements for tiered fcose layout when tiers are given as string[][]. Defines so that given nodes within a tier are placed
+ * right/left or top/bottom of each other. Following the defined hierarchy of tiers.
+ * @param tiers node tiers defined by the user
+ * @param orientation the orientation of the graph
+ * @param tierSeparation tier separation
+ * @param nodesOrder the order the nodes should appear in the tier
+ *  */
+function getRelativeTieredArrayPlacement(
+    tiers: string[][],
+    orientation: DirectionType,
+    tierSeparation: number,
+    nodesOrder?: Record<string, string>
+): FcoseRelativePlacementConstraint[] {
+    const relativePlacements: FcoseRelativePlacementConstraint[] = [];
+
+    tiers.forEach((tier, tierIndex) => {
+        // if within the tier a node order should be followed we add those placements
+        if (nodesOrder) {
+            const positionedArray = createPositionedArray(tier, orientation, tierSeparation, nodesOrder);
+            relativePlacements.push(...positionedArray);
+        }
+        // Next we take care of the hierarchical placement of the tiers
+        // if last tier do not add relative placement
+        if (tierIndex === tiers.length - 1) {
+            return;
+        }
+        // get one element for each subsequent tiers
+        const firstElement = tier[0];
+        const nextTierFirstElement = tiers[tierIndex + 1][0];
+        // Place onde node from the first tier to the left/top of the first node of the next tier
+        // That way we have one node from each tier defining the position of the tier relative to the other tiers
+        const placement =
+            orientation === 'horizontal'
+                ? { gap: tierSeparation, left: firstElement, right: nextTierFirstElement }
+                : { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
+        relativePlacements.push(placement);
+    });
+
+    return relativePlacements;
+}
+
+/**
+ * Gets nodes grouped by a given attribute
+ * @param nodes nodes to be grouped
+ * @param group the attribute to group by
+ * @param graph the graph
+ *  */
+function getNodeGroups(nodes: string[], group: string, graph: SimulationGraph): Record<string, string[]> {
+    const attributePathArray = group.split('.');
+
+    return nodes.reduce((groupAccumulator: Record<string, string[]>, node) => {
+        const nodeAttributes = graph.getNodeAttributes(node);
+        // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
+        // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
+        const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
+
+        // If it is not undefined at this point i.e. node group was found
+        if (nodeGroup !== undefined) {
+            const groupKey = String(nodeGroup);
+            // if group is not in tieredNodes add it, if it is add node to that tier
+            if (groupKey in groupAccumulator) {
+                groupAccumulator[groupKey].push(node);
+            } else {
+                groupAccumulator[groupKey] = [node];
+            }
+        }
+        return groupAccumulator;
+    }, {});
+}
+
+/**
+ * Gets nodes grouped by a given attribute
+ * @param nodes nodes to be grouped
+ * @param group the attribute to group by
+ * @param graph the graph
+ *  */
+function getNodeOrder(nodes: string[], orderPath: string, graph: SimulationGraph): Record<string, string> {
+    const attributePathArray = orderPath.split('.');
+
+    return nodes.reduce((groupAccumulator: Record<string, string>, node) => {
+        const nodeAttributes = graph.getNodeAttributes(node);
+        // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
+        // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
+        const nodeOrder = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
+
+        // If it is not undefined at this point i.e. node order was found
+        if (nodeOrder !== undefined) {
+            const order = String(nodeOrder);
+            groupAccumulator[node] = order;
+        }
+        return groupAccumulator;
+    }, {});
+}
+
+interface TiersProperties {
+    alignmentConstraint?: string[][];
+    relativePlacementConstraint?: FcoseRelativePlacementConstraint[];
+}
+
+/**
+ * Get properties values for tiered fcose layout
+ * @param tiers node tiers defined by the user
+ * @param orientation the orientation of the graph
+ * @param tierSeparation tier separation
+ *  */
+export function getTieredLayoutProperties(
+    graph: SimulationGraph,
+    tiers: GraphTiers,
+    orientation: DirectionType,
+    tierSeparation: number
+): TiersProperties {
+    let tiersArray: string[][] = Array.isArray(tiers) ? tiers : [];
+    let nodesOrder: Record<string, string>;
+
+    if (!Array.isArray(tiers)) {
+        // must be of type TiersConfig
+        const { group, order_nodes_by, rank } = tiers;
+        const nodes = graph.nodes();
+        const tieredNodes = getNodeGroups(nodes, group, graph);
+        nodesOrder = order_nodes_by ? getNodeOrder(nodes, order_nodes_by, graph) : undefined;
+
+        // if rank is defined use it to order the tiers
+        if (rank) {
+            const missingGroups: string[] = [];
+            tiersArray = rank.map((key) => {
+                if (!(key in tieredNodes)) {
+                    missingGroups.push(key);
+                    return [];
+                }
+                return tieredNodes[key];
+            });
+
+            if (missingGroups.length > 0) {
+                throw new Error(`Group(s) ${missingGroups.join(', ')} defined in rank not found within any Nodes`);
+            }
+        } else {
+            tiersArray = Object.values(tieredNodes);
+        }
+    }
+
+    return {
+        alignmentConstraint: tiersArray,
+        relativePlacementConstraint: getRelativeTieredArrayPlacement(
+            tiersArray,
+            orientation,
+            tierSeparation,
+            nodesOrder
+        ),
+    };
 }
 
 export default class FcoseLayout extends GraphLayout {
@@ -157,6 +397,12 @@ export default class FcoseLayout extends GraphLayout {
 
     public nodeSeparation: number;
 
+    public tierSeparation: number;
+
+    public orientation: DirectionType;
+
+    public tiers: GraphTiers;
+
     constructor(builder: FcoseLayoutBuilder) {
         super(builder);
         this.edgeElasticity = builder._edgeElasticity;
@@ -168,6 +414,9 @@ export default class FcoseLayout extends GraphLayout {
         this.iterations = builder._iterations;
         this.nodeRepulsion = builder._nodeRepulsion;
         this.nodeSeparation = builder._nodeSeparation;
+        this.tierSeparation = builder._tierSeparation;
+        this.orientation = builder.orientation;
+        this.tiers = builder.tiers;
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -181,6 +430,9 @@ export default class FcoseLayout extends GraphLayout {
         return new Promise((resolve) => {
             const hasPositions = graph.getNodeAttribute(graph.nodes()[0], 'x');
             const size = graph.getAttribute('size');
+            const tiersPlacement = this.tiers
+                ? getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation)
+                : { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
 
             const elements = [
                 ...graph.mapNodes<ElementDefinition>((id, attrs) => ({
@@ -198,6 +450,10 @@ export default class FcoseLayout extends GraphLayout {
                 elements,
                 headless: true,
                 layout: {
+                    alignmentConstraint: {
+                        horizontal: this.orientation === 'vertical' ? tiersPlacement.alignmentConstraint : undefined,
+                        vertical: this.orientation === 'horizontal' ? tiersPlacement.alignmentConstraint : undefined,
+                    },
                     animate: false,
                     edgeElasticity: this.edgeElasticity,
                     gravity: this.gravity,
@@ -209,12 +465,14 @@ export default class FcoseLayout extends GraphLayout {
                     nodeRepulsion: this.nodeRepulsion,
 
                     nodeSeparation: this.nodeSeparation,
-                    numIters: this.iterations,
 
+                    numIters: this.iterations,
                     quality: this.highQuality ? 'proof' : 'default',
 
                     // only randomize if there are no position in graph yet
                     randomize: !hasPositions,
+
+                    relativePlacementConstraint: tiersPlacement.relativePlacementConstraint,
 
                     stop: (ev) => {
                         const positions: LayoutMapping<XYPosition> = Object.fromEntries(

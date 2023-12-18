@@ -254,7 +254,9 @@ const filterComponentMap: Record<string, (props: FilterProps<any>) => JSX.Elemen
  */
 const appendFilterComponents = (columns: Array<TableColumn>): Array<TableColumn> => {
     return columns.map((col) => {
-        if (!col.filter) return col;
+        if (!col.filter) {
+            return col;
+        }
 
         if (!(col.filter in filterComponentMap)) {
             throw new Error(
@@ -424,6 +426,7 @@ const Table = forwardRef(
 
         useEffect(() => {
             setCurrentSortBy(initialSort);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, useDeepCompare([initialSort]));
 
         if (!data && !getItem) {
@@ -535,6 +538,7 @@ const Table = forwardRef(
             } else {
                 setCurrentSortBy(sortBy);
             }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [onSort, sortBy]);
 
         useEffect(() => {
@@ -631,6 +635,7 @@ const Table = forwardRef(
                     </div>
                 </div>
             );
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, useDeepCompare([tableProps, totalColumnsWidth, headerGroups]));
 
         return (

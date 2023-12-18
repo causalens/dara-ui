@@ -122,7 +122,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         };
 
         const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-            if (props.onKeyDown) props.onKeyDown(e);
+            if (props.onKeyDown) {
+                props.onKeyDown(e);
+            }
 
             if (props.keydownFilter && !props.keydownFilter(e)) {
                 e.preventDefault();
@@ -135,8 +137,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         // Add all optional items here to be used by the primary input
         const addOptionalItems = (): any => {
             const result: any = {};
-            if (props.minValue) result.minValue = props.minValue;
-            if (props.maxValue) result.maxValue = props.minValue;
+            if (props.minValue) {
+                result.minValue = props.minValue;
+            }
+            if (props.maxValue) {
+                result.maxValue = props.minValue;
+            }
 
             return result;
         };

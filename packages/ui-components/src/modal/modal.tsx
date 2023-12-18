@@ -136,7 +136,8 @@ function Modal(props: ModalProps): JSX.Element {
                 document.removeEventListener('keydown', keyHandler);
             };
         }
-    }, [renderModal]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [renderModal, props.onAttemptClose]);
 
     if (!props.render && !mounted) {
         return null;

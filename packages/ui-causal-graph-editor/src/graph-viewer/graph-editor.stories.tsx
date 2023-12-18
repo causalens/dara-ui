@@ -21,8 +21,6 @@ import deepCopy from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import { useEffect, useState } from 'react';
 
-import { NotificationWrapper, useNotifications } from '@darajs/ui-notifications';
-
 import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import {
     CircularLayout,
@@ -35,94 +33,12 @@ import {
 } from '../shared/graph-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
+import { Template, causalGraph, pagCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
     title: 'CausalGraphEditor/GraphEditor',
 } as Meta;
-
-const Template = (args: CausalGraphEditorProps): JSX.Element => {
-    const { pushNotification } = useNotifications();
-
-    return (
-        <>
-            <CausalGraphViewerComponent {...args} onNotify={pushNotification} style={{ margin: 0 }} />
-            <NotificationWrapper style={{ bottom: 0 }} />
-        </>
-    );
-};
-
-const causalGraph: CausalGraph = {
-    edges: {
-        input1: {
-            input4: {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {
-                    rendering_properties: {
-                        color: 'red',
-                        description:
-                            'my super long description text that spans a few lines, is super descriptive and goes in depth into the explanation of why this edge exists in the first place and this is some extra text that will be behind a scrollbar',
-                        tooltip: {
-                            key1: 'some value 1',
-                            key2: 'some value 2',
-                        },
-                    },
-                },
-            },
-            target: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} },
-        },
-        input2: {
-            target: {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {
-                    rendering_properties: {
-                        description:
-                            'my super long description text that spans a few lines, is super descriptive and goes in depth into the explanation of why this edge exists in the first place. It is actually so long that it does not fit by default and triggers overflow to scroll because of the max-height set to 5 lines',
-                        tooltip: 'some plaintext description',
-                    },
-                },
-            },
-        },
-        input3: { target: { edge_type: EdgeType.DIRECTED_EDGE, meta: {} } },
-        input4: {
-            target: {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: { rendering_properties: {} },
-            },
-        },
-    },
-    nodes: {
-        input1: {
-            meta: {
-                rendering_properties: {
-                    label: 'input1 renamed',
-                },
-            },
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        input2: {
-            meta: {
-                rendering_properties: {
-                    label: 'input2 renamed multi word node name',
-                },
-            },
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        input3: {
-            meta: {},
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        input4: {
-            meta: {},
-            variable_type: VariableType.UNSPECIFIED,
-        },
-        target: {
-            meta: {},
-            variable_type: VariableType.UNSPECIFIED,
-        },
-    },
-    version: '2.0',
-};
 
 export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
     const [nodeNumber, setNodeNumber] = useState(3);
@@ -167,6 +83,7 @@ export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
 
     useEffect(() => {
         updateInitialGraph(nodeNumber);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nodeNumber, useStrenghts]);
 
     function onUpdate(data): void {
@@ -204,14 +121,12 @@ export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
 };
 Interactive.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphLayout: PlanarLayout.Builder.build(),
 };
 
 export const MarketingBottom = Template.bind({});
 MarketingBottom.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: MarketingLayout.Builder.build(),
     zoomThresholds: {
@@ -225,7 +140,6 @@ MarketingBottom.args = {
 export const MarketingCenter = Template.bind({});
 MarketingCenter.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: MarketingLayout.Builder.targetLocation('center').build(),
 };
@@ -233,7 +147,6 @@ MarketingCenter.args = {
 export const PlanarVertical = Template.bind({});
 PlanarVertical.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: { ...causalGraph, edges: { input2: causalGraph.edges.input2 } },
     graphLayout: PlanarLayout.Builder.orientation('vertical').build(),
 };
@@ -241,7 +154,6 @@ PlanarVertical.args = {
 export const PlanarHorizontal = Template.bind({});
 PlanarHorizontal.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: SHIPPED_UNITS,
     graphLayout: PlanarLayout.Builder.build(),
 };
@@ -249,7 +161,6 @@ PlanarHorizontal.args = {
 export const Spring = Template.bind({});
 Spring.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: SpringLayout.Builder.build(),
 };
@@ -257,7 +168,6 @@ Spring.args = {
 export const Circular = Template.bind({});
 Circular.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: causalGraph,
     graphLayout: CircularLayout.Builder.build(),
 };
@@ -265,8 +175,7 @@ Circular.args = {
 export const Pag = Template.bind({});
 Pag.args = {
     editable: true,
-    editorMode: EditorMode.PAG_VIEWER,
-    graphData: causalGraph,
+    graphData: pagCausalGraph,
     graphLayout: FcoseLayout.Builder.build(),
 };
 
@@ -411,7 +320,6 @@ export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
 };
 RandomClusters.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphLayout: FcoseLayout.Builder.nodeRepulsion(100_000_000).nodeSeparation(20).build(),
 };
 
@@ -443,7 +351,6 @@ const singleLetterGraph: CausalGraph = {
 export const SingleLetter = Template.bind({});
 SingleLetter.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: singleLetterGraph,
     graphLayout: SpringLayout.Builder.nodeFontSize(80).build(),
 };
@@ -477,7 +384,6 @@ const longWordGraph: CausalGraph = {
 export const LongWord = Template.bind({});
 LongWord.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: longWordGraph,
     graphLayout: SpringLayout.Builder.build(),
 };
@@ -486,16 +392,29 @@ LongWord.args = {
 export const Fcose = Template.bind({});
 Fcose.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: SHIPPED_UNITS,
     // graphData: FRAUD,
     graphLayout: FcoseLayout.Builder.build(),
 };
 
+export const FcoseTiers = Template.bind({});
+
+const layout = FcoseLayout.Builder.build();
+layout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
+layout.tierSeparation = 300;
+layout.nodeRepulsion = 10000000;
+
+layout.orientation = 'vertical';
+
+FcoseTiers.args = {
+    editable: true,
+    graphData: FRAUD,
+    graphLayout: layout,
+};
+
 export const ForceAtlas = Template.bind({});
 ForceAtlas.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: FRAUD,
     graphLayout: ForceAtlasLayout.Builder.build(),
 };
@@ -618,7 +537,6 @@ Object.entries(predefinedLayout.layout).forEach(([nodeKey, position]) => {
 export const PredefinedPositions = Template.bind({});
 PredefinedPositions.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: PredefinedGraph,
     graphLayout: FcoseLayout.Builder.build(),
 };
@@ -626,7 +544,6 @@ PredefinedPositions.args = {
 export const CustomPositions = Template.bind({});
 CustomPositions.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: PredefinedGraph,
     graphLayout: CustomLayout.Builder.build(),
 };
@@ -635,7 +552,6 @@ CustomPositions.args = {
 export const CustomLayoutNoPositions = Template.bind({});
 CustomLayoutNoPositions.args = {
     editable: true,
-    editorMode: EditorMode.DEFAULT,
     graphData: SHIPPED_UNITS,
     graphLayout: CustomLayout.Builder.build(),
 };
@@ -662,7 +578,7 @@ VisualEdgeEncoder.args = {
         {
             source: 'first node',
             target: 'second node',
-            type: EdgeConstraintType.DIRECTED,
+            type: EdgeConstraintType.HARD_DIRECTED,
         },
     ],
 };

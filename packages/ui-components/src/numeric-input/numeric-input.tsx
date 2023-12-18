@@ -35,7 +35,9 @@ const InputWrapper = styled.div<NumericInputProps>`
     background-color: ${(props) => props.theme.colors.grey1};
     border: 1px solid
         ${(props) => {
-            if (props.errorMsg) return props.theme.colors.error;
+            if (props.errorMsg) {
+                return props.theme.colors.error;
+            }
             return props.theme.colors.grey1;
         }};
     border-radius: 0.25rem;
@@ -43,7 +45,9 @@ const InputWrapper = styled.div<NumericInputProps>`
     :focus-within:not(:disabled) {
         border: 1px solid
             ${(props) => {
-                if (props.errorMsg) return props.theme.colors.error;
+                if (props.errorMsg) {
+                    return props.theme.colors.error;
+                }
                 return props.theme.colors.grey3;
             }};
 
@@ -53,7 +57,6 @@ const InputWrapper = styled.div<NumericInputProps>`
     }
 
     input {
-        width: calc(100% - 1.25rem);
         height: calc(2.5rem - 2px);
         border: none;
         border-radius: 0.25rem;
@@ -72,8 +75,12 @@ const InputWrapper = styled.div<NumericInputProps>`
         background-color: ${(props) => (props.disabled ? props.theme.colors.grey1 : props.theme.colors.grey2)};
         border: 1px solid
             ${(props) => {
-                if (props.disabled) return props.theme.colors.grey1;
-                if (props.errorMsg) return props.theme.colors.error;
+                if (props.disabled) {
+                    return props.theme.colors.grey1;
+                }
+                if (props.errorMsg) {
+                    return props.theme.colors.error;
+                }
                 return props.theme.colors.grey2;
             }};
 
@@ -89,6 +96,7 @@ const InputWrapper = styled.div<NumericInputProps>`
     // Fix: Overrides the 22ch default width of the nested regular input
     > div:first-child {
         width: 100%;
+        height: auto;
     }
 `;
 
@@ -133,8 +141,12 @@ const numericFilter =
  * @returns the initial value of the numeric input
  */
 const getInitialValue = (value: number, initialValue: number): string => {
-    if (Number.isFinite(value)) return String(value);
-    if (Number.isFinite(initialValue)) return String(initialValue);
+    if (Number.isFinite(value)) {
+        return String(value);
+    }
+    if (Number.isFinite(initialValue)) {
+        return String(initialValue);
+    }
     return '';
 };
 
@@ -172,7 +184,9 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         const [input, setInput] = useState(getInitialValue(props.value, props.initialValue));
 
         const step = (value: number): void => {
-            if (!input || input === '-') return;
+            if (!input || input === '-') {
+                return;
+            }
 
             const isFloat = input.includes('.');
             const parsedValue = isFloat ? parseFloat(input) : parseInt(input);
@@ -201,12 +215,18 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         };
 
         const onKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
-            if (!props.stepper) return;
+            if (!props.stepper) {
+                return;
+            }
 
             const stepSkip = Math.abs(props.stepSkip ?? 1);
 
-            if (e.key === Key.UP) step(stepSkip);
-            if (e.key === Key.DOWN) step(stepSkip * -1);
+            if (e.key === Key.UP) {
+                step(stepSkip);
+            }
+            if (e.key === Key.DOWN) {
+                step(stepSkip * -1);
+            }
         };
 
         const onChange = useCallback(
@@ -225,16 +245,23 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                 }
                 props.onChange?.(parsed, e);
             },
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             [props.integerOnly, props.value, props.onChange]
         );
 
         useEffect(() => {
             setInput(getInitialValue(props.value, props.initialValue));
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [props.value]);
 
         return (
             <div>
-                <InputWrapper disabled={props.disabled} errorMsg={props.errorMsg} stepper={props.stepper}>
+                <InputWrapper
+                    disabled={props.disabled}
+                    errorMsg={props.errorMsg}
+                    stepper={props.stepper}
+                    style={props.style}
+                >
                     <Input
                         autoFocus={props.autoFocus}
                         className={props.className}
@@ -248,7 +275,6 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                         onKeyDown={onKeyDown}
                         placeholder={props.placeholder}
                         ref={ref}
-                        style={props.style}
                         value={input}
                     />
                     {props.stepper && <InputStepper disabled={props.disabled} step={step} stepSkip={props.stepSkip} />}

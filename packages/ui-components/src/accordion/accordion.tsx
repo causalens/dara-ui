@@ -120,11 +120,12 @@ function Accordion({
                 setOpenItems([...newOpenItems]);
             }
         },
-        [openItems, setOpenItems]
+        [multi, onChange, openItems, value]
     );
 
     useEffect(() => {
         setOpenItems(getInitialOpen(initialOpenItems, value, items));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     return (

@@ -69,7 +69,7 @@ interface NodeRendererProps {
  * @param props the component props
  */
 function NodeRenderer(props: NodeRendererProps): JSX.Element {
-    const { node } = props;
+    const { node, onClick: onClickProp } = props;
     const depth = (props.maxDepth - (props.node.depth % 5)).toString();
     const fill = props.color(depth).toString();
     const width = Number.isNaN(node.x1 - node.x0) ? undefined : node.x1 - node.x0;
@@ -78,8 +78,8 @@ function NodeRenderer(props: NodeRendererProps): JSX.Element {
     const isInteractive = (hasChildren && props.allowParentClick) || (!hasChildren && props.allowLeafClick);
 
     const onClick = useCallback(() => {
-        props.onClick(props.node.data);
-    }, [props.node]);
+        onClickProp(node.data);
+    }, [node, onClickProp]);
 
     return (
         <>
@@ -165,6 +165,7 @@ function Treemap(props: TreemapProps): JSX.Element {
                 .paddingInner(3)(root);
             setTreemap(root);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, useDeepCompare([props.data, props.height, props.width]));
 
     const color = d3

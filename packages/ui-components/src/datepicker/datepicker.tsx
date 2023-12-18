@@ -56,7 +56,7 @@ function getYears(minDate?: Date, maxDate?: Date): Item[] {
     const minYear = minDate?.getFullYear() ?? 1900;
     const maxYear = maxDate?.getFullYear() ?? 2100;
 
-    return range(minYear, maxYear, 1).map((val) => ({ label: val.toString(), value: val }));
+    return range(minYear, maxYear + 1, 1).map((val) => ({ label: val.toString(), value: val }));
 }
 
 /**
@@ -75,6 +75,9 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
     display: flex;
     flex-direction: ${(props) => (props.inline ? 'column' : 'row')};
     align-items: ${(props) => (props.inline ? 'baseline' : 'center')};
+
+    width: 8.5rem;
+
     color: ${(props) => props.theme.colors.text};
 
     .react-datepicker-popper {
@@ -734,6 +737,7 @@ function DatePicker(props: DatePickerProps): JSX.Element {
 
         const newEndDate = getInitialDate(newValue, formatToApply, false);
         setEndDate(newEndDate);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.value, props.initialValue]);
 
     useEffect(() => {
@@ -746,6 +750,7 @@ function DatePicker(props: DatePickerProps): JSX.Element {
         // We have to typecast to make compiler happy as we don't know which type it is at this point
         const newDateTime = getNewDatetime(selectedDate, time);
         props.onChange?.(newDateTime as Date & [Date, Date]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDate, selectedTime]);
 
     return (

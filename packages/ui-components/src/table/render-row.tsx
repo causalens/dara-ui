@@ -11,7 +11,10 @@ interface RowProps {
     onClickRow?: (row: any) => void | Promise<void>;
 }
 
-export const ROW_HEIGHT = 40;
+// Get the row height from the font size of the root element to respect rem units
+const { fontSize } = window.getComputedStyle(document.documentElement);
+
+export const ROW_HEIGHT = parseFloat(fontSize) * 2.5;
 
 // Prevents the isSorted or onClickRow prop being added to the dom element
 export const shouldForwardProp = (prop: any): boolean => !['isSorted', 'onClickRow'].includes(prop);
@@ -76,7 +79,7 @@ const Cell = styled.div`
     align-items: center;
 
     min-width: 80px;
-    height: 2.5rem;
+    height: ${() => `${ROW_HEIGHT}px`};
 
     color: ${(props) => props.theme.colors.grey6};
 
@@ -98,6 +101,38 @@ const CellContent = styled.span`
     white-space: nowrap;
 `;
 
+/**
+ * Checks if the previous and next props are equal while also
+ * forcing a re-render if any column in any headerGroup is being resized
+ *
+ * @param {any} prevProps - The previous props.
+ * @param {any} nextProps - The next props.
+ * @returns {boolean} - Whether the props are equal.
+ */
+const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
+    areEqual(prevProps, nextProps) &&
+    !(nextProps.data?.headerGroups || []).some((headerGroup) =>
+        (headerGroup?.headers || []).some((header) => header.isResizing)
+    );
+
+type Props = {
+    data: {
+        backgroundColor: string;
+        currentEditCell: [number, string | number];
+        getItem: (index: number) => any;
+        headerGroups: Array<HeaderGroup<object>>;
+        mappedColumns: Array<TableColumn>;
+        onClickRow: (row: any) => void | Promise<void>;
+        prepareRow: (row: any) => void;
+        rows: Array<any>;
+        throttledClickRow: (row: any) => void | Promise<void>;
+        totalColumnsWidth: number;
+        width: number;
+    };
+    index: number;
+    style: React.CSSProperties;
+};
+
 const RenderRow = React.memo(
     ({
         data: {
@@ -115,23 +150,7 @@ const RenderRow = React.memo(
         },
         index,
         style: renderRowStyle,
-    }: {
-        data: {
-            backgroundColor: string;
-            currentEditCell: [number, string | number];
-            getItem: (index: number) => any;
-            headerGroups: Array<HeaderGroup<object>>;
-            mappedColumns: Array<TableColumn>;
-            onClickRow: (row: any) => void | Promise<void>;
-            prepareRow: (row: any) => void;
-            rows: Array<any>;
-            throttledClickRow: (row: any) => void | Promise<void>;
-            totalColumnsWidth: number;
-            width: number;
-        };
-        index: number;
-        style: React.CSSProperties;
-    }): JSX.Element => {
+    }: Props): JSX.Element => {
         let row = rows[index];
 
         if (getItem) {
@@ -232,7 +251,7 @@ const RenderRow = React.memo(
             </Row>
         );
     },
-    areEqual
+    arePropsEqual
 );
 
 export default RenderRow;
