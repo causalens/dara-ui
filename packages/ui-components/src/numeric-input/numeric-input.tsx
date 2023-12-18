@@ -225,7 +225,7 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                 }
                 props.onChange?.(parsed, e);
             },
-            [props.integerOnly, props.value]
+            [props.integerOnly, props.value, props.onChange]
         );
 
         useEffect(() => {
