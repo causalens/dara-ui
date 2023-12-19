@@ -694,7 +694,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 this.emit('nodeMouseout', event, id);
             }
 
-            if (!this.editable) {
+            // don't reset mousedownKey if we're dragging as this can prevent the drag
+            // from working correctly when dragging quickly outside of a node
+            if (!this.editable && !this.isMovingNode && !this.isCreatingEdge) {
                 // resets mousedown position
                 this.mousedownNodeKey = null;
             }
