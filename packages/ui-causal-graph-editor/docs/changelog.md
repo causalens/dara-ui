@@ -2,13 +2,14 @@
 title: Changelog
 ---
 
-## NEXT
+## NEXT
 
+-   Fix an issue where dragging nodes too quickly would cause the node drag to stop working
 -   Added support for tiered layout in `Fcose`. It allows for nodes to be placed on tiers following some hierarchy and to further define requirements of nodes positions within that tier.
 
 ## 1.4.0
 
--   Added a differentiated arrow for `EdgeConstraintType.SOFT_DIRECTED` 
+-   Added a differentiated arrow for `EdgeConstraintType.SOFT_DIRECTED`
 -   Added support for edge `source`/`destination` fields for `CausalGraphEditor`.
 
 ## 1.3.0
@@ -22,7 +23,7 @@ title: Changelog
 
 ## 1.2.0
 
--   Updated so that graph object can take extra fields in its object, and `edgeExtrasContent` was added to the editor to allow extras fields to be added to side panel. 
+-   Updated so that graph object can take extra fields in its object, and `edgeExtrasContent` was added to the editor to allow extras fields to be added to side panel.
 
 ## 1.0.0
 
