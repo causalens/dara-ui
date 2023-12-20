@@ -165,7 +165,7 @@ export interface NumericInputProps extends InteractiveComponentProps<number> {
     onChange?: (value: number, e?: React.SyntheticEvent<HTMLInputElement>) => void | Promise<void>;
     /** An optional event listener for complete events (enter presses) */
     onComplete?: () => void | Promise<void>;
-    /** An optional event listener for keydown events if needed */
+    /** An optional event listener for keydown events */
     onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void | Promise<void>;
     /** An optional placeholder that will be used when the input is empty, defaults to '' */
     placeholder?: string;
