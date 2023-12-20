@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DagNode, coordQuad, sugiyama } from 'd3-dag';
+import { DagNode, SimplexOperator, SugiyamaOperator, coordQuad, layeringLongestPath, sugiyama } from 'd3-dag';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
 import { DagNodeData, dagGraphParser } from '../parsers';
 import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
+import { getTiersArray } from './utils';
 
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
@@ -82,9 +83,16 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
             /**
              * The nodeSize is scaled for consistent spacing in the horizontal layout
              */
-            const newDagLayout = sugiyama<DagNode<DagNodeData>>()
+            let newDagLayout = sugiyama()
                 .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
-                .coord(coordQuad() as any)(dag);
+                .coord(coordQuad() as any)(dag)
+                // .layering(layeringLongestPath());
+
+            // if (this.tiers) {
+            //     // const layering: SimplexOperator<DagNode> = getTiersArray(this.tiers, currentGraph, dag);
+            //     // newDagLayout = newDagLayout.layering(layering);
+            //     newDagLayout = newDagLayout.layering(layeringLongestPath());
+            // }
 
             const edgePoints = newDagLayout.dag.links().reduce((acc, link) => {
                 acc[`${link.source.id}||${link.target.id}`] = link.points.map((point) => ({

@@ -20,7 +20,7 @@ import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
 import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
-import { getPathInNodeAttribute } from './utils';
+import { getPathInNodeAttribute, getTiersArray } from './utils';
 
 cytoscape.use(fcose);
 
@@ -248,35 +248,6 @@ function getRelativeTieredArrayPlacement(
  * @param group the attribute to group by
  * @param graph the graph
  *  */
-function getNodeGroups(nodes: string[], group: string, graph: SimulationGraph): Record<string, string[]> {
-    const attributePathArray = group.split('.');
-
-    return nodes.reduce((groupAccumulator: Record<string, string[]>, node) => {
-        const nodeAttributes = graph.getNodeAttributes(node);
-        // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
-        // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
-        const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
-
-        // If it is not undefined at this point i.e. node group was found
-        if (nodeGroup !== undefined) {
-            const groupKey = String(nodeGroup);
-            // if group is not in tieredNodes add it, if it is add node to that tier
-            if (groupKey in groupAccumulator) {
-                groupAccumulator[groupKey].push(node);
-            } else {
-                groupAccumulator[groupKey] = [node];
-            }
-        }
-        return groupAccumulator;
-    }, {});
-}
-
-/**
- * Gets nodes grouped by a given attribute
- * @param nodes nodes to be grouped
- * @param group the attribute to group by
- * @param graph the graph
- *  */
 function getNodeOrder(nodes: string[], orderPath: string, graph: SimulationGraph): Record<string, string> {
     const attributePathArray = orderPath.split('.');
 
@@ -312,33 +283,14 @@ export function getTieredLayoutProperties(
     orientation: DirectionType,
     tierSeparation: number
 ): TiersProperties {
-    let tiersArray: string[][] = Array.isArray(tiers) ? tiers : [];
     let nodesOrder: Record<string, string>;
+    const tiersArray = getTiersArray(tiers, graph, false);
 
     if (!Array.isArray(tiers)) {
         // must be of type TiersConfig
-        const { group, order_nodes_by, rank } = tiers;
+        const { order_nodes_by } = tiers;
         const nodes = graph.nodes();
-        const tieredNodes = getNodeGroups(nodes, group, graph);
         nodesOrder = order_nodes_by ? getNodeOrder(nodes, order_nodes_by, graph) : undefined;
-
-        // if rank is defined use it to order the tiers
-        if (rank) {
-            const missingGroups: string[] = [];
-            tiersArray = rank.map((key) => {
-                if (!(key in tieredNodes)) {
-                    missingGroups.push(key);
-                    return [];
-                }
-                return tieredNodes[key];
-            });
-
-            if (missingGroups.length > 0) {
-                throw new Error(`Group(s) ${missingGroups.join(', ')} defined in rank not found within any Nodes`);
-            }
-        } else {
-            tiersArray = Object.values(tieredNodes);
-        }
     }
 
     return {

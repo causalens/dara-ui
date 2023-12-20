@@ -33,6 +33,7 @@ import {
     SimulationNode,
     SimulationNodeWithGroup,
 } from '../types';
+import { GraphTiers, getPathInNodeAttribute } from './graph-layout';
 import { getNodeGroup } from './utils';
 
 export type DagNodeData = SimulationNode & {
@@ -48,11 +49,9 @@ export function dagGraphParser(graph: SimulationGraph): Dag<DagNode<DagNodeData>
     const nodes: DagNodeData[] = graph.mapNodes((id: string, attributes: SimulationNode) => {
         const parentIds = graph.inboundNeighbors(id);
 
-        // const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
-
         return {
             ...attributes,
-            group: 'latent',
+            // group: 'latent',
             parentIds,
         };
     });
