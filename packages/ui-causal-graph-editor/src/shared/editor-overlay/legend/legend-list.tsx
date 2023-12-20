@@ -113,7 +113,13 @@ function Bidirected(props: SvgProps): JSX.Element {
 
 function HalfCircle(props: SvgProps): JSX.Element {
     return (
-            <path d="M 8.5,0 A 8.5,8.5 0 0,1 8.5,17" fill='none' stroke={props.color} strokeWidth="3" transform="translate(15, 1)"/>
+        <path
+            d="M 8.5,0 A 8.5,8.5 0 0,1 8.5,17"
+            fill="none"
+            stroke={props.color}
+            strokeWidth="3"
+            transform="translate(15, 1)"
+        />
     );
 }
 
@@ -126,10 +132,10 @@ const CenterSymbols: Record<LegendLineDefinition['centerSymbol'], (props: SvgPro
 
 const Arrows: Record<LegendLineDefinition['arrowType'], (props: SvgProps) => JSX.Element> = {
     empty: EmptyCircle,
-    soft: HalfCircle,
     filled: FullArrow,
     none: null,
     normal: Chevron,
+    soft: HalfCircle,
 };
 
 /**

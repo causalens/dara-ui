@@ -61,7 +61,7 @@ const PAG_LEGEND: LegendLineDefinition[] = [
 const ENCODER_LEGEND: LegendLineDefinition[] = [
     { label: 'Hard Directed' },
     { arrowType: 'soft', label: 'Soft Directed' },
-    { arrowType: 'none', centerSymbol: 'bidirected', label: 'Undirected' }, 
+    { arrowType: 'none', centerSymbol: 'bidirected', label: 'Undirected' },
     { arrowType: 'none', centerSymbol: 'cross', label: 'Prohibited' },
 ];
 
