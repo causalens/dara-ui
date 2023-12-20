@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Dag, DagNode, dagStratify } from 'd3-dag';
-import { DirectedGraph } from 'graphology';
+import { graphStratify, MutGraph } from 'd3-dag';
+import Graph, { DirectedGraph } from 'graphology';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 import isEqual from 'lodash/isEqual';
 import { generate } from 'shortid';
@@ -45,20 +45,30 @@ export type DagNodeData = SimulationNode & {
  *
  * @param rawData
  */
-export function dagGraphParser(graph: SimulationGraph): Dag<DagNode<DagNodeData>> {
+export function dagGraphParser(graph: SimulationGraph, tiers?: GraphTiers): MutGraph<DagNodeData, undefined> {
     const nodes: DagNodeData[] = graph.mapNodes((id: string, attributes: SimulationNode) => {
         const parentIds = graph.inboundNeighbors(id);
+        let nodeGroup = 'latent'
+
+        if(tiers && !Array.isArray(tiers)){
+            const { group, rank } = tiers;
+            const groupPath = group.split('.');
+            // const rankPath = rank.split('.');
+            nodeGroup = groupPath.reduce(getPathInNodeAttribute, attributes);
+            // const nodeRank = rankPath.reduce(getPathInNodeAttribute, attributes);
+           
+        }
 
         return {
             ...attributes,
-            // group: 'latent',
+            group: nodeGroup,
             parentIds,
         };
     });
 
     console.log('nodes', nodes);
-
-    return dagStratify<DagNodeData>()(nodes);
+    const stratify = graphStratify();
+    return stratify<DagNodeData>(nodes);
 }
 
 /**

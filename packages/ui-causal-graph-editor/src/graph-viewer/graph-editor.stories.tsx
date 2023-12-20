@@ -33,7 +33,7 @@ import {
 } from '../shared/graph-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, causalGraph, pagCausalGraph } from './utils/stories-utils';
+import { Template, causalGraph, pagCausalGraph, nodeTiersCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
@@ -160,10 +160,13 @@ PlanarHorizontal.args = {
 
 export const PlanarTiers = Template.bind({});
 const planarLayout = PlanarLayout.Builder.build();
+// planarLayout.tiers = { group: 'meta.test', rank: ['a', 'b', 'c', 'd', 'e'] };
 planarLayout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
+
 
 PlanarTiers.args = {
     editable: true,
+    // graphData: nodeTiersCausalGraph,
     graphData: FRAUD,
     graphLayout: planarLayout,
 };

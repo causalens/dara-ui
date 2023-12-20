@@ -89,7 +89,7 @@
     "cytoscape": "^3.23.0",
     "cytoscape-fcose": "^2.2.0",
     "d3": "6.2.0",
-    "d3-dag": "^0.6.0",
+    "d3-dag": "^1.1.0",
     "d3-scale": "3.2.1",
     "fontfaceobserver": "^2.3.0",
     "graphology": "^0.25.1",
