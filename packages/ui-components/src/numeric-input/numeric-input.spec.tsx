@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 /* eslint-disable jest/no-disabled-tests */
-import { render } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import { ThemeProvider, theme } from '@darajs/styled-components';
 
@@ -31,6 +32,9 @@ function RenderNumericInput(props: NumericInputProps): JSX.Element {
 }
 
 describe('Numeric Input', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
     it('should only accept numeric input', async () => {
         const { getByRole, rerender } = render(<RenderNumericInput />);
         const input = getByRole('textbox', { hidden: true });
@@ -99,6 +103,75 @@ describe('Numeric Input', () => {
         await userEvent.type(input, '1', { delay: 1 });
         expect(onChangeStub).toHaveBeenCalledTimes(1);
         expect(onChangeStub.mock.results[0].value).toEqual(21);
+    });
+
+    it('should update the callback method with latest values', async () => {
+        const onChangeStub = jest.fn((isChangeCalled, value) => [isChangeCalled, value]);
+
+        function TestItem(): React.ReactNode {
+            const [isButtonClicked, setIsButtonClicked] = React.useState<boolean>(false);
+
+            const onChange = React.useCallback(
+                (value: number): void => {
+                    onChangeStub(isButtonClicked, value);
+                },
+                [isButtonClicked]
+            );
+            return (
+                <div>
+                    <RenderNumericInput onChange={onChange} value={2} />
+                    <input onClick={() => setIsButtonClicked(true)} type="button" value="Click" />
+                </div>
+            );
+        }
+
+        const { getByRole } = render(<TestItem />);
+        const input = getByRole('textbox', { hidden: true });
+
+        // change it for the first time, the isButtonClicked value should still be false
+        await act(async () => {
+            await userEvent.type(input, '1', { delay: 1 });
+        });
+
+        // expect the mock to be called with the array result of [21, false]
+        await waitFor(() => {
+            expect(onChangeStub).toHaveBeenCalledTimes(1);
+            expect(onChangeStub.mock.results[0].value[1]).toEqual(21);
+            expect(onChangeStub.mock.results[0].value[0]).toEqual(false);
+        });
+
+        // fire the click on a different act to make sure it happens before the changes
+        act(() => {
+            fireEvent.click(screen.getByRole('button', { name: 'Click' }));
+        });
+
+        // click the button, the value should be true
+        await act(async () => {
+            await userEvent.type(input, '5', { delay: 1 });
+        });
+
+        // expect the mock to be called with the array result of [21, true] since we clicked the button
+        await waitFor(() => {
+            expect(onChangeStub).toHaveBeenCalledTimes(2);
+            expect(onChangeStub.mock.results[1].value[1]).toEqual(25);
+            expect(onChangeStub.mock.results[1].value[0]).toEqual(true);
+        });
+    });
+
+    it('should pass keydown to the parent', async () => {
+        const onKeydownStub = jest.fn((value) => value.key);
+
+        const { getByRole } = render(<RenderNumericInput onKeyDown={onKeydownStub} value={2} />);
+        const input = getByRole('textbox');
+
+        act(() => {
+            fireEvent.keyDown(input, { key: 'Enter' });
+        });
+
+        await waitFor(() => {
+            expect(onKeydownStub).toHaveBeenCalledTimes(1);
+            expect(onKeydownStub.mock.results[0].value).toEqual('Enter');
+        });
     });
 
     it('should implement the stepper correctly', async () => {
