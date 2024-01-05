@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.4.4
 
 -   Fix an issue where dragging nodes too quickly would cause the node drag to stop working
 -   Added `Soft Directed` edge to legend of `EdgeEncoder`
