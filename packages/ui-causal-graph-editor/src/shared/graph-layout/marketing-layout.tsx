@@ -20,12 +20,19 @@ import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph, SimulationNodeWithGroup } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
-import { GraphLayout, GraphLayoutBuilder } from './common';
+import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
+import { applyTierForces } from './spring-layout';
 
 export type TargetLocation = 'center' | 'bottom';
 
-class MarketingLayoutBuilder extends GraphLayoutBuilder<MarketingLayout> {
+class MarketingLayoutBuilder extends GraphLayoutBuilder<MarketingLayout> implements TieredGraphLayoutBuilder {
     _targetLocation: TargetLocation = 'bottom';
+
+    _tierSeparation = 300;
+
+    orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     /**
      * Sets the target location and returns the builder
@@ -34,6 +41,16 @@ class MarketingLayoutBuilder extends GraphLayoutBuilder<MarketingLayout> {
      */
     targetLocation(location: TargetLocation): this {
         this._targetLocation = location;
+        return this;
+    }
+
+    /**
+     * Set tier separation
+     *
+     * @param separation separation
+     */
+    tierSeparation(separation: number): this {
+        this._tierSeparation = separation;
         return this;
     }
 
@@ -52,9 +69,18 @@ class MarketingLayoutBuilder extends GraphLayoutBuilder<MarketingLayout> {
 export default class MarketingLayout extends GraphLayout {
     public targetLocation: TargetLocation = 'bottom';
 
+    public tierSeparation: number;
+
+    public orientation: DirectionType;
+
+    public tiers: GraphTiers;
+
     constructor(builder: MarketingLayoutBuilder) {
         super(builder);
         this.targetLocation = builder._targetLocation;
+        this.tierSeparation = builder._tierSeparation;
+        this.orientation = builder.orientation;
+        this.tiers = builder.tiers;
     }
 
     applyLayout(graph: SimulationGraph): Promise<{
@@ -122,6 +148,10 @@ export default class MarketingLayout extends GraphLayout {
                     })
             )
             .stop();
+
+        if (this.tiers) {
+            applyTierForces(simulation, graph, nodes, this.tiers, this.tierSeparation, this.orientation);
+        }
 
         simulation.tick(1000);
 

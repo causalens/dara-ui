@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.4.4
 
 -   Added `onKeyDown` prop to NumericInput to bubble up keydown events
 -   Added the `onChange` property to the `onChange` callback dependency

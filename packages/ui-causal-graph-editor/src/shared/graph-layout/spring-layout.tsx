@@ -19,11 +19,12 @@ import { Simulation, SimulationLinkDatum } from 'd3';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 import debounce from 'lodash/debounce';
 
-import { D3SimulationEdge, SimulationGraph, SimulationNode } from '../../types';
+import { D3SimulationEdge, SimulationGraph, SimulationNode, SimulationNodeWithGroup } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
-import { GraphLayout, GraphLayoutBuilder } from './common';
+import { getNodeOrder, getTiersArray } from '../utils';
+import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
 
-class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> {
+class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements TieredGraphLayoutBuilder {
     _collisionForce = 2;
 
     _gravity = -50;
@@ -31,6 +32,12 @@ class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> {
     _linkForce = 5;
 
     _warmupTicks = 100;
+
+    _tierSeparation = 300;
+
+    orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     /**
      * Set the multiplier for collision force
@@ -72,10 +79,122 @@ class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> {
         return this;
     }
 
+    /**
+     * Set tier separation
+     *
+     * @param separation separation
+     */
+    tierSeparation(separation: number): this {
+        this._tierSeparation = separation;
+        return this;
+    }
+
     build(): SpringLayout {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new SpringLayout(this);
     }
+}
+
+/**
+ * Apply force that orders nodes based on the tier order_nodes_by values
+ *
+ * @param simulation the D3 simulation
+ * @param tiers the tiers passed to the layout
+ * @param graph the simulation graph
+ * @param orientation the orientation of the layout
+ * @param nodesMap a map of node name to node object
+ */
+function applyOrderNodesForce(
+    simulation: d3.Simulation<SimulationNode, D3SimulationEdge>,
+    tiers: GraphTiers,
+    graph: SimulationGraph,
+    orientation: DirectionType,
+    nodesMap: Map<string, SimulationNodeWithGroup>
+): void {
+    if (!Array.isArray(tiers)) {
+        const { order_nodes_by } = tiers;
+        if (order_nodes_by) {
+            const simNodes = graph.nodes();
+            const nodesOrder = getNodeOrder(simNodes, order_nodes_by, graph);
+            const sortedNodesOrderArray = Object.entries(nodesOrder)
+                .sort((a, b) => Number(a[1]) - Number(b[1]))
+                .map((entry) => entry[0]);
+            const nodeSeparation = 200;
+
+            function forceOrder(): d3.Force<SimulationNodeWithGroup, undefined> {
+                function force(alpha: number): void {
+                    sortedNodesOrderArray.forEach((nodeName, index) => {
+                        const targetPosition = index * nodeSeparation;
+                        const targettedNode = nodesMap.get(nodeName);
+
+                        if (targettedNode) {
+                            if (orientation === 'horizontal') {
+                                // Apply a nudge towards the target y position
+                                targettedNode.vy += (targetPosition - targettedNode.y) * alpha;
+                            } else {
+                                // Apply a nudge towards the target x position
+                                targettedNode.vx += (targetPosition - targettedNode.x) * alpha;
+                            }
+                        }
+                    });
+                }
+                return force;
+            }
+
+            // apply layer force
+            simulation.force('order', forceOrder());
+        }
+    }
+}
+
+/**
+ * Apply forces which are needed as part of a tiered layout.
+ * There is one force which snaps the nodes to the relevant layers and another force ordering the nodes within the layers.
+ *
+ * @param simulation the D3 simulation
+ * @param graph the simulation graph
+ * @param nodes array of the nodes
+ * @param tiers the tiers passed to the layout
+ * @param tiersSeparation the separation between the tiers
+ * @param orientation the orientation of the layout
+ */
+export function applyTierForces(
+    simulation: d3.Simulation<SimulationNode, D3SimulationEdge>,
+    graph: SimulationGraph,
+    nodes: SimulationNodeWithGroup[],
+    tiers: GraphTiers,
+    tiersSeparation: number,
+    orientation: DirectionType
+): void {
+    const tiersArray = getTiersArray(tiers, graph);
+
+    const nodesMapping = new Map<string, SimulationNodeWithGroup>();
+    nodes.forEach((node) => nodesMapping.set(node.id, node));
+
+    applyOrderNodesForce(simulation, tiers, graph, orientation, nodesMapping);
+
+    function forceLayer(): d3.Force<SimulationNodeWithGroup, undefined> {
+        function force(alpha: number): void {
+            tiersArray.forEach((tier, index) => {
+                const targetPosition = index * tiersSeparation;
+                tier.forEach((nodeName) => {
+                    const targettedNode = nodesMapping.get(nodeName);
+                    if (targettedNode) {
+                        if (orientation === 'horizontal') {
+                            // Directly set the x position
+                            targettedNode.x = targetPosition + (targettedNode.x - targetPosition) * alpha;
+                        } else {
+                            // Directly set the y position
+                            targettedNode.y = targetPosition + (targettedNode.y - targetPosition) * alpha;
+                        }
+                    }
+                });
+            });
+        }
+        return force;
+    }
+    // apply layer force
+    simulation.force('layer', forceLayer());
 }
 
 /**
@@ -91,12 +210,21 @@ export default class SpringLayout extends GraphLayout {
 
     public warmupTicks: number;
 
+    public tierSeparation: number;
+
+    public orientation: DirectionType;
+
+    public tiers: GraphTiers;
+
     constructor(builder: SpringLayoutBuilder) {
         super(builder);
         this.collisionForce = builder._collisionForce;
         this.linkForce = builder._linkForce;
         this.gravity = builder._gravity;
         this.warmupTicks = builder._warmupTicks;
+        this.tierSeparation = builder._tierSeparation;
+        this.orientation = builder.orientation;
+        this.tiers = builder.tiers;
     }
 
     applyLayout(
@@ -130,6 +258,10 @@ export default class SpringLayout extends GraphLayout {
             // The center force keeps nodes in the middle of the viewport
             .force('center', d3.forceCenter())
             .stop(); // don't start just yet
+
+        if (this.tiers) {
+            applyTierForces(simulation, graph, nodes, this.tiers, this.tierSeparation, this.orientation);
+        }
 
         // Warm-up the simulation so the jump to the center isn't visible
         simulation.tick(this.warmupTicks);
