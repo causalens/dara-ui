@@ -102,14 +102,14 @@ class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements Ti
  * @param tiers the tiers passed to the layout
  * @param graph the simulation graph
  * @param orientation the orientation of the layout
- * @param nodes array of the nodes
+ * @param nodesMap a map of node name to node object
  */
 function applyOrderNodesForce(
     simulation: d3.Simulation<SimulationNode, D3SimulationEdge>,
     tiers: GraphTiers,
     graph: SimulationGraph,
     orientation: DirectionType,
-    nodes: SimulationNodeWithGroup[]
+    nodesMap: Map<string, SimulationNodeWithGroup>
 ): void {
     if (!Array.isArray(tiers)) {
         const { order_nodes_by } = tiers;
@@ -119,13 +119,13 @@ function applyOrderNodesForce(
             const sortedNodesOrderArray = Object.entries(nodesOrder)
                 .sort((a, b) => Number(a[1]) - Number(b[1]))
                 .map((entry) => entry[0]);
+            const nodeSeparation = 200;
 
             function forceOrder(): d3.Force<SimulationNodeWithGroup, undefined> {
                 function force(alpha: number): void {
                     sortedNodesOrderArray.forEach((nodeName, index) => {
-                        const nodeSeparation = 200;
                         const targetPosition = index * nodeSeparation;
-                        const targettedNode = nodes.find((obj) => obj.id === nodeName);
+                        const targettedNode = nodesMap.get(nodeName);
 
                         if (targettedNode) {
                             if (orientation === 'horizontal') {
@@ -168,14 +168,17 @@ export function applyTierForces(
 ): void {
     const tiersArray = getTiersArray(tiers, graph);
 
-    applyOrderNodesForce(simulation, tiers, graph, orientation, nodes);
+    const nodesMapping = new Map<string, SimulationNodeWithGroup>();
+    nodes.forEach((node) => nodesMapping.set(node.id, node));
+
+    applyOrderNodesForce(simulation, tiers, graph, orientation, nodesMapping);
 
     function forceLayer(): d3.Force<SimulationNodeWithGroup, undefined> {
         function force(alpha: number): void {
             tiersArray.forEach((tier, index) => {
                 const targetPosition = index * tiersSeparation;
                 tier.forEach((nodeName) => {
-                    const targettedNode = nodes.find((obj) => obj.id === nodeName);
+                    const targettedNode = nodesMapping.get(nodeName);
                     if (targettedNode) {
                         if (orientation === 'horizontal') {
                             // Directly set the x position
