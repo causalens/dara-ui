@@ -20,7 +20,7 @@ import { EditorMode } from '@types';
 
 export interface LegendLineDefinition {
     /** Arrow to show at end of line */
-    arrowType?: 'none' | 'normal' | 'filled' | 'empty';
+    arrowType?: 'none' | 'normal' | 'filled' | 'empty' | 'soft';
     /** Symbol to show in the center of the arrow */
     centerSymbol?: 'none' | 'cross' | 'question' | 'bidirected';
     /** color to represent */
@@ -59,7 +59,8 @@ const PAG_LEGEND: LegendLineDefinition[] = [
 ];
 
 const ENCODER_LEGEND: LegendLineDefinition[] = [
-    { label: 'Directed' },
+    { label: 'Hard Directed' },
+    { arrowType: 'soft', label: 'Soft Directed' },
     { arrowType: 'none', centerSymbol: 'bidirected', label: 'Undirected' },
     { arrowType: 'none', centerSymbol: 'cross', label: 'Prohibited' },
 ];

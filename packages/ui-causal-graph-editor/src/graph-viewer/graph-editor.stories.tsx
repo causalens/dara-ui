@@ -33,7 +33,7 @@ import {
 } from '../shared/graph-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, causalGraph, pagCausalGraph, nodeTiersCausalGraph } from './utils/stories-utils';
+import { Template, causalGraph, nodeTiersCausalGraph, nodeTiersList, pagCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
@@ -144,6 +144,16 @@ MarketingCenter.args = {
     graphLayout: MarketingLayout.Builder.targetLocation('center').build(),
 };
 
+export const MarketingTiers = Template.bind({});
+const marketingLayout = SpringLayout.Builder.build();
+marketingLayout.tiers = nodeTiersList;
+
+MarketingTiers.args = {
+    editable: true,
+    graphData: nodeTiersCausalGraph,
+    graphLayout: marketingLayout,
+};
+
 export const PlanarVertical = Template.bind({});
 PlanarVertical.args = {
     editable: true,
@@ -163,7 +173,6 @@ const planarLayout = PlanarLayout.Builder.build();
 // planarLayout.tiers = { group: 'meta.test', rank: ['a', 'b', 'c', 'd', 'e'] };
 planarLayout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
 
-
 PlanarTiers.args = {
     editable: true,
     // graphData: nodeTiersCausalGraph,
@@ -176,6 +185,27 @@ Spring.args = {
     editable: true,
     graphData: causalGraph,
     graphLayout: SpringLayout.Builder.build(),
+};
+
+export const SpringTiersArray = Template.bind({});
+const springArrayLayout = SpringLayout.Builder.build();
+springArrayLayout.tiers = nodeTiersList;
+
+SpringTiersArray.args = {
+    editable: true,
+    graphData: nodeTiersCausalGraph,
+    graphLayout: springArrayLayout,
+};
+
+export const SpringTiers = Template.bind({});
+const springLayout = SpringLayout.Builder.build();
+springLayout.tiers = { group: 'meta.group', order_nodes_by: 'meta.order', rank: ['a', 'b', 'c', 'd', 'e'] };
+springLayout.tierSeparation = 300;
+
+SpringTiers.args = {
+    editable: true,
+    graphData: FRAUD,
+    graphLayout: springLayout,
 };
 
 export const Circular = Template.bind({});

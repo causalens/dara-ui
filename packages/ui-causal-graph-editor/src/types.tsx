@@ -158,6 +158,10 @@ export interface SimulationNode extends FlatNodeRenderingMeta {
     size?: number;
 
     variable_type: string;
+    /** The velocity in the x-axis of the node */
+    vx?: number;
+    /** The velocity in the y-axis of the node */
+    vy?: number;
     /** The x coordinate of the node */
     x?: number;
     /** The y coordinate of the node */

@@ -19,8 +19,8 @@ import fcose, { FcoseLayoutOptions, FcoseRelativePlacementConstraint } from 'cyt
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
+import { getNodeOrder, getTiersArray } from '../utils';
 import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
-import { getPathInNodeAttribute, getTiersArray } from './utils';
 
 cytoscape.use(fcose);
 
@@ -242,30 +242,6 @@ function getRelativeTieredArrayPlacement(
     return relativePlacements;
 }
 
-/**
- * Gets nodes grouped by a given attribute
- * @param nodes nodes to be grouped
- * @param group the attribute to group by
- * @param graph the graph
- *  */
-function getNodeOrder(nodes: string[], orderPath: string, graph: SimulationGraph): Record<string, string> {
-    const attributePathArray = orderPath.split('.');
-
-    return nodes.reduce((groupAccumulator: Record<string, string>, node) => {
-        const nodeAttributes = graph.getNodeAttributes(node);
-        // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
-        // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
-        const nodeOrder = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
-
-        // If it is not undefined at this point i.e. node order was found
-        if (nodeOrder !== undefined) {
-            const order = String(nodeOrder);
-            groupAccumulator[node] = order;
-        }
-        return groupAccumulator;
-    }, {});
-}
-
 interface TiersProperties {
     alignmentConstraint?: string[][];
     relativePlacementConstraint?: FcoseRelativePlacementConstraint[];
@@ -283,8 +259,8 @@ export function getTieredLayoutProperties(
     orientation: DirectionType,
     tierSeparation: number
 ): TiersProperties {
+    const tiersArray = getTiersArray(tiers, graph);
     let nodesOrder: Record<string, string>;
-    const tiersArray = getTiersArray(tiers, graph, false);
 
     if (!Array.isArray(tiers)) {
         // must be of type TiersConfig
