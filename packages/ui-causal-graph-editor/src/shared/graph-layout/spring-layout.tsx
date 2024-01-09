@@ -126,19 +126,21 @@ function applyOrderNodesForce(
                         const nodeSeparation = 200;
                         const targetPosition = index * nodeSeparation;
                         const targettedNode = nodes.find((obj) => obj.id === nodeName);
+
                         if (targettedNode) {
                             if (orientation === 'horizontal') {
-                                // Directly set the y position
-                                targettedNode.y = targetPosition + (targettedNode.y - targetPosition) * alpha;
+                                // Apply a nudge towards the target y position
+                                targettedNode.vy += (targetPosition - targettedNode.y) * alpha;
                             } else {
-                                // Directly set the x position
-                                targettedNode.x = targetPosition + (targettedNode.x - targetPosition) * alpha;
+                                // Apply a nudge towards the target x position
+                                targettedNode.vx += (targetPosition - targettedNode.x) * alpha;
                             }
                         }
                     });
                 }
                 return force;
             }
+
             // apply layer force
             simulation.force('order', forceOrder());
         }
