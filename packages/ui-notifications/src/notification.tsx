@@ -83,8 +83,8 @@ const Body = styled.span<NotificationBodyProps>`
     display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
 
     font-weight: 400;
-    text-overflow: ellipsis;
     line-height: 1.25rem;
+    text-overflow: ellipsis;
 
     -webkit-box-orient: vertical;
     -webkit-line-clamp: ${(props) => (props.moreDetailsShown ? 1 : 2)};
@@ -101,12 +101,16 @@ const Icon = styled.div<NotificationIconsProps>`
 `;
 
 const MoreDetailsButton = styled.button`
-    color: ${() => theme.colors.grey4};
-    border: none;
-    background: transparent;
     cursor: pointer;
+
     display: flex;
+
     padding-left: 0;
+
+    color: ${() => theme.colors.grey4};
+
+    background: transparent;
+    border: none;
     :hover {
         text-decoration: underline;
     }
@@ -130,8 +134,10 @@ function getIcon(status: Status): JSX.Element {
 export interface NotificationProps {
     /** The notification to render */
     notification: NotificationPayload;
+    /**Whether to hide the dismiss X */
+    hideDismiss?: boolean;
     /** Handler to trigger the dismissal of the notification */
-    onDismiss: (key: string) => void | Promise<void>;
+    onDismiss?: (key: string) => void | Promise<void>;
     /** Optional handler to trigger when the more details button is clicked */
     onMoreDetailsClick?: (
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -161,11 +167,12 @@ function Notification(props: NotificationProps): JSX.Element {
                     </MoreDetailsButton>
                 )}
             </Message>
+            {!props.hideDismiss && 
             <CloseBtn
                 asButton
                 onClick={() => props.onDismiss(props.notification.key)}
                 status={props.notification.status}
-            />
+            />}
         </NotificationWrapper>
     );
 }

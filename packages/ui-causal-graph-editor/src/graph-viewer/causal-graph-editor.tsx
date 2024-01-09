@@ -14,17 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
-import { useEffect, useMemo, useState } from 'react';
-import * as React from 'react';
-import { GetReferenceClientRect } from 'tippy.js';
-
-import { useTheme } from '@darajs/styled-components';
-import { Tooltip } from '@darajs/ui-components';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
-import { ConfirmationModal } from '@darajs/ui-widgets';
-
 import {
     AddNodeButton,
     CenterGraphButton,
@@ -50,6 +39,17 @@ import {
     SimulationEdge,
     ZoomThresholds,
 } from '@types';
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
+import { useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
+import { GetReferenceClientRect } from 'tippy.js';
+
+import styled, { useTheme } from '@darajs/styled-components';
+import { Tooltip } from '@darajs/ui-components';
+import Notification from '@darajs/ui-notifications/src/notification';
+import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
@@ -65,6 +65,12 @@ import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
 
+const NotificationWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: inherit;
+`;
 export interface CausalGraphEditorProps extends Settings {
     /** Optional additional legends to show */
     additionalLegends?: LegendLineDefinition[];
@@ -643,6 +649,12 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                                 )}
                             </GraphContext.Provider>
                         </Overlay>
+                        <NotificationWrapper>
+                            <Notification
+                                hideDismiss
+                                notification={{ key: 'GraphError', message: 'My message', status: Status.ERROR }}
+                            />
+                        </NotificationWrapper>
                         <div ref={canvasParentRef} style={{ height: '100%', width: '100%' }} />
                         <Tooltip
                             content={tooltipContent}
