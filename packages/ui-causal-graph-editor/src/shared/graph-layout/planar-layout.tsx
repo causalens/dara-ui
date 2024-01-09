@@ -95,48 +95,46 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
                     .layering(layeringSimplex().group(groupAccessor));
 
                 newDagLayout(dag);
-
-                console.log('dag after:', dag.toJSON());
-
-                // if (this.tiers) {
-                //     // const layering: SimplexOperator<DagNode> = getTiersArray(this.tiers, currentGraph, dag);
-                //     // newDagLayout = newDagLayout.layering(layering);
-                //     newDagLayout = newDagLayout.layering(layeringLongestPath());
-                // }
-
-                // const edgePoints = dag.links().reduce((acc, link) => {
-                //     acc[`${link.source.id}||${link.target.id}`] = link.points.map((point) => ({
-                //         x: this.orientation === 'vertical' ? point.x : point.y,
-                //         y: this.orientation === 'vertical' ? point.y : point.x,
-                //     }));
-                //     return acc;
-                // }, {} as LayoutMapping<XYPosition[]>);
-
-                const edgePoints: LayoutMapping<XYPosition[]> = {};
-                for (const link of dag.links()) {
-                    edgePoints[`${link.source.data.id}||${link.target.data.id}`] = link.points.map(
-                        (point: number[]) => ({
-                            x: this.orientation === 'vertical' ? point[0] : point[1],
-                            y: this.orientation === 'vertical' ? point[1] : point[0],
-                        })
-                    );
-                }
-
-                const newLayout: LayoutMapping<XYPosition> = {};
-                for (const node of dag.nodes()) {
-                    newLayout[node.data.id] = {
-                        x: this.orientation === 'vertical' ? node.x : node.y,
-                        y: this.orientation === 'vertical' ? node.y : node.x,
-                    };
-                }
-
-                console.log('newLayout:', newLayout);
-
-                return { edgePoints, newLayout };
             } catch (e) {
                 console.log('error:', e);
-                return { edgePoints: null, newLayout: null };
+                throw new Error('FAILED');
             }
+
+            console.log('dag after:', dag.toJSON());
+
+            // if (this.tiers) {
+            //     // const layering: SimplexOperator<DagNode> = getTiersArray(this.tiers, currentGraph, dag);
+            //     // newDagLayout = newDagLayout.layering(layering);
+            //     newDagLayout = newDagLayout.layering(layeringLongestPath());
+            // }
+
+            // const edgePoints = dag.links().reduce((acc, link) => {
+            //     acc[`${link.source.id}||${link.target.id}`] = link.points.map((point) => ({
+            //         x: this.orientation === 'vertical' ? point.x : point.y,
+            //         y: this.orientation === 'vertical' ? point.y : point.x,
+            //     }));
+            //     return acc;
+            // }, {} as LayoutMapping<XYPosition[]>);
+
+            const edgePoints: LayoutMapping<XYPosition[]> = {};
+            for (const link of dag.links()) {
+                edgePoints[`${link.source.data.id}||${link.target.data.id}`] = link.points.map((point: number[]) => ({
+                    x: this.orientation === 'vertical' ? point[0] : point[1],
+                    y: this.orientation === 'vertical' ? point[1] : point[0],
+                }));
+            }
+
+            const newLayout: LayoutMapping<XYPosition> = {};
+            for (const node of dag.nodes()) {
+                newLayout[node.data.id] = {
+                    x: this.orientation === 'vertical' ? node.x : node.y,
+                    y: this.orientation === 'vertical' ? node.y : node.x,
+                };
+            }
+
+            console.log('newLayout:', newLayout);
+
+            return { edgePoints, newLayout };
         };
 
         const { newLayout, edgePoints } = computeLayout(graph);
