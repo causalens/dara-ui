@@ -165,6 +165,8 @@ export interface NumericInputProps extends InteractiveComponentProps<number> {
     onChange?: (value: number, e?: React.SyntheticEvent<HTMLInputElement>) => void | Promise<void>;
     /** An optional event listener for complete events (enter presses) */
     onComplete?: () => void | Promise<void>;
+    /** An optional event listener for keydown events */
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void | Promise<void>;
     /** An optional placeholder that will be used when the input is empty, defaults to '' */
     placeholder?: string;
     /** An optional property to set how many steps the stepper should take */
@@ -215,6 +217,9 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         };
 
         const onKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+            // run the keydown event handler if it exists
+            props.onKeyDown?.(e);
+
             if (!props.stepper) {
                 return;
             }
@@ -246,7 +251,7 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                 props.onChange?.(parsed, e);
             },
             // eslint-disable-next-line react-hooks/exhaustive-deps
-            [props.integerOnly, props.value]
+            [props.integerOnly, props.value, props.onChange]
         );
 
         useEffect(() => {
