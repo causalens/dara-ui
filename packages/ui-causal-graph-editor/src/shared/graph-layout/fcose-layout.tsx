@@ -19,6 +19,7 @@ import fcose, { FcoseLayoutOptions, FcoseRelativePlacementConstraint } from 'cyt
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
+import { getNodeOrder, getTiersArray } from '../utils';
 import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
 
 cytoscape.use(fcose);
@@ -155,33 +156,6 @@ class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> implements Tier
 }
 
 /**
- * Based on a node attribute checks if the path is in the attribute or in extras, if not found returns undefined
- * @param attributes node object or a sub attribute of the node object
- * @param path path to the attribute
- *  */
-function getPathInNodeAttribute(attributes: Record<string, any>, path: string): any {
-    let searchablePath = path;
-    // If attribute becomes undefined we have a non valid path within the node
-    if (attributes === undefined) {
-        throw new Error('Could not find path for rank or group within Node');
-    }
-    // If path is in meta change it to originalMeta
-    if (searchablePath === 'meta') {
-        searchablePath = 'originalMeta';
-    }
-    // Check if path is in node attributes
-    if (Object.prototype.hasOwnProperty.call(attributes, searchablePath)) {
-        return attributes[searchablePath];
-    }
-    // If not check if it has been moved to extras
-    if (attributes?.extras && searchablePath in attributes.extras) {
-        return attributes.extras[searchablePath];
-    }
-    // If not found the node does not have that attribute
-    return undefined;
-}
-
-/**
  * Creates an array of relative placements for a given tier given a certain order of nodes and orientation
  * @param tier tier to be placed
  * @param orientation the orientation of the graph
@@ -268,59 +242,6 @@ function getRelativeTieredArrayPlacement(
     return relativePlacements;
 }
 
-/**
- * Gets nodes grouped by a given attribute
- * @param nodes nodes to be grouped
- * @param group the attribute to group by
- * @param graph the graph
- *  */
-function getNodeGroups(nodes: string[], group: string, graph: SimulationGraph): Record<string, string[]> {
-    const attributePathArray = group.split('.');
-
-    return nodes.reduce((groupAccumulator: Record<string, string[]>, node) => {
-        const nodeAttributes = graph.getNodeAttributes(node);
-        // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
-        // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
-        const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
-
-        // If it is not undefined at this point i.e. node group was found
-        if (nodeGroup !== undefined) {
-            const groupKey = String(nodeGroup);
-            // if group is not in tieredNodes add it, if it is add node to that tier
-            if (groupKey in groupAccumulator) {
-                groupAccumulator[groupKey].push(node);
-            } else {
-                groupAccumulator[groupKey] = [node];
-            }
-        }
-        return groupAccumulator;
-    }, {});
-}
-
-/**
- * Gets nodes grouped by a given attribute
- * @param nodes nodes to be grouped
- * @param group the attribute to group by
- * @param graph the graph
- *  */
-function getNodeOrder(nodes: string[], orderPath: string, graph: SimulationGraph): Record<string, string> {
-    const attributePathArray = orderPath.split('.');
-
-    return nodes.reduce((groupAccumulator: Record<string, string>, node) => {
-        const nodeAttributes = graph.getNodeAttributes(node);
-        // The node attribute containing the group can be deep within the node, e.g. meta.rendering_properties.group
-        // or anywhere else defined by the user. Here we tranverse the path checking what the group value is.
-        const nodeOrder = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
-
-        // If it is not undefined at this point i.e. node order was found
-        if (nodeOrder !== undefined) {
-            const order = String(nodeOrder);
-            groupAccumulator[node] = order;
-        }
-        return groupAccumulator;
-    }, {});
-}
-
 interface TiersProperties {
     alignmentConstraint?: string[][];
     relativePlacementConstraint?: FcoseRelativePlacementConstraint[];
@@ -338,33 +259,14 @@ export function getTieredLayoutProperties(
     orientation: DirectionType,
     tierSeparation: number
 ): TiersProperties {
-    let tiersArray: string[][] = Array.isArray(tiers) ? tiers : [];
+    const tiersArray = getTiersArray(tiers, graph);
     let nodesOrder: Record<string, string>;
 
     if (!Array.isArray(tiers)) {
         // must be of type TiersConfig
-        const { group, order_nodes_by, rank } = tiers;
+        const { order_nodes_by } = tiers;
         const nodes = graph.nodes();
-        const tieredNodes = getNodeGroups(nodes, group, graph);
         nodesOrder = order_nodes_by ? getNodeOrder(nodes, order_nodes_by, graph) : undefined;
-
-        // if rank is defined use it to order the tiers
-        if (rank) {
-            const missingGroups: string[] = [];
-            tiersArray = rank.map((key) => {
-                if (!(key in tieredNodes)) {
-                    missingGroups.push(key);
-                    return [];
-                }
-                return tieredNodes[key];
-            });
-
-            if (missingGroups.length > 0) {
-                throw new Error(`Group(s) ${missingGroups.join(', ')} defined in rank not found within any Nodes`);
-            }
-        } else {
-            tiersArray = Object.values(tieredNodes);
-        }
     }
 
     return {

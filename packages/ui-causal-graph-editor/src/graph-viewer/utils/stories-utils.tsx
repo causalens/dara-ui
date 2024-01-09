@@ -255,4 +255,4 @@ export const nodeTiersCausalGraph = {
     },
 };
 
-export const nodeTiersList = [['target'], ['input1', 'input2'], ['input3', 'input4']];
+export const nodeTiersList = [['input1', 'input2'], ['input3', 'input4'], ['target']];
