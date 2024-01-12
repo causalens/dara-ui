@@ -14,11 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { coordQuad, decrossTwoLayer, layeringSimplex, sugiyama } from 'd3-dag';
+import {
+    GraphNode,
+    SugiLinkDatum,
+    SugiNode,
+    SugiNodeDatum,
+    coordQuad,
+    decrossTwoLayer,
+    layeringSimplex,
+    sugiyama,
+} from 'd3-dag';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { DirectionType, GraphTiers, SimulationGraph, TieredGraphLayoutBuilder } from '../../types';
-import { dagGraphParser } from '../parsers';
+import { DagNodeData, dagGraphParser } from '../parsers';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
@@ -47,7 +56,7 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
  *
  * @param data the data of a pure node or link
  */
-function getNodeValue(data: any): number {
+function getNodeValue(data: SugiNodeDatum<{ ord?: number }> | SugiLinkDatum<{ ord?: number }>): number {
     if (data.role === 'node') {
         return Number(data.node.data.ord) || 0;
     }
@@ -64,16 +73,16 @@ function getNodeValue(data: any): number {
  *
  * @param layers the layers defined by the layering step
  */
-function customDecross(layers: any): void {
-    const vals = new Map();
+function customDecross(layers: SugiNode<{ ord?: number }, unknown>[][]): void {
+    const vals = new Map<SugiNode, number>();
 
-    layers.forEach((layer: any) => {
-        layer.forEach((node: any) => {
+    layers.forEach((layer) => {
+        layer.forEach((node) => {
             const val = getNodeValue(node.data);
             vals.set(node, val);
         });
 
-        layer.sort((a: any, b: any) => vals.get(a) - vals.get(b));
+        layer.sort((a, b) => vals.get(a) - vals.get(b));
     });
 }
 
@@ -121,17 +130,17 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
             let newDagLayout;
 
             try {
-                function groupAccessor(node: any): string {
+                function groupAccessor(node: GraphNode<DagNodeData, any>): string {
                     return node.data.group;
                 }
 
-                function rankAccessor(node: any): number {
+                function rankAccessor(node: GraphNode<DagNodeData, any>): number {
                     return node.data.rank;
                 }
 
                 newDagLayout = sugiyama()
                     .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
-                    .coord(coordQuad() as any)
+                    .coord(coordQuad())
                     .layering(
                         this.tiers ? layeringSimplex().group(groupAccessor).rank(rankAccessor) : layeringSimplex()
                     )

@@ -36,15 +36,16 @@ import {
 } from '../types';
 import { getNodeGroup, getNodeOrder, getTiersArray } from './utils';
 
-export type DagNodeData = SimulationNode & {
-    parentIds: string[];
-};
-
 interface NodeOrder {
     group: string;
     order: string;
     rank: number;
 }
+
+export type DagNodeData = SimulationNode &
+    Partial<NodeOrder> & {
+        parentIds: string[];
+    };
 
 /**
  * This parses the graph structure into a Dag structure that the d3-dag library can understand
@@ -52,9 +53,9 @@ interface NodeOrder {
  * @param graph The SimulationGraph
  * @param tiers Any tiers passed to the layout
  */
-export function dagGraphParser(graph: SimulationGraph, tiers?: GraphTiers): MutGraph<DagNodeData, undefined> {
+export function dagGraphParser(graph: SimulationGraph, tiers?: GraphTiers): MutGraph<DagNodeData, any> {
     const nodeTiersMap = new Map<string, NodeOrder>();
-    let nodesOrder: any = {};
+    let nodesOrder: Record<string, string> = {};
 
     // If there are tiers we need to add group and ord properties to the node for PlanarLayout algo to consider them
     if (tiers) {
