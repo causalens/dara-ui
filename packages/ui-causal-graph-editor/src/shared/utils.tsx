@@ -18,8 +18,7 @@ import { hasCycle } from 'graphology-dag';
 
 import { DefaultTheme } from '@darajs/styled-components';
 
-import { EdgeType, NodeGroup, SimulationGraph } from '../types';
-import { GraphTiers } from './graph-layout/common';
+import { EdgeType, GraphTiers, NodeGroup, SimulationGraph } from '../types';
 
 /**
  * Check if adding an edge to the graph will create a cycle.
