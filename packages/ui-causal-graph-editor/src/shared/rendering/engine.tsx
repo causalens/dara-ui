@@ -38,12 +38,13 @@ import {
     ZoomThresholds,
 } from '@types';
 
+import { GraphLayoutWithTiers } from '../graph-layout/common';
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';
 import { NodeObject, PixiNodeStyle, getNodeSize } from './node';
 import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
-import { colorToPixi, getZoomState } from './utils';
+import { colorToPixi, getZoomState, isGraphLayoutWithTiers } from './utils';
 
 const WORLD_PADDING = 100;
 
@@ -1273,9 +1274,26 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 status: Status.WARNING,
                 title: 'Defaulting to Fcose Layout',
             });
+
+            // Check if the current layout has tiers and orientation, and store them if it does
+            let tiers;
+            let orientation;
+            if (isGraphLayoutWithTiers(this.layout)) {
+                tiers = this.layout.tiers;
+                orientation = this.layout.orientation;
+            }
+
+            // Rebuild the layout
             this.layout = FcoseLayout.Builder.nodeSize(this.layout.nodeSize)
                 .nodeFontSize(this.layout.nodeFontSize)
                 .build();
+
+            // Reassign tiers and orientation to the new layout if they were present in the old layout
+            if (tiers !== undefined) {
+                (this.layout as GraphLayoutWithTiers).tiers = tiers;
+                (this.layout as GraphLayoutWithTiers).orientation = orientation;
+            }
+
             this.updateLayout();
         }
     }

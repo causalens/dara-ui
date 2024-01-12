@@ -16,7 +16,7 @@
  */
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
-import { SimulationGraph } from '../../types';
+import { DirectionType, GraphTiers, SimulationGraph } from '../../types';
 
 export abstract class GraphLayoutBuilder<T> {
     _nodeSize = 64;
@@ -90,4 +90,9 @@ export abstract class GraphLayout {
         onMove?: (nodeId: string, x: number, y: number) => void | Promise<void>;
         onStartDrag?: () => void | Promise<void>;
     }>;
+}
+
+export interface GraphLayoutWithTiers extends GraphLayout {
+    orientation: DirectionType;
+    tiers: GraphTiers;
 }
