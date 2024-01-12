@@ -151,21 +151,21 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
                 throw new Error('d3-dag failed to resolve the layering of graph nodes for PlanarLayout.');
             }
 
-            const edgePoints: LayoutMapping<XYPosition[]> = {};
-            for (const link of dag.links()) {
-                edgePoints[`${link.source.data.id}||${link.target.data.id}`] = link.points.map((point: number[]) => ({
+            const edgePoints: LayoutMapping<XYPosition[]> = Array.from(dag.links()).reduce((acc, link) => {
+                acc[`${link.source.data.id}||${link.target.data.id}`] = link.points.map((point: number[]) => ({
                     x: this.orientation === 'vertical' ? point[0] : point[1],
                     y: this.orientation === 'vertical' ? point[1] : point[0],
                 }));
-            }
+                return acc;
+            }, {} as LayoutMapping<XYPosition[]>);
 
-            const newLayout: LayoutMapping<XYPosition> = {};
-            for (const node of dag.nodes()) {
-                newLayout[node.data.id] = {
+            const newLayout: LayoutMapping<XYPosition> = Array.from(dag.nodes()).reduce((layout, node) => {
+                layout[node.data.id] = {
                     x: this.orientation === 'vertical' ? node.x : node.y,
                     y: this.orientation === 'vertical' ? node.y : node.x,
                 };
-            }
+                return layout;
+            }, {} as LayoutMapping<XYPosition>);
 
             return { edgePoints, newLayout };
         };
