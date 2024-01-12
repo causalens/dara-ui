@@ -18,9 +18,15 @@ import * as d3 from 'd3';
 import { SimulationLinkDatum } from 'd3';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
-import { SimulationGraph, SimulationNodeWithGroup } from '../../types';
+import {
+    DirectionType,
+    GraphTiers,
+    SimulationGraph,
+    SimulationNodeWithGroup,
+    TieredGraphLayoutBuilder,
+} from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
-import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
+import { GraphLayout, GraphLayoutBuilder } from './common';
 import { applyTierForces } from './spring-layout';
 
 export type TargetLocation = 'center' | 'bottom';

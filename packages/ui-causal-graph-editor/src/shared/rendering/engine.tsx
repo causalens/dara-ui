@@ -15,7 +15,17 @@
  * limitations under the License.
  */
 import { Cull } from '@pixi-essentials/cull';
-import { CustomLayout, FcoseLayout, GraphLayout, PlanarLayout } from '@shared/graph-layout';
+import FontFaceObserver from 'fontfaceobserver';
+import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
+import debounce from 'lodash/debounce';
+import { Viewport } from 'pixi-viewport';
+import * as PIXI from 'pixi.js';
+
+import { DefaultTheme } from '@darajs/styled-components';
+import { NotificationPayload } from '@darajs/ui-notifications';
+import { Status } from '@darajs/ui-utils';
+
+import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
 import { getNodeGroup } from '@shared/utils';
 import {
@@ -27,15 +37,6 @@ import {
     SimulationNode,
     ZoomThresholds,
 } from '@types';
-import FontFaceObserver from 'fontfaceobserver';
-import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
-import debounce from 'lodash/debounce';
-import { Viewport } from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
-
-import { DefaultTheme } from '@darajs/styled-components';
-import { NotificationPayload } from '@darajs/ui-notifications';
-import { Status } from '@darajs/ui-utils';
 
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';

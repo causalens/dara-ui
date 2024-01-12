@@ -27,13 +27,13 @@ import {
     D3SimulationEdge,
     FlatEdgeRenderingMeta,
     FlatNodeRenderingMeta,
+    GraphTiers,
     SimulationAttributes,
     SimulationEdge,
     SimulationGraph,
     SimulationNode,
     SimulationNodeWithGroup,
 } from '../types';
-import { GraphTiers } from './graph-layout';
 import { getNodeGroup, getNodeOrder, getTiersArray } from './utils';
 
 export type DagNodeData = SimulationNode & {
