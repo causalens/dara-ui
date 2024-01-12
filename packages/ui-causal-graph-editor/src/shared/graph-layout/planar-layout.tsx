@@ -52,7 +52,7 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
 }
 
 /**
- * Gets the order value for a given node data
+ * Gets the order value for a given node or link data
  *
  * @param data the data of a pure node or link
  */
