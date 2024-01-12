@@ -56,7 +56,7 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
  *
  * @param data the data of a pure node or link
  */
-function getNodeValue(data: SugiNodeDatum<{ ord?: number }> | SugiLinkDatum<{ ord?: number }>): number {
+function getOrdValue(data: SugiNodeDatum<{ ord?: number }> | SugiLinkDatum<{ ord?: number }>): number {
     if (data.role === 'node') {
         return Number(data.node.data.ord) || 0;
     }
@@ -78,7 +78,7 @@ function customDecross(layers: SugiNode<{ ord?: number }, unknown>[][]): void {
 
     layers.forEach((layer) => {
         layer.forEach((node) => {
-            const val = getNodeValue(node.data);
+            const val = getOrdValue(node.data);
             vals.set(node, val);
         });
 
