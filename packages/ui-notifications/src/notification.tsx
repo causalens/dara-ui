@@ -134,8 +134,6 @@ function getIcon(status: Status): JSX.Element {
 export interface NotificationProps {
     /** The notification to render */
     notification: NotificationPayload;
-    /**Whether to hide the dismiss X */
-    hideDismiss?: boolean;
     /** Handler to trigger the dismissal of the notification */
     onDismiss?: (key: string) => void | Promise<void>;
     /** Optional handler to trigger when the more details button is clicked */
@@ -167,12 +165,11 @@ function Notification(props: NotificationProps): JSX.Element {
                     </MoreDetailsButton>
                 )}
             </Message>
-            {!props.hideDismiss && 
             <CloseBtn
                 asButton
                 onClick={() => props.onDismiss(props.notification.key)}
                 status={props.notification.status}
-            />}
+            />
         </NotificationWrapper>
     );
 }

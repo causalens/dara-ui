@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { graphStratify, MutGraph } from 'd3-dag';
-import Graph, { DirectedGraph } from 'graphology';
+import { MutGraph, graphStratify } from 'd3-dag';
+import { DirectedGraph } from 'graphology';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 import isEqual from 'lodash/isEqual';
 import { generate } from 'shortid';
@@ -33,41 +33,69 @@ import {
     SimulationNode,
     SimulationNodeWithGroup,
 } from '../types';
-import { GraphTiers, getPathInNodeAttribute } from './graph-layout';
-import { getNodeGroup } from './utils';
+import { GraphTiers } from './graph-layout';
+import { getNodeGroup, getNodeOrder, getTiersArray } from './utils';
 
 export type DagNodeData = SimulationNode & {
     parentIds: string[];
 };
 
+interface NodeOrder {
+    group: string;
+    order: string;
+    rank: number;
+}
+
 /**
  * This parses the graph structure into a Dag structure that the d3-dag library can understand
  *
- * @param rawData
+ * @param graph The SimulationGraph
+ * @param tiers Any tiers passed to the layout
  */
 export function dagGraphParser(graph: SimulationGraph, tiers?: GraphTiers): MutGraph<DagNodeData, undefined> {
+    const nodeTiersMap = new Map<string, NodeOrder>();
+    let nodesOrder: any = {};
+
+    // If there are tiers we need to add group and ord properties to the node for PlanarLayout algo to consider them
+    if (tiers) {
+        const nodeTiersArray = getTiersArray(tiers, graph);
+        if (!Array.isArray(tiers)) {
+            const { order_nodes_by } = tiers;
+            nodesOrder = order_nodes_by ? getNodeOrder(graph.nodes(), order_nodes_by, graph) : {};
+        }
+
+        nodeTiersArray.forEach((innerArray, index) => {
+            innerArray.forEach((node) => {
+                nodeTiersMap.set(node, { group: String(index), order: nodesOrder[node], rank: index });
+            });
+        });
+    }
+
     const nodes: DagNodeData[] = graph.mapNodes((id: string, attributes: SimulationNode) => {
         const parentIds = graph.inboundNeighbors(id);
-        let nodeGroup = 'latent'
+        let nodeGroup = 'latent';
+        let nodeOrder;
+        let nodeRank;
 
-        if(tiers && !Array.isArray(tiers)){
-            const { group, rank } = tiers;
-            const groupPath = group.split('.');
-            // const rankPath = rank.split('.');
-            nodeGroup = groupPath.reduce(getPathInNodeAttribute, attributes);
-            // const nodeRank = rankPath.reduce(getPathInNodeAttribute, attributes);
-           
+        if (tiers) {
+            const nodeData = nodeTiersMap.get(id);
+            // in the case of e.g. a new node group etc may be undefined
+            nodeGroup = nodeData?.group;
+            nodeOrder = nodeData?.order;
+            nodeRank = nodeData?.rank;
         }
 
         return {
             ...attributes,
             group: nodeGroup,
+            ord: nodeOrder,
             parentIds,
+            rank: nodeRank,
         };
     });
 
-    console.log('nodes', nodes);
     const stratify = graphStratify();
+
     return stratify<DagNodeData>(nodes);
 }
 

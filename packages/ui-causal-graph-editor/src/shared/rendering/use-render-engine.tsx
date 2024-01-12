@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { EdgeConstraint, EditorMode, SimulationEdge, SimulationGraph, ZoomThresholds } from '@types';
 import * as PIXI from 'pixi.js';
 import * as React from 'react';
 
 import { useTheme } from '@darajs/styled-components';
-
-import { EdgeConstraint, EditorMode, SimulationEdge, SimulationGraph, ZoomThresholds } from '@types';
+import { NotificationPayload } from '@darajs/ui-notifications';
 
 import { GraphLayout } from '../graph-layout';
 import { DragMode } from '../use-drag-mode';
@@ -95,6 +95,7 @@ export function useRenderEngine(
     editable: boolean,
     editorMode: EditorMode,
     constraints?: EdgeConstraint[],
+    errorHandler?: (error: NotificationPayload) => void,
     processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle,
     zoomThresholds?: ZoomThresholds
 ): UseRenderEngineApi {
@@ -111,6 +112,7 @@ export function useRenderEngine(
             theme,
             constraints,
             zoomThresholds,
+            errorHandler,
             processEdgeStyle
         );
     }

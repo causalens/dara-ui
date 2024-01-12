@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 import { Cull } from '@pixi-essentials/cull';
-import FontFaceObserver from 'fontfaceobserver';
-import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
-import debounce from 'lodash/debounce';
-import { Viewport } from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
-
-import { DefaultTheme } from '@darajs/styled-components';
-
-import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
+import { CustomLayout, FcoseLayout, GraphLayout, PlanarLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
 import { getNodeGroup } from '@shared/utils';
 import {
@@ -35,6 +27,15 @@ import {
     SimulationNode,
     ZoomThresholds,
 } from '@types';
+import FontFaceObserver from 'fontfaceobserver';
+import { LayoutMapping, XYPosition, assignLayout } from 'graphology-layout/utils';
+import debounce from 'lodash/debounce';
+import { Viewport } from 'pixi-viewport';
+import * as PIXI from 'pixi.js';
+
+import { DefaultTheme } from '@darajs/styled-components';
+import { NotificationPayload } from '@darajs/ui-notifications';
+import { Status } from '@darajs/ui-utils';
 
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';
@@ -181,6 +182,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Callback executed when a drag motion is started */
     private onStartDrag?: () => void = null;
 
+    /** Callback for raising error from a layout build into the Graph component */
+    private errorHandler?: (error: NotificationPayload) => void;
+
     /** Callback executed when an edge needs style change */
     private processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
 
@@ -225,6 +229,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         theme: DefaultTheme,
         constraints?: EdgeConstraint[],
         zoomThresholds?: ZoomThresholds,
+        errorHandler?: (error: NotificationPayload) => void,
         processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle
     ) {
         super();
@@ -235,6 +240,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.theme = theme;
         this.constraints = constraints;
         this.zoomThresholds = zoomThresholds;
+        this.errorHandler = errorHandler;
         this.processEdgeStyle = processEdgeStyle;
         PIXI.Filter.defaultResolution = 3;
     }
@@ -1244,16 +1250,33 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // Cleanup previous layout
         this.onCleanup?.();
 
-        const { layout, edgePoints, onStartDrag, onEndDrag, onCleanup, onMove, onAddNode, onAddEdge } =
-            await this.layout.applyLayout(this.graph, (l, e) => this.setLayout(l, e, false));
-        this.onAddNode = onAddNode;
-        this.onAddEdge = onAddEdge;
-        this.onStartDrag = onStartDrag;
-        this.onEndDrag = onEndDrag;
-        this.onCleanup = onCleanup;
-        this.onMove = onMove;
+        try {
+            const { layout, edgePoints, onStartDrag, onEndDrag, onCleanup, onMove, onAddNode, onAddEdge } =
+                await this.layout.applyLayout(this.graph, (l, e) => this.setLayout(l, e, false));
+            this.onAddNode = onAddNode;
+            this.onAddEdge = onAddEdge;
+            this.onStartDrag = onStartDrag;
+            this.onEndDrag = onEndDrag;
+            this.onCleanup = onCleanup;
+            this.onMove = onMove;
 
-        this.setLayout(layout, edgePoints);
+            this.setLayout(layout, edgePoints);
+        } catch (e) {
+            // TODO: remove console below once we have a nice way of showing more info with the stack trace
+            // eslint-disable-next-line no-console
+            console.error(e);
+            // call error handler
+            this.errorHandler({
+                key: 'LayoutError',
+                message: e.message,
+                status: Status.WARNING,
+                title: 'Defaulting to Fcose Layout',
+            });
+            this.layout = FcoseLayout.Builder.nodeSize(this.layout.nodeSize)
+                .nodeFontSize(this.layout.nodeFontSize)
+                .build();
+            this.updateLayout();
+        }
     }
 
     /**

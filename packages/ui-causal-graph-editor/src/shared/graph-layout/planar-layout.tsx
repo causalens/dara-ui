@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MutGraphNode, SimplexOperator, coordQuad, layeringLongestPath, layeringSimplex, sugiyama } from 'd3-dag';
+import { coordQuad, decrossTwoLayer, layeringSimplex, sugiyama } from 'd3-dag';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { SimulationGraph } from '../../types';
-import { DagNodeData, dagGraphParser } from '../parsers';
+import { dagGraphParser } from '../parsers';
 import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
-import { getTiersArray } from './utils';
 
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     /**
      * Sets the nodes orientation
@@ -39,6 +40,41 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new PlanarLayout(this);
     }
+}
+
+/**
+ * Gets the order value for a given node data
+ *
+ * @param data the data of a pure node or link
+ */
+function getNodeValue(data: any): number {
+    if (data.role === 'node') {
+        return Number(data.node.data.ord) || 0;
+    }
+    // Here we define which order the edges connecting nodes from previous layer should appear in
+    // As a crude approach we define that their order should follow the mean of the source and target nodes.
+    const sourceOrd = Number.isNaN(Number(data.link.source.data.ord)) ? 0 : Number(data.link.source.data.ord);
+    const targetOrd = Number.isNaN(Number(data.link.target.data.ord)) ? 0 : Number(data.link.target.data.ord);
+
+    return (sourceOrd + targetOrd) / 2;
+}
+
+/**
+ * customDecross function that takes ordering of nodes into account
+ *
+ * @param layers the layers defined by the layering step
+ */
+function customDecross(layers: any): void {
+    const vals = new Map();
+
+    layers.forEach((layer: any) => {
+        layer.forEach((node: any) => {
+            const val = getNodeValue(node.data);
+            vals.set(node, val);
+        });
+
+        layer.sort((a: any, b: any) => vals.get(a) - vals.get(b));
+    });
 }
 
 /**
@@ -77,44 +113,34 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
             newLayout: LayoutMapping<XYPosition>;
             onAddNode?: () => void | Promise<void>;
         } => {
-            console.log('tiers:', this.tiers);
             const dag = dagGraphParser(currentGraph, this.tiers);
-            console.log('dag:', dag.toJSON());
 
-            function groupAccessor(node: any): string {
-                return node.data.group;
-            }
+            /**
+             * The nodeSize is scaled for consistent spacing in the horizontal layout
+             */
+            let newDagLayout;
 
             try {
-                /**
-                 * The nodeSize is scaled for consistent spacing in the horizontal layout
-                 */
-                const newDagLayout = sugiyama()
+                function groupAccessor(node: any): string {
+                    return node.data.group;
+                }
+
+                function rankAccessor(node: any): number {
+                    return node.data.rank;
+                }
+
+                newDagLayout = sugiyama()
                     .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
                     .coord(coordQuad() as any)
-                    .layering(layeringSimplex().group(groupAccessor));
+                    .layering(
+                        this.tiers ? layeringSimplex().group(groupAccessor).rank(rankAccessor) : layeringSimplex()
+                    )
+                    .decross(this.tiers ? customDecross : decrossTwoLayer());
 
                 newDagLayout(dag);
             } catch (e) {
-                console.log('error:', e);
-                throw new Error('FAILED');
+                throw new Error('d3-dag failed to resolve the layering of graph nodes for PlanarLayout.');
             }
-
-            console.log('dag after:', dag.toJSON());
-
-            // if (this.tiers) {
-            //     // const layering: SimplexOperator<DagNode> = getTiersArray(this.tiers, currentGraph, dag);
-            //     // newDagLayout = newDagLayout.layering(layering);
-            //     newDagLayout = newDagLayout.layering(layeringLongestPath());
-            // }
-
-            // const edgePoints = dag.links().reduce((acc, link) => {
-            //     acc[`${link.source.id}||${link.target.id}`] = link.points.map((point) => ({
-            //         x: this.orientation === 'vertical' ? point.x : point.y,
-            //         y: this.orientation === 'vertical' ? point.y : point.x,
-            //     }));
-            //     return acc;
-            // }, {} as LayoutMapping<XYPosition[]>);
 
             const edgePoints: LayoutMapping<XYPosition[]> = {};
             for (const link of dag.links()) {
@@ -131,8 +157,6 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
                     y: this.orientation === 'vertical' ? node.y : node.x,
                 };
             }
-
-            console.log('newLayout:', newLayout);
 
             return { edgePoints, newLayout };
         };

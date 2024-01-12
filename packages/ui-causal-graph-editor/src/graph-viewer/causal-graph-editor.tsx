@@ -47,7 +47,7 @@ import { GetReferenceClientRect } from 'tippy.js';
 
 import styled, { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
-import Notification from '@darajs/ui-notifications/src/notification';
+import { Notification, NotificationPayload } from '@darajs/ui-notifications';
 import { Status, useUpdateEffect } from '@darajs/ui-utils';
 import { ConfirmationModal } from '@darajs/ui-widgets';
 
@@ -66,11 +66,31 @@ import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
 
 const NotificationWrapper = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: inherit;
+    position: relative;
+    z-index: 100;
+    top: calc(100% - 8rem);
+    left: calc(100% - 23rem);
+
+    height: 0;
+
+    div {
+        align-items: center;
+        height: 7rem;
+        padding: 0.75rem;
+    }
+
+    span {
+        flex-grow: 1;
+
+        -webkit-line-clamp: 3;
+    }
+
+    h2 {
+        align-self: baseline;
+        height: 1.6rem;
+    }
 `;
+
 export interface CausalGraphEditorProps extends Settings {
     /** Optional additional legends to show */
     additionalLegends?: LegendLineDefinition[];
@@ -130,6 +150,11 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         () => props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER)
     );
 
+    const [error, setError] = useState(null);
+    const handleError = (e: NotificationPayload): void => {
+        setError(e);
+    };
+
     const {
         getCenterPosition,
         useEngineEvent,
@@ -147,6 +172,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.editable,
         editorMode,
         props.initialConstraints,
+        handleError,
         props.processEdgeStyle,
         props.zoomThresholds
     );
@@ -649,12 +675,11 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                                 )}
                             </GraphContext.Provider>
                         </Overlay>
-                        <NotificationWrapper>
-                            <Notification
-                                hideDismiss
-                                notification={{ key: 'GraphError', message: 'My message', status: Status.ERROR }}
-                            />
-                        </NotificationWrapper>
+                        {error && (
+                            <NotificationWrapper>
+                                <Notification notification={error} onDismiss={() => setError(null)} />
+                            </NotificationWrapper>
+                        )}
                         <div ref={canvasParentRef} style={{ height: '100%', width: '100%' }} />
                         <Tooltip
                             content={tooltipContent}

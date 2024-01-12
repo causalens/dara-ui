@@ -22,4 +22,3 @@ export { default as SpringLayout } from './spring-layout';
 export { default as CircularLayout } from './circular-layout';
 export { default as ForceAtlasLayout } from './force-atlas-layout';
 export { default as FcoseLayout } from './fcose-layout';
-export { getPathInNodeAttribute } from './utils';
