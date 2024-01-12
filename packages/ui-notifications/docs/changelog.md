@@ -2,7 +2,12 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Exposed Notification component at root for easier import
+
 ## 1.4.2
+
 -   Updated `pushErrorNotification` and `pushWarningNotification` in a react callback to prevent unnecesary re-renders.
 
 ## 1.0.1

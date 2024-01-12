@@ -22,6 +22,8 @@ import { Viewport } from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 
 import { DefaultTheme } from '@darajs/styled-components';
+import { NotificationPayload } from '@darajs/ui-notifications';
+import { Status } from '@darajs/ui-utils';
 
 import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
@@ -36,12 +38,13 @@ import {
     ZoomThresholds,
 } from '@types';
 
+import { GraphLayoutWithTiers } from '../graph-layout/common';
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';
 import { NodeObject, PixiNodeStyle, getNodeSize } from './node';
 import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
-import { colorToPixi, getZoomState } from './utils';
+import { colorToPixi, getZoomState, isGraphLayoutWithTiers } from './utils';
 
 const WORLD_PADDING = 100;
 
@@ -181,6 +184,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Callback executed when a drag motion is started */
     private onStartDrag?: () => void = null;
 
+    /** Callback for raising error from a layout build into the Graph component */
+    private errorHandler?: (error: NotificationPayload) => void;
+
     /** Callback executed when an edge needs style change */
     private processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
 
@@ -225,6 +231,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         theme: DefaultTheme,
         constraints?: EdgeConstraint[],
         zoomThresholds?: ZoomThresholds,
+        errorHandler?: (error: NotificationPayload) => void,
         processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle
     ) {
         super();
@@ -235,6 +242,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.theme = theme;
         this.constraints = constraints;
         this.zoomThresholds = zoomThresholds;
+        this.errorHandler = errorHandler;
         this.processEdgeStyle = processEdgeStyle;
         PIXI.Filter.defaultResolution = 3;
     }
@@ -1244,16 +1252,50 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // Cleanup previous layout
         this.onCleanup?.();
 
-        const { layout, edgePoints, onStartDrag, onEndDrag, onCleanup, onMove, onAddNode, onAddEdge } =
-            await this.layout.applyLayout(this.graph, (l, e) => this.setLayout(l, e, false));
-        this.onAddNode = onAddNode;
-        this.onAddEdge = onAddEdge;
-        this.onStartDrag = onStartDrag;
-        this.onEndDrag = onEndDrag;
-        this.onCleanup = onCleanup;
-        this.onMove = onMove;
+        try {
+            const { layout, edgePoints, onStartDrag, onEndDrag, onCleanup, onMove, onAddNode, onAddEdge } =
+                await this.layout.applyLayout(this.graph, (l, e) => this.setLayout(l, e, false));
+            this.onAddNode = onAddNode;
+            this.onAddEdge = onAddEdge;
+            this.onStartDrag = onStartDrag;
+            this.onEndDrag = onEndDrag;
+            this.onCleanup = onCleanup;
+            this.onMove = onMove;
 
-        this.setLayout(layout, edgePoints);
+            this.setLayout(layout, edgePoints);
+        } catch (e) {
+            // TODO: remove console below once we have a nice way of showing more info with the stack trace
+            // eslint-disable-next-line no-console
+            console.error(e);
+            // call error handler
+            this.errorHandler({
+                key: 'LayoutError',
+                message: e.message,
+                status: Status.WARNING,
+                title: 'Defaulting to Fcose Layout',
+            });
+
+            // Check if the current layout has tiers and orientation, and store them if it does
+            let tiers;
+            let orientation;
+            if (isGraphLayoutWithTiers(this.layout)) {
+                tiers = this.layout.tiers;
+                orientation = this.layout.orientation;
+            }
+
+            // Rebuild the layout
+            this.layout = FcoseLayout.Builder.nodeSize(this.layout.nodeSize)
+                .nodeFontSize(this.layout.nodeFontSize)
+                .build();
+
+            // Reassign tiers and orientation to the new layout if they were present in the old layout
+            if (tiers !== undefined) {
+                (this.layout as GraphLayoutWithTiers).tiers = tiers;
+                (this.layout as GraphLayoutWithTiers).orientation = orientation;
+            }
+
+            this.updateLayout();
+        }
     }
 
     /**

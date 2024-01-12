@@ -19,10 +19,18 @@ import { Simulation, SimulationLinkDatum } from 'd3';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 import debounce from 'lodash/debounce';
 
-import { D3SimulationEdge, SimulationGraph, SimulationNode, SimulationNodeWithGroup } from '../../types';
+import {
+    D3SimulationEdge,
+    DirectionType,
+    GraphTiers,
+    SimulationGraph,
+    SimulationNode,
+    SimulationNodeWithGroup,
+    TieredGraphLayoutBuilder,
+} from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
 import { getNodeOrder, getTiersArray } from '../utils';
-import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
+import { GraphLayout, GraphLayoutBuilder } from './common';
 
 class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements TieredGraphLayoutBuilder {
     _collisionForce = 2;

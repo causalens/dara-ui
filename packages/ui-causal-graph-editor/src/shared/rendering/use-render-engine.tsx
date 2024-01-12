@@ -18,6 +18,7 @@ import * as PIXI from 'pixi.js';
 import * as React from 'react';
 
 import { useTheme } from '@darajs/styled-components';
+import { NotificationPayload } from '@darajs/ui-notifications';
 
 import { EdgeConstraint, EditorMode, SimulationEdge, SimulationGraph, ZoomThresholds } from '@types';
 
@@ -95,6 +96,7 @@ export function useRenderEngine(
     editable: boolean,
     editorMode: EditorMode,
     constraints?: EdgeConstraint[],
+    errorHandler?: (error: NotificationPayload) => void,
     processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle,
     zoomThresholds?: ZoomThresholds
 ): UseRenderEngineApi {
@@ -111,6 +113,7 @@ export function useRenderEngine(
             theme,
             constraints,
             zoomThresholds,
+            errorHandler,
             processEdgeStyle
         );
     }

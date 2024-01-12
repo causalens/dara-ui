@@ -18,6 +18,8 @@ import * as PIXI from 'pixi.js';
 
 import { ZoomState, ZoomThresholds } from '@types';
 
+import { GraphLayout, GraphLayoutWithTiers } from '../graph-layout/common';
+
 export const MOUSE_EVENTS = ['mousemove', 'mouseover', 'mouseout', 'mousedown', 'mouseup'] as const;
 
 const colorCache = new Map<string, [number, number]>();
@@ -72,4 +74,8 @@ export function getZoomState(scale: number, zoomThresholds?: ZoomThresholds): Zo
         }),
         {} as ZoomState
     );
+}
+
+export function isGraphLayoutWithTiers(layout: GraphLayout): layout is GraphLayoutWithTiers {
+    return (layout as GraphLayoutWithTiers).tiers !== undefined;
 }

@@ -14,15 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DagNode, coordQuad, sugiyama } from 'd3-dag';
+import {
+    GraphNode,
+    SugiLinkDatum,
+    SugiNode,
+    SugiNodeDatum,
+    coordQuad,
+    decrossTwoLayer,
+    layeringSimplex,
+    sugiyama,
+} from 'd3-dag';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
-import { SimulationGraph } from '../../types';
+import { DirectionType, GraphTiers, SimulationGraph, TieredGraphLayoutBuilder } from '../../types';
 import { DagNodeData, dagGraphParser } from '../parsers';
-import { DirectionType, GraphLayout, GraphLayoutBuilder } from './common';
+import { GraphLayout, GraphLayoutBuilder } from './common';
 
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     /**
      * Sets the nodes orientation
@@ -41,11 +52,48 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
 }
 
 /**
+ * Gets the order value for a given node or link data
+ *
+ * @param data the data of a pure node or link
+ */
+function getOrdValue(data: SugiNodeDatum<{ ord?: number }> | SugiLinkDatum<{ ord?: number }>): number {
+    if (data.role === 'node') {
+        return Number(data.node.data.ord) || 0;
+    }
+    // Here we define which order the edges connecting nodes from previous layer should appear in
+    // As a crude approach we define that their order should follow the mean of the source and target nodes.
+    const sourceOrd = Number.isNaN(Number(data.link.source.data.ord)) ? 0 : Number(data.link.source.data.ord);
+    const targetOrd = Number.isNaN(Number(data.link.target.data.ord)) ? 0 : Number(data.link.target.data.ord);
+
+    return (sourceOrd + targetOrd) / 2;
+}
+
+/**
+ * customDecross function that takes ordering of nodes into account
+ *
+ * @param layers the layers defined by the layering step
+ */
+function customDecross(layers: SugiNode<{ ord?: number }, unknown>[][]): void {
+    const vals = new Map<SugiNode, number>();
+
+    layers.forEach((layer) => {
+        layer.forEach((node) => {
+            const val = getOrdValue(node.data);
+            vals.set(node, val);
+        });
+
+        layer.sort((a, b) => vals.get(a) - vals.get(b));
+    });
+}
+
+/**
  * The Planar layout utilises the sugiyama algorithm to lay out nodes in a way that minimises
  * edge crossings.
  */
-export default class PlanarLayout extends GraphLayout {
+export default class PlanarLayout extends GraphLayout implements TieredGraphLayoutBuilder {
     public orientation: DirectionType = 'horizontal';
+
+    tiers: GraphTiers;
 
     constructor(builder: PlanarLayoutBuilder) {
         super(builder);
@@ -74,29 +122,49 @@ export default class PlanarLayout extends GraphLayout {
             newLayout: LayoutMapping<XYPosition>;
             onAddNode?: () => void | Promise<void>;
         } => {
-            const dag = dagGraphParser(currentGraph);
+            const dag = dagGraphParser(currentGraph, this.tiers);
 
             /**
              * The nodeSize is scaled for consistent spacing in the horizontal layout
              */
-            const newDagLayout = sugiyama<DagNode<DagNodeData>>()
-                .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
-                .coord(coordQuad() as any)(dag);
+            let newDagLayout;
 
-            const edgePoints = newDagLayout.dag.links().reduce((acc, link) => {
-                acc[`${link.source.id}||${link.target.id}`] = link.points.map((point) => ({
-                    x: this.orientation === 'vertical' ? point.x : point.y,
-                    y: this.orientation === 'vertical' ? point.y : point.x,
+            try {
+                function groupAccessor(node: GraphNode<DagNodeData, any>): string {
+                    return node.data.group;
+                }
+
+                function rankAccessor(node: GraphNode<DagNodeData, any>): number {
+                    return node.data.rank;
+                }
+
+                newDagLayout = sugiyama()
+                    .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
+                    .coord(coordQuad())
+                    .layering(
+                        this.tiers ? layeringSimplex().group(groupAccessor).rank(rankAccessor) : layeringSimplex()
+                    )
+                    .decross(this.tiers ? customDecross : decrossTwoLayer());
+
+                newDagLayout(dag);
+            } catch (e) {
+                throw new Error('d3-dag failed to resolve the layering of graph nodes for PlanarLayout.');
+            }
+
+            const edgePoints: LayoutMapping<XYPosition[]> = Array.from(dag.links()).reduce((acc, link) => {
+                acc[`${link.source.data.id}||${link.target.data.id}`] = link.points.map((point: number[]) => ({
+                    x: this.orientation === 'vertical' ? point[0] : point[1],
+                    y: this.orientation === 'vertical' ? point[1] : point[0],
                 }));
                 return acc;
             }, {} as LayoutMapping<XYPosition[]>);
 
-            const newLayout = newDagLayout.dag.descendants().reduce((acc, node) => {
-                acc[node.id] = {
+            const newLayout: LayoutMapping<XYPosition> = Array.from(dag.nodes()).reduce((layout, node) => {
+                layout[node.data.id] = {
                     x: this.orientation === 'vertical' ? node.x : node.y,
                     y: this.orientation === 'vertical' ? node.y : node.x,
                 };
-                return acc;
+                return layout;
             }, {} as LayoutMapping<XYPosition>);
 
             return { edgePoints, newLayout };

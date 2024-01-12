@@ -18,9 +18,9 @@ import cytoscape, { ElementDefinition, NodeSingular } from 'cytoscape';
 import fcose, { FcoseLayoutOptions, FcoseRelativePlacementConstraint } from 'cytoscape-fcose';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
-import { SimulationGraph } from '../../types';
+import { DirectionType, GraphTiers, SimulationGraph, TieredGraphLayoutBuilder } from '../../types';
 import { getNodeOrder, getTiersArray } from '../utils';
-import { DirectionType, GraphLayout, GraphLayoutBuilder, GraphTiers, TieredGraphLayoutBuilder } from './common';
+import { GraphLayout, GraphLayoutBuilder } from './common';
 
 cytoscape.use(fcose);
 
