@@ -121,6 +121,8 @@ export interface CausalGraphEditorProps extends Settings {
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
     /** Optional handler to process the edge style */
     processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+    /** Optional boolean defining whether a node and an edge can be selected simultaneously */
+    simultaneousEdgeNodeSelection?: boolean;
     /** Pass through of the native style prop */
     style?: React.CSSProperties;
     /** Optional parameter to force a tooltip to use a particular font size */
@@ -462,12 +464,16 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     });
 
     useEngineEvent('nodeClick', (event, nodeId) => {
-        setSelectedEdge(null);
+        if (!props.simultaneousEdgeNodeSelection) {
+            setSelectedEdge(null);
+        }
         setSelectedNode(nodeId);
     });
 
     useEngineEvent('edgeClick', (event, source, target) => {
-        setSelectedNode(null);
+        if (!props.simultaneousEdgeNodeSelection) {
+            setSelectedNode(null);
+        }
         setSelectedEdge([source, target]);
     });
 
