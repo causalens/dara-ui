@@ -14,18 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
-import { useEffect, useMemo, useState } from 'react';
-import * as React from 'react';
-import { GetReferenceClientRect } from 'tippy.js';
-
-import styled, { useTheme } from '@darajs/styled-components';
-import { Tooltip } from '@darajs/ui-components';
-import { Notification, NotificationPayload } from '@darajs/ui-notifications';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
-import { ConfirmationModal } from '@darajs/ui-widgets';
-
 import {
     AddNodeButton,
     CenterGraphButton,
@@ -51,6 +39,17 @@ import {
     SimulationEdge,
     ZoomThresholds,
 } from '@types';
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
+import { useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
+import { GetReferenceClientRect } from 'tippy.js';
+
+import styled, { useTheme } from '@darajs/styled-components';
+import { Tooltip } from '@darajs/ui-components';
+import { Notification, NotificationPayload } from '@darajs/ui-notifications';
+import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import GraphContext from '../shared/graph-context';
 import { GraphLayout } from '../shared/graph-layout';
@@ -121,6 +120,8 @@ export interface CausalGraphEditorProps extends Settings {
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
     /** Optional handler to process the edge style */
     processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+    /** Optional boolean defining whether a node and an edge can be selected simultaneously */
+    simultaneousEdgeNodeSelection?: boolean;
     /** Pass through of the native style prop */
     style?: React.CSSProperties;
     /** Optional parameter to force a tooltip to use a particular font size */
@@ -462,12 +463,16 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     });
 
     useEngineEvent('nodeClick', (event, nodeId) => {
-        setSelectedEdge(null);
+        if (!props.simultaneousEdgeNodeSelection) {
+            setSelectedEdge(null);
+        }
         setSelectedNode(nodeId);
     });
 
     useEngineEvent('edgeClick', (event, source, target) => {
-        setSelectedNode(null);
+        if (!props.simultaneousEdgeNodeSelection) {
+            setSelectedNode(null);
+        }
         setSelectedEdge([source, target]);
     });
 
