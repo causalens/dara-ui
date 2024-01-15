@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.5.0
 
 -   Added support for tiered layout in `Fcose`, `Planar`, `Spring` and `Marketing` layouts. It allows for nodes to be placed on tiers following some hierarchy and to further define requirements of nodes positions within that tier.
 

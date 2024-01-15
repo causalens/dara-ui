@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.5.0
 
 -   Exposed Notification component at root for easier import
 
