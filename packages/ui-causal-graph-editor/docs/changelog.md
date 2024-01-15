@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+- Added `simultaneousEdgeNodeSelection` prop to `CausalGraphEditor` which when set to true allows for both an edge and a node to be selected simultaneously. 
+
 ## 1.5.0
 
 -   Added support for tiered layout in `Fcose`, `Planar`, `Spring` and `Marketing` layouts. It allows for nodes to be placed on tiers following some hierarchy and to further define requirements of nodes positions within that tier.
