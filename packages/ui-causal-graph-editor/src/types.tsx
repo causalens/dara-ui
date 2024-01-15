@@ -303,6 +303,6 @@ export type GraphTiers = string[][] | TiersConfig;
  * Defines necessary properties that need to be implemented by graph layouts to support tiered layouts
  */
 export interface TieredGraphLayoutBuilder {
-    orientation: DirectionType;
+    orientation?: DirectionType;
     tiers: GraphTiers;
 }

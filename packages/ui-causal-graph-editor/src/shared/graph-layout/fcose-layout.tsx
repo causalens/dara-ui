@@ -45,7 +45,7 @@ class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> implements Tier
 
     _tierSeparation = 200;
 
-    orientation: DirectionType = 'horizontal';
+    orientation?: DirectionType = 'horizontal';
 
     tiers: GraphTiers;
 
