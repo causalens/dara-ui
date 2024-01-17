@@ -142,11 +142,11 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
 
     const canvasParentRef = React.useRef<HTMLDivElement>(null);
 
-    const { state, api } = useCausalGraphEditor(
+    const { state, api, layout } = useCausalGraphEditor(
         props.graphData,
         props.editorMode,
-        props.availableInputs,
-        props.graphLayout.requiresPosition
+        props.graphLayout,
+        props.availableInputs
     );
 
     const [editorMode] = useState(
@@ -171,7 +171,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     } = useRenderEngine(
         canvasParentRef,
         state.graph,
-        props.graphLayout,
+        layout,
         props.editable,
         editorMode,
         props.initialConstraints,
@@ -569,7 +569,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     const { dragMode, setDragMode } = useDragMode(
         props.editable,
         !props.disableEdgeAdd,
-        props.graphLayout.supportsDrag,
+        layout.supportsDrag,
         onSetDragMode
     );
 
@@ -595,7 +595,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     return (
         <SettingsProvider
             settings={{
-                allowNodeDrag: props.graphLayout.supportsDrag,
+                allowNodeDrag: layout.supportsDrag,
                 allowSelectionWhenNotEditable: props.allowSelectionWhenNotEditable,
                 disableEdgeAdd: props.disableEdgeAdd,
                 disableLatentNodeAdd: props.disableLatentNodeAdd,

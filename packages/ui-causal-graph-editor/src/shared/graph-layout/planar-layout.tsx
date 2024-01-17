@@ -33,7 +33,7 @@ import { GraphLayout, GraphLayoutBuilder } from './common';
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
 
-    tiers: GraphTiers;
+    _tiers: GraphTiers;
 
     /**
      * Sets the nodes orientation
@@ -42,6 +42,16 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
      */
     orientation(direction: DirectionType): this {
         this._orientation = direction;
+        return this;
+    }
+
+    /**
+     * Sets the tiers for the graph
+     *
+     * @param tiers the tiers to use
+     */
+    tiers(tiers: GraphTiers): this {
+        this._tiers = tiers;
         return this;
     }
 
@@ -93,11 +103,12 @@ function customDecross(layers: SugiNode<{ ord?: number }, unknown>[][]): void {
 export default class PlanarLayout extends GraphLayout implements TieredGraphLayoutBuilder {
     public orientation: DirectionType = 'horizontal';
 
-    tiers: GraphTiers;
+    public tiers: GraphTiers;
 
     constructor(builder: PlanarLayoutBuilder) {
         super(builder);
         this.orientation = builder._orientation;
+        this.tiers = builder._tiers;
     }
 
     // eslint-disable-next-line class-methods-use-this

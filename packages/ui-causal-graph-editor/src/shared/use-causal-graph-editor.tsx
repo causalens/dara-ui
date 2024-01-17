@@ -19,10 +19,12 @@ import { useEffect, useMemo, useReducer, useRef } from 'react';
 
 import { CausalGraph, EditorMode, GraphState } from '../types';
 import { GraphActionCreators, GraphActionType, GraphReducer } from './causal-graph-store';
+import { GraphLayout } from './graph-layout';
 import { causalGraphParser } from './parsers';
 
 export interface UseCausalGraphEditorApi {
     api: GraphApi;
+    layout: GraphLayout;
     state: GraphState;
 }
 
@@ -43,9 +45,10 @@ export type GraphApi = {
 export default function useCausalGraphEditor(
     graphData: CausalGraph,
     editorMode: EditorMode,
-    availableInputs?: string[],
-    newNodesRequirePosition?: boolean
+    graphLayout: GraphLayout,
+    availableInputs?: string[]
 ): UseCausalGraphEditorApi {
+    const newNodesRequirePosition = graphLayout.requiresPosition;
     const [state, dispatch] = useReducer(
         GraphReducer,
         {
@@ -59,6 +62,26 @@ export default function useCausalGraphEditor(
             };
         }
     );
+
+    const isTimeSeriesCausalGraph = useMemo(() => {
+        const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
+        return nodeClass === 'TimeSeriesNode';
+    }, [state.graph]);
+
+    const layout = useMemo(() => {
+        // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
+        const newLayout = graphLayout;
+        if (
+            isTimeSeriesCausalGraph &&
+            'tiers' in newLayout &&
+            'orientation' in newLayout &&
+            newLayout.tiers === undefined
+        ) {
+            // We set tiers based on TimeSeriesCausalGraph structure of node lags
+            newLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
+        }
+        return newLayout;
+    }, [isTimeSeriesCausalGraph, graphLayout]);
 
     // bind each action creator to dispatch
     const api = useMemo(() => {
@@ -89,6 +112,7 @@ export default function useCausalGraphEditor(
 
     return {
         api,
+        layout,
         state,
     };
 }
