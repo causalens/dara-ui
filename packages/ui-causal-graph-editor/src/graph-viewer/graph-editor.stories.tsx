@@ -33,7 +33,14 @@ import {
 } from '../shared/graph-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, causalGraph, nodeTiersCausalGraph, nodeTiersList, pagCausalGraph } from './utils/stories-utils';
+import {
+    Template,
+    causalGraph,
+    nodeTiersCausalGraph,
+    nodeTiersList,
+    pagCausalGraph,
+    timeSeriesCausalGraph,
+} from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
@@ -625,4 +632,11 @@ VisualEdgeEncoder.args = {
             type: EdgeConstraintType.HARD_DIRECTED,
         },
     ],
+};
+
+export const TimeSeries = Template.bind({});
+TimeSeries.args = {
+    editable: true,
+    graphData: timeSeriesCausalGraph,
+    graphLayout: MarketingLayout.Builder.build(),
 };
