@@ -145,6 +145,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
     const { state, api } = useCausalGraphEditor(
         props.graphData,
         props.editorMode,
+        props.graphLayout,
         props.availableInputs,
         props.graphLayout.requiresPosition
     );
@@ -158,21 +159,21 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         setError(e);
     };
 
-    const isTimeSeriesCausalGraph = useMemo(() => {
-        const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
-        return nodeClass === 'TimeSeriesNode';
-    }, [state.graph]);
+    // const isTimeSeriesCausalGraph = useMemo(() => {
+    //     const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
+    //     return nodeClass === 'TimeSeriesNode';
+    // }, [state.graph]);
 
-    // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
-    if (
-        isTimeSeriesCausalGraph &&
-        'tiers' in props.graphLayout &&
-        'orientation' in props.graphLayout &&
-        props.graphLayout.tiers === undefined
-    ) {
-        // We set tiers based on TimeSeriesCausalGraph structure of node lags
-        props.graphLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
-    }
+    // // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
+    // if (
+    //     isTimeSeriesCausalGraph &&
+    //     'tiers' in props.graphLayout &&
+    //     'orientation' in props.graphLayout &&
+    //     props.graphLayout.tiers === undefined
+    // ) {
+    //     // We set tiers based on TimeSeriesCausalGraph structure of node lags
+    //     props.graphLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
+    // }
 
     const {
         getCenterPosition,
