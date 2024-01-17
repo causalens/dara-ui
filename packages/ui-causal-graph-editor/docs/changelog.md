@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.5.1
 
 -   Added `simultaneousEdgeNodeSelection` prop to `CausalGraphEditor` which when set to true allows for both an edge and a node to be selected simultaneously. 
 -   If `TimeSeriesCausalGraph` object is passed to `CausalGraphEditor` and no tiers are defines, it now uses `time_lag` and `variable_name` to define the `order_nodes_by` and `group` respectively. 
