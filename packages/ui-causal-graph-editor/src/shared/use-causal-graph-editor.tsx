@@ -24,6 +24,7 @@ import { causalGraphParser } from './parsers';
 
 export interface UseCausalGraphEditorApi {
     api: GraphApi;
+    layout: GraphLayout;
     state: GraphState;
 }
 
@@ -45,9 +46,9 @@ export default function useCausalGraphEditor(
     graphData: CausalGraph,
     editorMode: EditorMode,
     graphLayout: GraphLayout,
-    availableInputs?: string[],
-    newNodesRequirePosition?: boolean
+    availableInputs?: string[]
 ): UseCausalGraphEditorApi {
+    const newNodesRequirePosition = graphLayout.requiresPosition;
     const [state, dispatch] = useReducer(
         GraphReducer,
         {
@@ -67,6 +68,21 @@ export default function useCausalGraphEditor(
         return nodeClass === 'TimeSeriesNode';
     }, [state.graph]);
 
+    const layout = useMemo(() => {
+        // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
+        const newLayout = graphLayout;
+        if (
+            isTimeSeriesCausalGraph &&
+            'tiers' in newLayout &&
+            'orientation' in newLayout &&
+            newLayout.tiers === undefined
+        ) {
+            // We set tiers based on TimeSeriesCausalGraph structure of node lags
+            newLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
+        }
+        return newLayout;
+    }, [isTimeSeriesCausalGraph, graphLayout]);
+
     // bind each action creator to dispatch
     const api = useMemo(() => {
         return actionNames.reduce<GraphApi>((acc, actionName) => {
@@ -76,19 +92,6 @@ export default function useCausalGraphEditor(
             return acc;
         }, {} as GraphApi);
     }, [dispatch]);
-
-    useEffect(() => {
-        // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
-        if (
-            isTimeSeriesCausalGraph &&
-            'tiers' in graphLayout &&
-            'orientation' in graphLayout &&
-            graphLayout.tiers === undefined
-        ) {
-            // We set tiers based on TimeSeriesCausalGraph structure of node lags
-            graphLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
-        }
-    }, [isTimeSeriesCausalGraph, graphLayout]);
 
     // Init graph data, update when outside graph nodes/edges changes
     const lastParentData = useRef(graphData); // keep track of last parent data to skip unnecessary updates
@@ -109,6 +112,7 @@ export default function useCausalGraphEditor(
 
     return {
         api,
+        layout,
         state,
     };
 }
