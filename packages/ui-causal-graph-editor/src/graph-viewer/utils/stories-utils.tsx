@@ -431,3 +431,889 @@ export const timeSeriesCausalGraph = {
     },
     version: '0.3.14',
 };
+
+export const planarLayoutCausalGraph = {
+    edges: {
+        '0': {
+            '16': {
+                destination: {
+                    identifier: '16',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '0',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '1': {
+            '14': {
+                destination: {
+                    identifier: '14',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '1',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '11': {
+            '3': {
+                destination: {
+                    identifier: '3',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '11',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '12': {
+            '13': {
+                destination: {
+                    identifier: '13',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '12',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '4': {
+                destination: {
+                    identifier: '4',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '12',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '13': {
+            '20': {
+                destination: {
+                    identifier: '20',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '13',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '15': {
+            '6': {
+                destination: {
+                    identifier: '6',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '15',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '16': {
+            '10': {
+                destination: {
+                    identifier: '10',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '16',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '17': {
+            '6': {
+                destination: {
+                    identifier: '6',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '17',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '7': {
+                destination: {
+                    identifier: '7',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '17',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '18': {
+            '5': {
+                destination: {
+                    identifier: '5',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '18',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '19': {
+            '17': {
+                destination: {
+                    identifier: '17',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '19',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '2': {
+            '11': {
+                destination: {
+                    identifier: '11',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '2',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '20': {
+            '7': {
+                destination: {
+                    identifier: '7',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '20',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '21': {
+            '10': {
+                destination: {
+                    identifier: '10',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '21',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '12': {
+                destination: {
+                    identifier: '12',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '21',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '7': {
+                destination: {
+                    identifier: '7',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '21',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '3': {
+            '7': {
+                destination: {
+                    identifier: '7',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '3',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '4': {
+            '13': {
+                destination: {
+                    identifier: '13',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '4',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '9': {
+                destination: {
+                    identifier: '9',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '4',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '8': {
+            '0': {
+                destination: {
+                    identifier: '0',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '8',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '14': {
+                destination: {
+                    identifier: '14',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '8',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+        '9': {
+            '18': {
+                destination: {
+                    identifier: '18',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '9',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+            '6': {
+                destination: {
+                    identifier: '6',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {
+                    rendering_properties: {},
+                },
+                source: {
+                    identifier: '9',
+                    meta: {
+                        rendering_properties: {
+                            latent: false,
+                        },
+                    },
+                    node_class: 'Node',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
+    },
+    nodes: {
+        '0': {
+            identifier: '0',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '1': {
+            identifier: '1',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '10': {
+            identifier: '10',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '11': {
+            identifier: '11',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '12': {
+            identifier: '12',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '13': {
+            identifier: '13',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '14': {
+            identifier: '14',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '15': {
+            identifier: '15',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '16': {
+            identifier: '16',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '17': {
+            identifier: '17',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '18': {
+            identifier: '18',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '19': {
+            identifier: '19',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '2': {
+            identifier: '2',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '20': {
+            identifier: '20',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '21': {
+            identifier: '21',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '3': {
+            identifier: '3',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '4': {
+            identifier: '4',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '5': {
+            identifier: '5',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '6': {
+            identifier: '6',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '7': {
+            identifier: '7',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '8': {
+            identifier: '8',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+        '9': {
+            identifier: '9',
+            meta: {
+                rendering_properties: {
+                    latent: false,
+                },
+            },
+            node_class: 'Node',
+            variable_type: 'unspecified',
+        },
+    },
+    version: '0.3.14',
+};

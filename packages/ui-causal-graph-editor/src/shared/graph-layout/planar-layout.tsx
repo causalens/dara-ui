@@ -16,11 +16,13 @@
  */
 import {
     GraphNode,
+    Layering,
     SugiLinkDatum,
     SugiNode,
     SugiNodeDatum,
     coordQuad,
     decrossTwoLayer,
+    layeringLongestPath,
     layeringSimplex,
     sugiyama,
 } from 'd3-dag';
@@ -30,10 +32,19 @@ import { DirectionType, GraphTiers, SimulationGraph, TieredGraphLayoutBuilder } 
 import { DagNodeData, dagGraphParser } from '../parsers';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
+// Defines the Layering algorithms supported by PlanarLayout
+export enum LayeringAlgorithm {
+    /** is optimized to minimize the total height of the graph, height being the direction in which the layers are placed */
+    LONGEST_PATH = 'longest_path',
+    /** is optimized to minimize the overall length of edges */
+    SIMPLEX = 'simplex',
+}
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
     _orientation: DirectionType = 'horizontal';
 
     _tiers: GraphTiers;
+
+    _layeringAlgorithm: LayeringAlgorithm = LayeringAlgorithm.SIMPLEX;
 
     /**
      * Sets the nodes orientation
@@ -52,6 +63,16 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
      */
     tiers(tiers: GraphTiers): this {
         this._tiers = tiers;
+        return this;
+    }
+
+    /**
+     * Sets the layering algorithm to use
+     *
+     * @param algorithm the layering algorithm to use
+     */
+    layeringAlgorithm(algorithm: LayeringAlgorithm): this {
+        this._layeringAlgorithm = algorithm;
         return this;
     }
 
@@ -97,6 +118,18 @@ function customDecross(layers: SugiNode<{ ord?: number }, unknown>[][]): void {
 }
 
 /**
+ * Gets the layering algorithm for a given LayeringAlgorithm enum value
+ *
+ * @param algorithm the layering algorithm to use
+ */
+function getLayeringAlgorithm(algorithm: LayeringAlgorithm): Layering<DagNodeData, any> {
+    if (algorithm === LayeringAlgorithm.LONGEST_PATH) {
+        return layeringLongestPath();
+    }
+    return layeringSimplex();
+}
+
+/**
  * The Planar layout utilises the sugiyama algorithm to lay out nodes in a way that minimises
  * edge crossings.
  */
@@ -105,10 +138,13 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
 
     public tiers: GraphTiers;
 
+    public layeringAlgorithm: LayeringAlgorithm = LayeringAlgorithm.SIMPLEX;
+
     constructor(builder: PlanarLayoutBuilder) {
         super(builder);
         this.orientation = builder._orientation;
         this.tiers = builder._tiers;
+        this.layeringAlgorithm = builder._layeringAlgorithm;
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -153,7 +189,9 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
                     .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
                     .coord(coordQuad())
                     .layering(
-                        this.tiers ? layeringSimplex().group(groupAccessor).rank(rankAccessor) : layeringSimplex()
+                        this.tiers
+                            ? layeringSimplex().group(groupAccessor).rank(rankAccessor)
+                            : getLayeringAlgorithm(this.layeringAlgorithm)
                     )
                     .decross(this.tiers ? customDecross : decrossTwoLayer());
 
