@@ -4,7 +4,7 @@ title: Changelog
 
 ## NEXT
 
--   Added the ability to define the layering algorithm for `PlanarLayout`. Between the default `SIMPLEX` or `LONGEST_PATH`
+-   Added `layeringAlgorithm` prop to `PlanarLayout`, which allows the ability to define the layering algorithm between default `SIMPLEX` or `LONGEST_PATH`
 
 ## 1.5.1
 
