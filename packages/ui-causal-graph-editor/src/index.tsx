@@ -30,6 +30,7 @@ export {
     SpringLayout,
     FcoseLayout,
     ForceAtlasLayout,
+    LayeringAlgorithms,
 } from './shared/graph-layout';
 export { default as GraphContext } from './shared/graph-context';
 export { causalGraphParser } from './shared/parsers';

@@ -31,6 +31,7 @@ import {
     PlanarLayout,
     SpringLayout,
 } from '../shared/graph-layout';
+import { LayeringAlgorithms } from '../shared/graph-layout/planar-layout';
 import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
 import {
@@ -39,6 +40,7 @@ import {
     nodeTiersCausalGraph,
     nodeTiersList,
     pagCausalGraph,
+    planarLayoutCausalGraph,
     timeSeriesCausalGraph,
 } from './utils/stories-utils';
 
@@ -173,6 +175,31 @@ PlanarHorizontal.args = {
     editable: true,
     graphData: SHIPPED_UNITS,
     graphLayout: PlanarLayout.Builder.build(),
+};
+
+export const PlanarLayoutAlgos = (): JSX.Element => {
+    const planarSimplex = PlanarLayout.Builder.build();
+    planarSimplex.layeringAlgorithm = LayeringAlgorithms.SIMPLEX;
+
+    const planarLongestPath = PlanarLayout.Builder.build();
+    planarLongestPath.layeringAlgorithm = LayeringAlgorithms.LONGEST_PATH;
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <span>Simplex:</span>
+            <CausalGraphViewerComponent
+                graphData={planarLayoutCausalGraph}
+                graphLayout={planarSimplex}
+                style={{ margin: 0 }}
+            />
+            <span>Longest Path:</span>
+            <CausalGraphViewerComponent
+                graphData={planarLayoutCausalGraph}
+                graphLayout={planarLongestPath}
+                style={{ margin: 0 }}
+            />
+        </div>
+    );
 };
 
 export const PlanarTiers = Template.bind({});
