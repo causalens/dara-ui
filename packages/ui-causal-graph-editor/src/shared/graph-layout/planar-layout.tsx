@@ -33,10 +33,10 @@ import { DagNodeData, dagGraphParser } from '../parsers';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
 // Defines the Layering algorithms supported by PlanarLayout
-export enum LayeringAlgorithms {
-    // is optimized to minimize the total height of the graph, height being the direction in which the layers are placed
+export enum LayeringAlgorithm {
+    /** is optimized to minimize the total height of the graph, height being the direction in which the layers are placed */
     LONGEST_PATH = 'longest_path',
-    // is optimized to minimize the overall length of edges
+    /** is optimized to minimize the overall length of edges */
     SIMPLEX = 'simplex',
 }
 class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
@@ -44,7 +44,7 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
 
     _tiers: GraphTiers;
 
-    _layeringAlgorithm: LayeringAlgorithms = LayeringAlgorithms.SIMPLEX;
+    _layeringAlgorithm: LayeringAlgorithm = LayeringAlgorithm.SIMPLEX;
 
     /**
      * Sets the nodes orientation
@@ -71,7 +71,7 @@ class PlanarLayoutBuilder extends GraphLayoutBuilder<PlanarLayout> {
      *
      * @param algorithm the layering algorithm to use
      */
-    layeringAlgorithm(algorithm: LayeringAlgorithms): this {
+    layeringAlgorithm(algorithm: LayeringAlgorithm): this {
         this._layeringAlgorithm = algorithm;
         return this;
     }
@@ -118,12 +118,12 @@ function customDecross(layers: SugiNode<{ ord?: number }, unknown>[][]): void {
 }
 
 /**
- * Gets the layering algorithm for a given LayeringAlgorithms enum value
+ * Gets the layering algorithm for a given LayeringAlgorithm enum value
  *
  * @param algorithm the layering algorithm to use
  */
-function getLayeringAlgorithm(algorithm: LayeringAlgorithms): Layering<DagNodeData, any> {
-    if (algorithm === LayeringAlgorithms.LONGEST_PATH) {
+function getLayeringAlgorithm(algorithm: LayeringAlgorithm): Layering<DagNodeData, any> {
+    if (algorithm === LayeringAlgorithm.LONGEST_PATH) {
         return layeringLongestPath();
     }
     return layeringSimplex();
@@ -138,7 +138,7 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
 
     public tiers: GraphTiers;
 
-    public layeringAlgorithm: LayeringAlgorithms = LayeringAlgorithms.SIMPLEX;
+    public layeringAlgorithm: LayeringAlgorithm = LayeringAlgorithm.SIMPLEX;
 
     constructor(builder: PlanarLayoutBuilder) {
         super(builder);
