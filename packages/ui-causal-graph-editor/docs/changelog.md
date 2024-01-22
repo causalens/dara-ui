@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Added the ability to define the layering algorithm for `PlanarLayout`. Between the default `SIMPLEX` or `LONGEST_PATH`
+
 ## 1.5.1
 
 -   Added `simultaneousEdgeNodeSelection` prop to `CausalGraphEditor` which when set to true allows for both an edge and a node to be selected simultaneously. 
