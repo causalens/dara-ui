@@ -657,7 +657,9 @@ function DatePicker(props: DatePickerProps): JSX.Element {
 
     const onChangeDate = (date: Date): void => {
         // close datepicker when a date is chosen
-        datepickerRef.current?.setOpen(false);
+        if (props.shouldCloseOnSelect) {
+            datepickerRef.current?.setOpen(false);
+        }
 
         if (props.selectsRange) {
             // if range datepicker then update the correct part of the selected date
