@@ -2,6 +2,9 @@
 title: Changelog
 ---
 
+## NEXT
+- Fixed an issue where the filled button in the dark theme was using the wrong color, now it uses `blue1` color.
+
 ## 1.4.4
 
 -   Added `onKeyDown` prop to NumericInput to bubble up keydown events
