@@ -621,8 +621,6 @@ function DatePicker(props: DatePickerProps): JSX.Element {
     const [endDate, setEndDate] = useState<string>(() => getInitialDate(value, formatToApply, false));
     // state to track which date is being selected based on the input which has been interacted with
     const [isSelectingStart, setIsSelectingStart] = useState<boolean>(null);
-    // state to define whether the datepicker should be open or not so that this can be updated is useLayoutEffect when necessary
-    const [shouldDatepickerBeOpen, setShouldDatepickerBeOpen] = useState<boolean>(false);
 
     // Keep state in refs so we can compare it in useEffect without subscribing
     const selectedDateRef = useRef(selectedDate);
@@ -788,13 +786,6 @@ function DatePicker(props: DatePickerProps): JSX.Element {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDate, selectedTime]);
 
-    // This needs to be useLayoutEffect as it needs to run before the datepicker is opened to avoid a jumping behaviour
-    useLayoutEffect(() => {
-        if (shouldDatepickerBeOpen === true) {
-            datepickerRef.current?.setOpen(true);
-        }
-    }, [shouldDatepickerBeOpen]);
-
     return (
         <>
             <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -807,19 +798,16 @@ function DatePicker(props: DatePickerProps): JSX.Element {
                         <DateTimeWrapper isRange={props.selectsRange}>
                             <DateInput
                                 isTimeRange={props.selectsRange && props.showTimeInput}
-                                onBlur={() => {
-                                    setShouldDatepickerBeOpen(false);
-                                }}
                                 onChange={(e) => {
                                     onChangeDateInput(true, e);
                                 }}
                                 onClick={() => {
                                     setIsSelectingStart(true);
-                                    setShouldDatepickerBeOpen(true);
+                                    datepickerRef.current?.setOpen(true);
                                 }}
                                 onFocus={() => {
                                     setIsSelectingStart(true);
-                                    setShouldDatepickerBeOpen(true);
+                                    datepickerRef.current?.setOpen(true);
                                 }}
                                 onKeyDown={(e) => {
                                     datepickerRef.current?.onInputKeyDown(e);
@@ -844,19 +832,16 @@ function DatePicker(props: DatePickerProps): JSX.Element {
                                 <DateTimeWrapper isRange>
                                     <DateInput
                                         isTimeRange={props.showTimeInput}
-                                        onBlur={() => {
-                                            setShouldDatepickerBeOpen(false);
-                                        }}
                                         onChange={(e) => {
                                             onChangeDateInput(false, e);
                                         }}
                                         onClick={() => {
                                             setIsSelectingStart(false);
-                                            setShouldDatepickerBeOpen(true);
+                                            datepickerRef.current?.setOpen(true);
                                         }}
                                         onFocus={() => {
                                             setIsSelectingStart(false);
-                                            setShouldDatepickerBeOpen(true);
+                                            datepickerRef.current?.setOpen(true);
                                         }}
                                         onKeyDown={(e) => {
                                             datepickerRef.current?.onInputKeyDown(e);
@@ -885,9 +870,6 @@ function DatePicker(props: DatePickerProps): JSX.Element {
                         disabled={props.disabled}
                         inline={props.inline}
                         maxDate={props.maxDate}
-                        onBlur={() => {
-                            setShouldDatepickerBeOpen(false);
-                        }}
                         onChange={onChangeDate}
                         ref={datepickerRef}
                         selectsEnd={!isSelectingStart}
