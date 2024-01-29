@@ -44,7 +44,7 @@ DatepickerWithTime.args = { shouldCloseOnSelect: false, showTimeInput: true };
 
 export const DatepickerWithRange = (args: DatePickerProps): JSX.Element => <DatepickerComponent {...args} />;
 DatepickerWithRange.args = {
-    initialValue: [new Date('1995-12-17T03:24:00'), new Date()],
+    initialValue: [new Date('2024-01-17T03:24:00'), new Date()],
     selectsRange: true,
     shouldCloseOnSelect: false,
 };

@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where if selecting the start or end date in a `Datepicker` always resulted in the user selecting the whole range instead of the selected input. 
+
 ## 1.4.4
 
 -   Added `onKeyDown` prop to NumericInput to bubble up keydown events
