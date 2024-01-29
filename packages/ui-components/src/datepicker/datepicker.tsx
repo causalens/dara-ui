@@ -20,7 +20,7 @@ import { format, parse } from 'date-fns';
 import enGB from 'date-fns/locale/en-GB';
 import { range } from 'lodash';
 import { transparentize } from 'polished';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
