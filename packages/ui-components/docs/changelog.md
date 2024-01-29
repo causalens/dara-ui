@@ -5,6 +5,7 @@ title: Changelog
 ## NEXT
 
 -   Fixed an issue where if selecting the start or end date in a `Datepicker` always resulted in the user selecting the whole range instead of the selected input. 
+-   Fixed an issue where the filled button in the dark theme was using the wrong color, now it uses `blue1` color.
 
 ## 1.4.4
 
