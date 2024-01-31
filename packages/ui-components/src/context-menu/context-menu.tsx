@@ -121,10 +121,11 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             document.dispatchEvent(new Event('contextmenu'));
             e.preventDefault();
             e.stopPropagation();
+
             boundingRectRef.current = {
                 ...boundingRectRef.current,
-                left: e.clientX,
-                top: e.clientY,
+                left: e.clientX + 2,
+                top: e.clientY - 4,
             };
             update();
             setShowMenu(true);
