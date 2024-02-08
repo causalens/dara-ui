@@ -28,7 +28,7 @@ export interface LegendArrowDefinition {
     arrowType?: 'none' | 'normal' | 'filled' | 'empty' | 'soft';
     /** Symbol to show in the center of the arrow */
     centerSymbol?: 'none' | 'cross' | 'question' | 'bidirected';
-    /** defines the filled color of the node symbol */
+    /** defines the filled color of the edge/arrow symbol */
     color?: string;
     /** dashArray SVG path property - line will be dashed if specified */
     dashArray?: string;
