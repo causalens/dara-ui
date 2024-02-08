@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Updated the type of `additionalLegends` to also allow defining nodes
+
 ## 1.5.2
 
 -   Added `layeringAlgorithm` prop to `PlanarLayout`, which allows the ability to define the layering algorithm between default `SIMPLEX` or `LONGEST_PATH`
