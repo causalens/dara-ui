@@ -14,58 +14,98 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DefaultTheme } from '@darajs/styled-components';
-
 import { EditorMode } from '@types';
 
-export interface LegendLineDefinition {
+export interface LegendNodeDefinition {
+    /** defines the filled color of the node symbol */
+    color?: string;
+    /** defines the border color of the node symbol */
+    highlight_color?: string;
+}
+
+export interface LegendArrowDefinition {
     /** Arrow to show at end of line */
     arrowType?: 'none' | 'normal' | 'filled' | 'empty' | 'soft';
     /** Symbol to show in the center of the arrow */
     centerSymbol?: 'none' | 'cross' | 'question' | 'bidirected';
-    /** color to represent */
-    color?: keyof DefaultTheme['colors'];
+    /** defines the filled color of the node symbol */
+    color?: string;
     /** dashArray SVG path property - line will be dashed if specified */
     dashArray?: string;
-    /** legend label */
-    label?: string;
-    /** Show empty spot instead of a legend line */
-    spacer?: boolean;
 }
 
-const RESOLVER_LEGEND: LegendLineDefinition[] = [
+/**  Union type for the 'type' property */
+type GraphSymbolType = 'none' | 'edge' | 'node';
+
+interface BaseGraphLegendDefinition {
+    /** legend label */
+    label?: string;
+    /** legend symbol type */
+    type: GraphSymbolType;
+}
+
+// Extend the base interface for each specific 'type' value
+interface NoneGraphLegendDefinition extends BaseGraphLegendDefinition {
+    symbol?: never;
+    type: 'none'; // No symbol for 'none' type
+}
+
+export interface EdgeGraphLegendDefinition extends BaseGraphLegendDefinition {
+    symbol?: LegendArrowDefinition;
+    type: 'edge';
+}
+
+export interface NodeGraphLegendDefinition extends BaseGraphLegendDefinition {
+    symbol?: LegendNodeDefinition;
+    type: 'node';
+}
+
+export type GraphLegendDefinition = NoneGraphLegendDefinition | EdgeGraphLegendDefinition | NodeGraphLegendDefinition;
+
+const RESOLVER_LEGEND: GraphLegendDefinition[] = [
     {
-        centerSymbol: 'question',
-        dashArray: '10 6',
         label: 'Unresolved',
+        symbol: {
+            centerSymbol: 'question',
+            dashArray: '10 6',
+        },
+        type: 'edge',
     },
     {
-        dashArray: '10 6',
         label: 'Not accepted',
+        symbol: {
+            dashArray: '10 6',
+        },
+        type: 'edge',
     },
     {
-        dashArray: '6 4',
         label: 'Accepted',
+        symbol: {
+            dashArray: '6 4',
+        },
+        type: 'edge',
     },
     {
         label: 'Domain knowledge',
+        symbol: {},
+        type: 'edge',
     },
 ];
 
-const PAG_LEGEND: LegendLineDefinition[] = [
-    { arrowType: 'filled', label: 'Directed' },
-    { arrowType: 'empty', label: 'Wildcard' },
-    { arrowType: 'none', label: 'Undirected' },
+const PAG_LEGEND: GraphLegendDefinition[] = [
+    { label: 'Directed', symbol: { arrowType: 'filled' }, type: 'edge' },
+    { label: 'Wildcard', symbol: { arrowType: 'empty' }, type: 'edge' },
+    { label: 'Undirected', symbol: { arrowType: 'none' }, type: 'edge' },
 ];
 
-const ENCODER_LEGEND: LegendLineDefinition[] = [
-    { label: 'Hard Directed' },
-    { arrowType: 'soft', label: 'Soft Directed' },
-    { arrowType: 'none', centerSymbol: 'bidirected', label: 'Undirected' },
-    { arrowType: 'none', centerSymbol: 'cross', label: 'Prohibited' },
+const ENCODER_LEGEND: GraphLegendDefinition[] = [
+    { label: 'Hard Directed', type: 'edge' },
+    { label: 'Soft Directed', symbol: { arrowType: 'soft' }, type: 'edge' },
+    { label: 'Undirected', symbol: { arrowType: 'none', centerSymbol: 'bidirected' }, type: 'edge' },
+    { label: 'Prohibited', symbol: { arrowType: 'none', centerSymbol: 'cross' }, type: 'edge' },
 ];
 
-const DEFAULT_LEGENDS: Map<EditorMode, LegendLineDefinition[]> = new Map([
+const DEFAULT_LEGENDS: Map<EditorMode, GraphLegendDefinition[]> = new Map([
     [EditorMode.DEFAULT, []],
     [EditorMode.PAG_VIEWER, PAG_LEGEND],
     [EditorMode.RESOLVER, RESOLVER_LEGEND],
@@ -74,8 +114,8 @@ const DEFAULT_LEGENDS: Map<EditorMode, LegendLineDefinition[]> = new Map([
 
 export function getLegendData(
     editorMode: EditorMode,
-    additionalLegend: LegendLineDefinition[]
-): LegendLineDefinition[] {
+    additionalLegend: GraphLegendDefinition[]
+): GraphLegendDefinition[] {
     const modeData = DEFAULT_LEGENDS.get(editorMode) ?? [];
 
     return [...modeData, ...(additionalLegend ?? []).filter(Boolean)];

@@ -133,8 +133,34 @@ Interactive.args = {
     graphLayout: PlanarLayout.Builder.build(),
 };
 
+// /** Arrow to show at end of line */
+// arrowType?: 'none' | 'normal' | 'filled' | 'empty' | 'soft';
+// /** Symbol to show in the center of the arrow */
+// centerSymbol?: 'none' | 'cross' | 'question' | 'bidirected';
+// /** color to represent */
+// color?: keyof DefaultTheme['colors'];
+// /** dashArray SVG path property - line will be dashed if specified */
+// dashArray?: string;
+// /** legend label */
+// label?: string;
+// /** Show empty spot instead of a legend line */
+// spacer?: boolean;
+
 export const MarketingBottom = Template.bind({});
 MarketingBottom.args = {
+    additionalLegends: [
+        {
+            label: 'test arrow',
+            type: 'edge',
+        },
+        {
+            type: 'none',
+        },
+        {
+            label: 'test node',
+            type: 'node',
+        },
+    ],
     editable: true,
     graphData: causalGraph,
     graphLayout: MarketingLayout.Builder.build(),

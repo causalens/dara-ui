@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 export { default as Legend } from './legend';
-export { LegendLineDefinition, getLegendData } from './legend-data';
+export { GraphLegendDefinition, getLegendData } from './legend-data';

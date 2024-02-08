@@ -31,8 +31,8 @@ import {
     CenterGraphButton,
     DragModeButton,
     EdgeInfoContent,
+    GraphLegendDefinition,
     Legend,
-    LegendLineDefinition,
     NodeInfoContent,
     Overlay,
     RecalculateLayoutButton,
@@ -94,7 +94,7 @@ const NotificationWrapper = styled.div`
 
 export interface CausalGraphEditorProps extends Settings {
     /** Optional additional legends to show */
-    additionalLegends?: LegendLineDefinition[];
+    additionalLegends?: GraphLegendDefinition[];
     /** Input nodes */
     availableInputs?: string[];
     /** Standard class name prop */

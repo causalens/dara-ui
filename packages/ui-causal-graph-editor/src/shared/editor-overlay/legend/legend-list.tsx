@@ -16,7 +16,7 @@
  */
 import styled, { useTheme } from '@darajs/styled-components';
 
-import { LegendLineDefinition } from './legend-data';
+import { GraphLegendDefinition, LegendArrowDefinition } from './legend-data';
 
 const LegendText = styled.span`
     color: ${(props) => props.theme.colors.text};
@@ -123,14 +123,14 @@ function HalfCircle(props: SvgProps): JSX.Element {
     );
 }
 
-const CenterSymbols: Record<LegendLineDefinition['centerSymbol'], (props: SvgProps) => JSX.Element> = {
+const CenterSymbols: Record<LegendArrowDefinition['centerSymbol'], (props: SvgProps) => JSX.Element> = {
     bidirected: Bidirected,
     cross: Cross,
     none: null,
     question: QuestionMark,
 };
 
-const Arrows: Record<LegendLineDefinition['arrowType'], (props: SvgProps) => JSX.Element> = {
+const Arrows: Record<LegendArrowDefinition['arrowType'], (props: SvgProps) => JSX.Element> = {
     empty: EmptyCircle,
     filled: FullArrow,
     none: null,
@@ -141,54 +141,58 @@ const Arrows: Record<LegendLineDefinition['arrowType'], (props: SvgProps) => JSX
 /**
  * Component to generate a legend line
  */
-function LegendLine({
-    label,
-    color = 'grey5',
-    dashArray,
-    arrowType = 'normal',
-    centerSymbol = 'none',
-    spacer,
-}: LegendLineDefinition): JSX.Element {
+function LegendSymbol({ label, type, symbol }: GraphLegendDefinition): JSX.Element {
     const theme = useTheme();
 
-    if (spacer) {
-        return <span style={{ height: '0.5rem', width: '100%' }} />;
+    if (type === 'node') {
+        const fillColor = symbol?.color ?? theme.colors.blue4;
+        const borderColor = symbol?.highlight_color ?? theme.colors.primary;
+
+        return (
+            <svg height="16px" viewBox="-40 0 100 25">
+                <circle cx="10" cy="12" fill={fillColor} r="12" stroke={borderColor} strokeWidth="1" />
+            </svg>
+        );
     }
 
-    const Symbol = CenterSymbols[centerSymbol];
-    const Arrow = Arrows[arrowType];
+    if (type === 'edge') {
+        const edgeColor = symbol?.color ?? theme.colors.grey5;
 
-    return (
-        <svg height="12px" viewBox="-40 0 100 20">
-            <g key={label}>
-                <line
-                    stroke={theme.colors[color]}
-                    strokeDasharray={dashArray ?? 'none'}
-                    strokeWidth={4}
-                    style={{ opacity: 0.5 }}
-                    x1={-25}
-                    x2={40}
-                    y1={10}
-                    y2={10}
-                />
-                {Symbol && (
-                    <Symbol color={theme.colors[color]} fill={theme.colors.blue1} transform="translate (0, 2)" />
-                )}
-                {Arrow && <Arrow color={theme.colors[color]} fill={theme.colors.blue1} transform="translate(25, 1)" />}
-            </g>
-        </svg>
-    );
+        const Symbol = CenterSymbols[symbol?.centerSymbol ?? 'none'];
+        const Arrow = Arrows[symbol?.arrowType ?? 'normal'];
+
+        return (
+            <svg height="16px" viewBox="-40 0 100 25">
+                <g key={label}>
+                    <line
+                        stroke={edgeColor}
+                        strokeDasharray={symbol?.dashArray ?? 'none'}
+                        strokeWidth={4}
+                        style={{ opacity: 0.5 }}
+                        x1={-25}
+                        x2={40}
+                        y1={10}
+                        y2={10}
+                    />
+                    {Symbol && <Symbol color={edgeColor} fill={theme.colors.blue1} transform="translate (0, 2)" />}
+                    {Arrow && <Arrow color={edgeColor} fill={theme.colors.blue1} transform="translate(25, 1)" />}
+                </g>
+            </svg>
+        );
+    }
+
+    return <span style={{ height: '0.5rem', width: '100%' }} />;
 }
 
 export interface LegendListProps {
-    listItems: LegendLineDefinition[];
+    listItems: GraphLegendDefinition[];
 }
 export function LegendList({ listItems }: LegendListProps): JSX.Element {
     return (
         <Ul>
             {listItems.map(({ label, ...props }) => (
                 <Li key={label}>
-                    <LegendLine {...props} label={label} />
+                    <LegendSymbol {...props} label={label} />
                     <LegendText>{label}</LegendText>
                 </Li>
             ))}
