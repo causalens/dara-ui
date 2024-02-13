@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.6.0
 
 -   `ContextMenu` component is now offset a few pixels from the cursor to prevent the first item from being accidentally selected when the context menu is opened.
 
