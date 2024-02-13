@@ -46,10 +46,14 @@ bearer:
 test:
 	lerna run test
 
-# Version all the main packages in lockstep as a patch - run pnpm i and lock to update the lockfiles accordingly
-version:
+version-patch:
 	@lerna version patch --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version patch && borg lock
 
+version-minor:
+	@lerna version minor --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version minor && borg lock
+
+version-major:
+	@lerna version major --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version major && borg lock
 # Publish all the packages to the appropriate repositories
 publish:
 	git reset --hard
