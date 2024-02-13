@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.6.0
 
 -   Updated the type of `additionalLegends` to also allow defining nodes
 -   Added a new prop `defaultLegends` which allows default legends to be passed based on each `EditorMode`. Consequently the default legends have been removed from this package and moved to dara.
