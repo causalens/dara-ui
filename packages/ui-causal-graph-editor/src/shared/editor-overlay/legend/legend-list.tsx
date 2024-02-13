@@ -154,7 +154,7 @@ function LegendSymbol(props: GraphLegendDefinition): JSX.Element {
 
         return (
             <svg height="16px" viewBox="-40 0 100 25">
-                <circle cx="10" cy="12" fill={fillColor} r="12" stroke={borderColor} strokeWidth="1" />
+                <circle cx="8" cy="12" fill={fillColor} r="12" stroke={borderColor} strokeWidth="1" />
             </svg>
         );
     }

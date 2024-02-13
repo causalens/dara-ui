@@ -129,6 +129,16 @@ export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
     );
 };
 Interactive.args = {
+    additionalLegends: [
+        {
+            label: 'Other',
+            type: 'node',
+        },
+        {
+            label: 'Other',
+            type: 'edge',
+        },
+    ],
     editable: true,
     graphLayout: PlanarLayout.Builder.build(),
 };
@@ -141,7 +151,7 @@ MarketingBottom.args = {
             type: 'edge',
         },
         {
-            type: 'none',
+            type: 'spacer',
         },
         {
             label: 'test node',

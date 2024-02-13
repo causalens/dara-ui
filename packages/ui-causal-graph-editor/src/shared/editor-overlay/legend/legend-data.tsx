@@ -55,7 +55,7 @@ export function getLegendData(
     editorMode: EditorMode,
     additionalLegend: GraphLegendDefinition[]
 ): GraphLegendDefinition[] {
-    const modeData = defaultLegends[editorMode] ?? [];
+    const modeData = defaultLegends?.[editorMode] ?? [];
 
     return [...modeData, ...(additionalLegend ?? []).filter(Boolean)];
 }
