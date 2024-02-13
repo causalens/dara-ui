@@ -99,6 +99,8 @@ export interface CausalGraphEditorProps extends Settings {
     availableInputs?: string[];
     /** Standard class name prop */
     className?: string;
+    /** default legends per editor mode */
+    defaultLegends?: Record<EditorMode, GraphLegendDefinition[]>;
     /** Any extra sections to display in the side panel on edge click */
     edgeExtrasContent?: React.ReactElement;
     /** The backend data */
@@ -623,7 +625,11 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
-                            bottomLeft={<Legend listItems={getLegendData(editorMode, props.additionalLegends)} />}
+                            bottomLeft={
+                                <Legend
+                                    listItems={getLegendData(props.defaultLegends, editorMode, props.additionalLegends)}
+                                />
+                            }
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}

@@ -16,7 +16,7 @@
  */
 import styled, { useTheme } from '@darajs/styled-components';
 
-import { GraphLegendDefinition, LegendArrowDefinition } from './legend-data';
+import { GraphLegendDefinition } from './legend-data';
 
 const LegendText = styled.span`
     color: ${(props) => props.theme.colors.text};
@@ -123,14 +123,18 @@ function HalfCircle(props: SvgProps): JSX.Element {
     );
 }
 
-const CenterSymbols: Record<LegendArrowDefinition['centerSymbol'], (props: SvgProps) => JSX.Element> = {
+type CenterSymbolType = Extract<GraphLegendDefinition, { type: 'edge' }>['center_symbol'];
+
+const CenterSymbols: Record<CenterSymbolType, (props: SvgProps) => JSX.Element> = {
     bidirected: Bidirected,
     cross: Cross,
     none: null,
     question: QuestionMark,
 };
 
-const Arrows: Record<LegendArrowDefinition['arrowType'], (props: SvgProps) => JSX.Element> = {
+type ArrowsType = Extract<GraphLegendDefinition, { type: 'edge' }>['arrow_type'];
+
+const Arrows: Record<ArrowsType, (props: SvgProps) => JSX.Element> = {
     empty: EmptyCircle,
     filled: FullArrow,
     none: null,
@@ -141,12 +145,12 @@ const Arrows: Record<LegendArrowDefinition['arrowType'], (props: SvgProps) => JS
 /**
  * Component to generate a legend line
  */
-function LegendSymbol({ label, type, symbol }: GraphLegendDefinition): JSX.Element {
+function LegendSymbol(props: GraphLegendDefinition): JSX.Element {
     const theme = useTheme();
 
-    if (type === 'node') {
-        const fillColor = symbol?.color ?? theme.colors.blue4;
-        const borderColor = symbol?.highlight_color ?? theme.colors.primary;
+    if (props.type === 'node') {
+        const fillColor = props?.color ?? theme.colors.blue4;
+        const borderColor = props?.highlight_color ?? theme.colors.primary;
 
         return (
             <svg height="16px" viewBox="-40 0 100 25">
@@ -155,18 +159,18 @@ function LegendSymbol({ label, type, symbol }: GraphLegendDefinition): JSX.Eleme
         );
     }
 
-    if (type === 'edge') {
-        const edgeColor = symbol?.color ?? theme.colors.grey5;
+    if (props.type === 'edge') {
+        const edgeColor = props?.color ?? theme.colors.grey5;
 
-        const Symbol = CenterSymbols[symbol?.centerSymbol ?? 'none'];
-        const Arrow = Arrows[symbol?.arrowType ?? 'normal'];
+        const Symbol = CenterSymbols[props?.center_symbol ?? 'none'];
+        const Arrow = Arrows[props?.arrow_type ?? 'normal'];
 
         return (
             <svg height="16px" viewBox="-40 0 100 25">
-                <g key={label}>
+                <g key={props.label}>
                     <line
                         stroke={edgeColor}
-                        strokeDasharray={symbol?.dashArray ?? 'none'}
+                        strokeDasharray={props?.dash_array ?? 'none'}
                         strokeWidth={4}
                         style={{ opacity: 0.5 }}
                         x1={-25}
@@ -192,7 +196,7 @@ export function LegendList({ listItems }: LegendListProps): JSX.Element {
         <Ul>
             {listItems.map(({ label, ...props }) => (
                 <Li key={label}>
-                    <LegendSymbol {...props} label={label} />
+                    <LegendSymbol {...props} />
                     <LegendText>{label}</LegendText>
                 </Li>
             ))}

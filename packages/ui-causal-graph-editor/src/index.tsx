@@ -36,5 +36,6 @@ export { default as GraphContext } from './shared/graph-context';
 export { causalGraphParser } from './shared/parsers';
 export { causalGraphSerializer, serializeGraphEdge, serializeGraphNode } from './shared/serializer';
 export { GraphActionCreators, GraphReducer } from './shared/causal-graph-store';
+export { GraphLegendDefinition } from './shared/editor-overlay';
 export { FloatingButton } from './shared/editor-overlay/floating-elements';
 export { PixiEdgeStyle } from './shared/rendering/edge';
