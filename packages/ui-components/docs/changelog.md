@@ -4,6 +4,7 @@ title: Changelog
 
 ## NEXT
 
+-   `UploadDropzone` now has `enablePaste` prop to conditionally activate paste functionality, allowing for more customizable behavior. By default, pasting text directly into the `UploadDropzone` is now disabled, requiring explicit activation via the `enablePaste` prop.
 -   `ContextMenu` component is now offset a few pixels from the cursor to prevent the first item from being accidentally selected when the context menu is opened.
 
 ## 1.5.2

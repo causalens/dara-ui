@@ -63,6 +63,8 @@ export interface UploadDropzoneProps {
     accept?: string;
     /** Standard react className property */
     className?: string;
+    /** Determines if the paste event listener should be enabled, allowing for direct pasting of text as files. */
+    enablePaste?: boolean;
     /** An onDrop handler that is called when a file is dropped or selected from the */
     onDrop: (acceptedFiles: Array<File>) => void | Promise<void>;
     /** Styling property */
@@ -77,6 +79,9 @@ export interface UploadDropzoneProps {
  */
 function UploadDropzone(props: UploadDropzoneProps): JSX.Element {
     useEffect(() => {
+        if (!props.enablePaste) {
+            return;
+        }
         const handlePaste = (ev: ClipboardEvent): void => {
             const blob = new Blob([ev.clipboardData.getData('Text')], { type: 'text/plain' });
             const file = new File([blob], 'pasted_data', { type: 'text/plain' });
