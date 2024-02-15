@@ -1,6 +1,6 @@
 {
   "name": "@darajs/ui-notifications",
-  "version": "1.5.2",
+  "version": "1.5.4",
   "description": "Notification system for the Dara UI Framework",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,9 +18,9 @@
   "license": "Apache-2.0",
   "prettier": "@darajs/prettier-config",
   "devDependencies": {
-    "@darajs/eslint-config": "^1.5.2",
-    "@darajs/prettier-config": "^1.5.2",
-    "@darajs/stylelint-config": "^1.5.2",
+    "@darajs/eslint-config": "^1.5.4",
+    "@darajs/prettier-config": "^1.5.4",
+    "@darajs/stylelint-config": "^1.5.4",
     "@storybook/addon-a11y": "^6.5.16",
     "@storybook/addon-actions": "^6.5.16",
     "@storybook/addon-essentials": "^6.5.16",
@@ -45,9 +45,9 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@darajs/styled-components": "^1.5.2",
-    "@darajs/ui-icons": "^1.5.2",
-    "@darajs/ui-utils": "^1.5.2",
+    "@darajs/styled-components": "^1.5.4",
+    "@darajs/ui-icons": "^1.5.4",
+    "@darajs/ui-utils": "^1.5.4",
     "lodash": "4.17.21",
     "polished": "^4.1.1",
     "react": "^18.0",
