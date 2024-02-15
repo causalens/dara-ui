@@ -14,48 +14,69 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { DefaultTheme } from '@darajs/styled-components';
+
 import { EditorMode } from '@types';
 
-export interface LegendNodeDefinition {}
+export interface LegendLineDefinition {
+    /** Arrow to show at end of line */
+    arrowType?: 'none' | 'normal' | 'filled' | 'empty' | 'soft';
+    /** Symbol to show in the center of the arrow */
+    centerSymbol?: 'none' | 'cross' | 'question' | 'bidirected';
+    /** color to represent */
+    color?: keyof DefaultTheme['colors'];
+    /** dashArray SVG path property - line will be dashed if specified */
+    dashArray?: string;
+    /** legend label */
+    label?: string;
+    /** Show empty spot instead of a legend line */
+    spacer?: boolean;
+}
 
-export type GraphLegendDefinition =
-    | {
-          /** defines the label for the legend entry */
-          label?: string;
-          /** the type of the symbol to show */
-          type: 'spacer';
-      }
-    | {
-          /** Arrow to show at end of line */
-          arrow_type?: 'none' | 'normal' | 'filled' | 'empty' | 'soft';
-          /** Symbol to show in the center of the arrow */
-          center_symbol?: 'none' | 'cross' | 'question' | 'bidirected';
-          /** defines the filled color of the edge/arrow symbol */
-          color?: string;
-          /** dashArray SVG path property - line will be dashed if specified */
-          dash_array?: string;
-          /** defines the label for the legend entry */
-          label?: string;
-          /** the type of the symbol to show */
-          type: 'edge';
-      }
-    | {
-          /** defines the filled color of the node symbol */
-          color?: string;
-          /** defines the border color of the node symbol */
-          highlight_color?: string;
-          /** defines the label for the legend entry */
-          label?: string;
-          /** the type of the symbol to show */
-          type: 'node';
-      };
+const RESOLVER_LEGEND: LegendLineDefinition[] = [
+    {
+        centerSymbol: 'question',
+        dashArray: '10 6',
+        label: 'Unresolved',
+    },
+    {
+        dashArray: '10 6',
+        label: 'Not accepted',
+    },
+    {
+        dashArray: '6 4',
+        label: 'Accepted',
+    },
+    {
+        label: 'Domain knowledge',
+    },
+];
+
+const PAG_LEGEND: LegendLineDefinition[] = [
+    { arrowType: 'filled', label: 'Directed' },
+    { arrowType: 'empty', label: 'Wildcard' },
+    { arrowType: 'none', label: 'Undirected' },
+];
+
+const ENCODER_LEGEND: LegendLineDefinition[] = [
+    { label: 'Hard Directed' },
+    { arrowType: 'soft', label: 'Soft Directed' },
+    { arrowType: 'none', centerSymbol: 'bidirected', label: 'Undirected' },
+    { arrowType: 'none', centerSymbol: 'cross', label: 'Prohibited' },
+];
+
+const DEFAULT_LEGENDS: Map<EditorMode, LegendLineDefinition[]> = new Map([
+    [EditorMode.DEFAULT, []],
+    [EditorMode.PAG_VIEWER, PAG_LEGEND],
+    [EditorMode.RESOLVER, RESOLVER_LEGEND],
+    [EditorMode.EDGE_ENCODER, ENCODER_LEGEND],
+]);
 
 export function getLegendData(
-    defaultLegends: Record<EditorMode, GraphLegendDefinition[]>,
     editorMode: EditorMode,
-    additionalLegend: GraphLegendDefinition[]
-): GraphLegendDefinition[] {
-    const modeData = defaultLegends?.[editorMode] ?? [];
+    additionalLegend: LegendLineDefinition[]
+): LegendLineDefinition[] {
+    const modeData = DEFAULT_LEGENDS.get(editorMode) ?? [];
 
     return [...modeData, ...(additionalLegend ?? []).filter(Boolean)];
 }

@@ -129,43 +129,12 @@ export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
     );
 };
 Interactive.args = {
-    additionalLegends: [
-        {
-            label: 'Other',
-            type: 'node',
-        },
-        {
-            label: 'Other',
-            type: 'edge',
-        },
-    ],
     editable: true,
     graphLayout: PlanarLayout.Builder.build(),
 };
 
 export const MarketingBottom = Template.bind({});
 MarketingBottom.args = {
-    additionalLegends: [
-        {
-            label: 'test arrow',
-            type: 'edge',
-        },
-        {
-            type: 'spacer',
-        },
-        {
-            label: 'test node',
-            type: 'node',
-        },
-        {
-            label: 'another node',
-            symbol: {
-                color: 'red',
-                highlight_color: 'green',
-            },
-            type: 'node',
-        },
-    ],
     editable: true,
     graphData: causalGraph,
     graphLayout: MarketingLayout.Builder.build(),

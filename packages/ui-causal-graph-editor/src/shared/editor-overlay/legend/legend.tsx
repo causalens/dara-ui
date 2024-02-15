@@ -87,7 +87,6 @@ function Legend(props: LegendProps): JSX.Element {
             <LegendWrapper
                 ref={panelRef}
                 style={{
-                    minWidth: '13rem',
                     opacity: showLegend ? 1 : 0,
                     pointerEvents: !showLegend || disablePointerEvents ? 'none' : 'all',
                     transform: showLegend ? 'scale(1)' : 'scale(0)',

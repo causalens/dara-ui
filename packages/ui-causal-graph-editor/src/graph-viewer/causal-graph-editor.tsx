@@ -31,8 +31,8 @@ import {
     CenterGraphButton,
     DragModeButton,
     EdgeInfoContent,
-    GraphLegendDefinition,
     Legend,
+    LegendLineDefinition,
     NodeInfoContent,
     Overlay,
     RecalculateLayoutButton,
@@ -94,13 +94,11 @@ const NotificationWrapper = styled.div`
 
 export interface CausalGraphEditorProps extends Settings {
     /** Optional additional legends to show */
-    additionalLegends?: GraphLegendDefinition[];
+    additionalLegends?: LegendLineDefinition[];
     /** Input nodes */
     availableInputs?: string[];
     /** Standard class name prop */
     className?: string;
-    /** default legends per editor mode */
-    defaultLegends?: Record<EditorMode, GraphLegendDefinition[]>;
     /** Any extra sections to display in the side panel on edge click */
     edgeExtrasContent?: React.ReactElement;
     /** The backend data */
@@ -625,11 +623,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
-                            bottomLeft={
-                                <Legend
-                                    listItems={getLegendData(props.defaultLegends, editorMode, props.additionalLegends)}
-                                />
-                            }
+                            bottomLeft={<Legend listItems={getLegendData(editorMode, props.additionalLegends)} />}
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}
