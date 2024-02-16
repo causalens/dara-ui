@@ -248,6 +248,11 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                     setInput(value);
                     return;
                 }
+                // if the value is decimal and ends in a zero the user has also not changed the number/finished typing
+                if (value.includes('.') && value.endsWith('0')) {
+                    setInput(value);
+                    return;
+                }
                 // if the user is typing a negative number, don't call onChange until they have added the number
                 if (value === '-') {
                     setInput(value);
