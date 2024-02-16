@@ -5,6 +5,7 @@ title: Changelog
 ## NEXT
 
 -   Fixed an issue with `NumericInput` where one could not enter decimal numbers ending in 0.
+-   Fixed an issue where one was not able to type a negative number in `NumericInput` in controlled mode unless they started with the number before the sign.
 
 ## 1.6.1
 
