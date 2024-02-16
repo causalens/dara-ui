@@ -248,6 +248,11 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
                     setInput(value);
                     return;
                 }
+                // if the user is typing a negative number, don't call onChange until they have added the number
+                if (value === '-') {
+                    setInput(value);
+                    return;
+                }
                 props.onChange?.(parsed, e);
             },
             // eslint-disable-next-line react-hooks/exhaustive-deps
