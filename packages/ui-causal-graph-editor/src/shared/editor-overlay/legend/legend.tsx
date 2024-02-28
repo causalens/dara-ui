@@ -43,7 +43,9 @@ const LegendWrapper = styled.div`
     border-radius: 4px;
     box-shadow: ${({ theme }) => theme.shadow.light};
 
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+        opacity 0.3s,
+        transform 0.3s;
 `;
 
 const LegendOpenButton = styled(FloatingButton)`

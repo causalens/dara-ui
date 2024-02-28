@@ -42,7 +42,7 @@ const EDGE_OFFSET = 10;
  */
 const LOCAL_MULTIPLIER = 1.5;
 
-export class EdgeObject extends PIXI.utils.EventEmitter<typeof MOUSE_EVENTS[number]> {
+export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[number]> {
     edgeGfx: PIXI.Container;
 
     edgeSymbolsGfx: PIXI.Container;

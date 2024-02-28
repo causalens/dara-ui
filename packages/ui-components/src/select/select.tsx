@@ -253,9 +253,9 @@ function Select(props: SelectProps): JSX.Element {
                             ...styles.popper,
 
                             width:
-                                props.applySameWidthModifier === false
-                                    ? undefined
-                                    : parseFloat((styles.popper as any)?.width) + 2,
+                                props.applySameWidthModifier === false ?
+                                    undefined
+                                :   parseFloat((styles.popper as any)?.width) + 2,
                             zIndex: 9999,
                         }}
                     >

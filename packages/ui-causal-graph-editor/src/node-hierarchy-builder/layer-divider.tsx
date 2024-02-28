@@ -39,7 +39,9 @@ const LayerBorder = styled.div`
 
         background: ${(props) => props.theme.colors.grey3};
 
-        transition: background-color 0.15s cubic-bezier(0.4, 0, 1, 1), height 0.15s cubic-bezier(0.4, 0, 1, 1);
+        transition:
+            background-color 0.15s cubic-bezier(0.4, 0, 1, 1),
+            height 0.15s cubic-bezier(0.4, 0, 1, 1);
     }
 `;
 

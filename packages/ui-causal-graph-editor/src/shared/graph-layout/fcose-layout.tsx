@@ -233,9 +233,9 @@ function getRelativeTieredArrayPlacement(
         // Place onde node from the first tier to the left/top of the first node of the next tier
         // That way we have one node from each tier defining the position of the tier relative to the other tiers
         const placement =
-            orientation === 'horizontal'
-                ? { gap: tierSeparation, left: firstElement, right: nextTierFirstElement }
-                : { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
+            orientation === 'horizontal' ?
+                { gap: tierSeparation, left: firstElement, right: nextTierFirstElement }
+            :   { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
         relativePlacements.push(placement);
     });
 
@@ -332,9 +332,10 @@ export default class FcoseLayout extends GraphLayout {
         return new Promise((resolve) => {
             const hasPositions = graph.getNodeAttribute(graph.nodes()[0], 'x');
             const size = graph.getAttribute('size');
-            const tiersPlacement = this.tiers
-                ? getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation)
-                : { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
+            const tiersPlacement =
+                this.tiers ?
+                    getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation)
+                :   { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
 
             const elements = [
                 ...graph.mapNodes<ElementDefinition>((id, attrs) => ({

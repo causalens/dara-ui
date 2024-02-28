@@ -217,9 +217,9 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             ) {
                 // This is a hack to change the highlight in the next render cycle so filteredItems had time to update
                 setPendingHighlight(
-                    changes.selectedItem
-                        ? props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
-                        : 0
+                    changes.selectedItem ?
+                        props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
+                    :   0
                 );
                 return {
                     ...changes,

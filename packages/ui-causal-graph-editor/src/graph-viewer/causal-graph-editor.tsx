@@ -406,7 +406,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 right: event.clientX,
                 top: event.clientY,
                 width: 0,
-            } as DOMRect);
+            }) as DOMRect;
 
         setTooltipContent(
             getTooltipContent(
@@ -451,7 +451,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                 right: event.clientX,
                 top: event.clientY,
                 width: 0,
-            } as DOMRect);
+            }) as DOMRect;
         setTooltipContent(edgeTooltipContent);
     });
 

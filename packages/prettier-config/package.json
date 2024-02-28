@@ -9,7 +9,7 @@
     "index.json"
   ],
   "dependencies": {
-    "prettier": "2.4.1"
+    "prettier": "3.2.5"
   },
   "publishConfig": {
     "access": "public"

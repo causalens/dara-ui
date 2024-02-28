@@ -33,16 +33,12 @@ const shouldForwardProp = (prop: any): boolean => !['asButton'].includes(prop);
  * A thin style wrapper around the base FontAwesome icon component that adds button styling and colors it using the
  * cl icon color
  */
-const StyledFAIcon: StyledComponent<
-    (props: FontAwesomeIconProps) => JSX.Element,
-    DefaultTheme,
-    AsButtonProp,
-    never
-> = styled(FontAwesomeIcon).withConfig({ shouldForwardProp })<AsButtonProp>`
-    cursor: ${(props) => (props.asButton ? 'pointer' : 'inherit')};
-    color: inherit;
-    ${(props) => (props.asButton ? `:hover { color: ${props.theme.colors.grey6}; }` : '')}
-`;
+const StyledFAIcon: StyledComponent<(props: FontAwesomeIconProps) => JSX.Element, DefaultTheme, AsButtonProp, never> =
+    styled(FontAwesomeIcon).withConfig({ shouldForwardProp })<AsButtonProp>`
+        cursor: ${(props) => (props.asButton ? 'pointer' : 'inherit')};
+        color: inherit;
+        ${(props) => (props.asButton ? `:hover { color: ${props.theme.colors.grey6}; }` : '')}
+    `;
 
 const mapFASizeToMD: { [k: string]: string } = {
     '10x': '120px',

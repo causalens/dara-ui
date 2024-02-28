@@ -111,13 +111,13 @@ export const NodeWrapper = styled.ul<DisplayProp>`
     list-style: none;
 
     animation: ${(props) =>
-        props.open
-            ? css`
-                  ${grow} 300ms ease-out forwards
-              `
-            : css`
-                  ${contract} 300ms ease-in forwards
-              `};
+        props.open ?
+            css`
+                ${grow} 300ms ease-out forwards
+            `
+        :   css`
+                ${contract} 300ms ease-in forwards
+            `};
 `;
 
 export interface HierarchyNode {
