@@ -14,6 +14,9 @@ prepare:
 lint:
 	lerna run lint
 
+format-check:
+	lerna run format:check
+
 # Local bearer is expected in ./bin/bearer
 LOCAL_BEARER := ./bin/bearer
 BEARER_CONFIG := ./bearer.yml

@@ -13,5 +13,18 @@
         "tabWidth": 2
       }
     }
-  ]
+  ],
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^@darajs/(.*)$",
+    "^@/(.*)$",
+    "^@shared/(.*)$",
+    "^@types$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

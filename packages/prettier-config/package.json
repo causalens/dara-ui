@@ -9,6 +9,7 @@
     "index.json"
   ],
   "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "prettier": "3.2.5"
   },
   "publishConfig": {

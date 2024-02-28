@@ -8,6 +8,8 @@
   "scripts": {
     "build": "rimraf dist && tsc && tsc-alias",
     "lint": "eslint src --ext .tsx --max-warnings 0 && stylelint './src/**/*.tsx'",
+    "format": "prettier src",
+    "format:check": "prettier src --check",
     "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix",
     "package": "yarn build && yarn publish --no-git-tag-version",
     "test-watch": "jest --watch",

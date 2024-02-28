@@ -65,7 +65,7 @@ export function useD3Axis<T>(
 /** Helper function for getting a linear d3Scale instance, based on data and domain */
 const getLinearScale = (data: Array<number>, domain: [number, number]): ScaleLinear<number, number> => {
     return scaleLinear().domain([data ? Math.min(...data) : domain[0], data ? Math.max(...data) : domain[1]]);
-};
+}
 
 /**
  * Hook that returns a function that generates the props for a linearly scaled axis based on the size in pixels of the
@@ -84,7 +84,7 @@ export function useD3LinearAxis(
 /** Helper function for getting a time d3Scale instance, based on data and domain */
 const getTimeScale = (data: Array<Date>, domain: [Date, Date]): ScaleTime<number, number> => {
     return scaleTime().domain([data ? data[0] : domain[0], data ? data[data.length - 1] : domain[1]]);
-};
+}
 
 /**
  * Hook that returns a function that generates the props for a time scaled axis based on the size in pixels of the
@@ -104,10 +104,8 @@ export function useD3TimeAxis(data: Array<Date>, domain?: [Date, Date]): (axisSi
  * @param mapping a mapping dict that translates the numeric value to a label
  */
 export function useD3OrdinalAxis(mapping: { [k: number]: string }): (axisSize?: number) => AxisProps<string> {
-    return (): AxisProps<string> => {
-        return {
+    return (): AxisProps<string> => ({
             tickFormatter: (tick: number): string => mapping[tick],
             type: 'category',
-        };
-    };
+        });
 }
