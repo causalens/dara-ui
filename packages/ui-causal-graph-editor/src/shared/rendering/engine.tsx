@@ -600,7 +600,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /**
      * Notify the engine about focus change on the graph canvas
      *
-     * This is used to enable/disable the zoom-on-scroll behaviour
+     * This is used to enable/disable the wheel listener
      *
      * @param isFocused - focus state
      */

@@ -57,6 +57,10 @@ interface UseRenderEngineApi {
      */
     onSetDragMode: (dragMode: DragMode | null) => void;
     /**
+     * Notify the engine about whether the canvas has focus
+     */
+    onSetFocus: (isFocused: boolean) => void;
+    /**
      * Should be called whenever available constraints change
      *
      * @param constraints new set of constraints
@@ -172,6 +176,11 @@ export function useRenderEngine(
         onSetDragMode: (dragMode: DragMode | null) => {
             engine.current.setDragMode(dragMode);
         },
+        onSetFocus: (isFocused: boolean) => {
+            if (engine.current.initialized) {
+                engine.current.setFocus(isFocused);
+            }
+        },
         onUpdateConstraints: (newConstraints: EdgeConstraint[]) => {
             if (engine.current.initialized) {
                 engine.current.updateConstraints(newConstraints);
@@ -188,10 +197,5 @@ export function useRenderEngine(
             }
         },
         useEngineEvent,
-        onSetFocus: (focus: boolean) => {
-            if (engine.current.initialized) {
-                engine.current.setFocus(focus);
-            }
-        },
     };
 }
