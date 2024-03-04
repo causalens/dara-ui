@@ -188,5 +188,10 @@ export function useRenderEngine(
             }
         },
         useEngineEvent,
+        onSetFocus: (focus: boolean) => {
+            if (engine.current.initialized) {
+                engine.current.setFocus(focus);
+            }
+        },
     };
 }

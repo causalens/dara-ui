@@ -23,7 +23,7 @@ import { GetReferenceClientRect } from 'tippy.js';
 import styled, { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
 import { Notification, NotificationPayload } from '@darajs/ui-notifications';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { Status, useOnClickOutside, useUpdateEffect } from '@darajs/ui-utils';
 import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import {
@@ -90,6 +90,20 @@ const NotificationWrapper = styled.div`
         align-self: baseline;
         height: 1.6rem;
     }
+`;
+
+const GraphPane = styled.div<{ $hasFocus: boolean }>`
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    /* We set a minHeight so that at least some of the graph will always appear within the container */
+    min-height: 100px;
+    position: relative;
+
+    border: 2px solid transparent;
+    border-radius: 6px;
+    border-color: ${(props) => (props.$hasFocus ? props.theme.colors.grey3 : 'transparent')};
+    box-shadow: ${(props) => (props.$hasFocus ? props.theme.shadow.light : 'none')};
 `;
 
 export interface CausalGraphEditorProps extends Settings {
@@ -170,6 +184,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         onEdgeSelected,
         onSearchResults,
         onUpdateConstraints,
+        onSetFocus,
     } = useRenderEngine(
         canvasParentRef,
         state.graph,
@@ -181,6 +196,16 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         props.processEdgeStyle,
         props.zoomThresholds
     );
+
+    const paneRef = React.useRef<HTMLDivElement>(null);
+    const [hasFocus, setHasFocus] = useState(false);
+
+    function onPaneFocus(focus: boolean): void {
+        setHasFocus(focus);
+        onSetFocus(focus);
+    }
+
+    useOnClickOutside(paneRef.current, () => onPaneFocus(false));
 
     // track selection
     const [selectedEdge, setSelectedEdge] = useState<[string, string]>(null);
@@ -609,17 +634,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             }}
         >
             <PointerContext.Provider value={{ disablePointerEvents: isDragging, onPanelEnter, onPanelExit }}>
-                {/* We set a minHeight so that at least some of the graph will alwyas appear within the container */}
-                <div
-                    style={{
-                        display: 'flex',
-                        flex: '1 1 auto',
-                        flexDirection: 'column',
-                        minHeight: '100px',
-                        position: 'relative',
-                        ...props.style,
-                    }}
-                >
+                <GraphPane $hasFocus={hasFocus} onClick={() => onPaneFocus(true)} ref={paneRef} style={props.style}>
                     <Graph
                         onMouseEnter={() => setShowFrameButtons(true)}
                         onMouseLeave={() => setShowFrameButtons(false)}
@@ -702,7 +717,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         />
                         <ConfirmationModal title="Confirm Removal" {...removeEdgeProps} />
                     </Graph>
-                </div>
+                </GraphPane>
             </PointerContext.Provider>
         </SettingsProvider>
     );

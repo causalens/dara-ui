@@ -515,17 +515,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         container.appendChild(this.app.view as HTMLCanvasElement);
         this.textureCache = new TextureCache(this.app.renderer);
 
-        this.app.view.addEventListener('wheel', (event) => {
-            event.preventDefault();
-        });
-
         // Create viewport and add it to the app
         this.viewport = new Viewport({
             events: this.app.renderer.events,
         });
 
         // enable viewport features
-        this.viewport.drag().pinch().wheel().decelerate().clampZoom({ maxScale: 2 });
+        this.viewport.drag({ wheel: false }).pinch().decelerate().clampZoom({ maxScale: 2 });
 
         this.viewport.addEventListener('frame-end', () => {
             if (this.viewport.dirty) {
@@ -599,6 +595,32 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.updateStyles();
         this.initialized = true;
         this.resetViewport();
+    }
+
+    /**
+     * Notify the engine about focus change on the graph canvas
+     *
+     * This is used to enable/disable the zoom-on-scroll behaviour
+     *
+     * @param isFocused - focus state
+     */
+    public setFocus(isFocused: boolean): void {
+        if (!isFocused) {
+            this.viewport.plugins.remove('wheel');
+            this.app.view.removeEventListener('wheel', Engine.wheelListener);
+        } else {
+            this.viewport.wheel();
+            this.app.view.addEventListener('wheel', Engine.wheelListener);
+        }
+    }
+
+    /**
+     * Wheel listener which disables the default browser scrolling behaviour
+     *
+     * @param event - mouse wheel event
+     */
+    private static wheelListener(event: WheelEvent): void {
+        event.preventDefault();
     }
 
     /**
