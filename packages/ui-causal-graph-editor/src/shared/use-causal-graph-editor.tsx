@@ -17,11 +17,10 @@
 import isEqual from 'lodash/isEqual';
 import { useEffect, useMemo, useReducer, useRef } from 'react';
 
-import { CausalGraph, EditorMode, GraphState } from '../types';
+import { CausalGraph, EditorMode, GraphState, SimulationGraph } from '../types';
 import { GraphActionCreators, GraphActionType, GraphReducer } from './causal-graph-store';
 import { GraphLayout } from './graph-layout';
 import { causalGraphParser } from './parsers';
-import { updateNodesForTimeSeries } from './utils';
 
 export interface UseCausalGraphEditorApi {
     api: GraphApi;
@@ -39,6 +38,38 @@ export type GraphApi = {
     // eslint-disable-next-line prettier/prettier
     [k in ActionName]: (...args: Parameters<(typeof GraphActionCreators)[k]>) => void;
 };
+
+/**
+ * Function which receives a list of nodes and returns a list of nodes but with an added property for those that share a variable_name
+ *
+ * @param nodes graphData nodes before parsing
+ * @returns
+ */
+export function updateNodesForTimeSeries(graph: SimulationGraph, api: GraphApi): void {
+    // Step 1: Group nodes by variable_name
+    const groupedNodes = new Map<string, string[]>();
+    graph.nodes().forEach((nodeId) => {
+        const variableName = graph.getNodeAttribute(nodeId, 'extras')?.variable_name;
+        if (variableName) {
+            // Check if variableName is not undefined
+            if (!groupedNodes.has(variableName)) {
+                groupedNodes.set(variableName, []);
+            }
+            groupedNodes.get(variableName)?.push(nodeId);
+        }
+    });
+
+    // Step 2: Add 'time_series_variable' to nodes that share the same variable_name
+    groupedNodes.forEach((group, variableName) => {
+        if (group.length > 1) {
+            group.forEach((nodeId) => {
+                const newExtras = graph.getNodeAttribute(nodeId, 'extras');
+                newExtras.time_series_variable = variableName;
+                api.updateNode(nodeId, newExtras);
+            });
+        }
+    });
+}
 
 /**
  * A helper hook to inject causal graph editor API for given initial graphdata
