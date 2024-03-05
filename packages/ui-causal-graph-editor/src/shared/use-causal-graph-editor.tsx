@@ -40,7 +40,7 @@ export type GraphApi = {
 };
 
 /**
- * Function which receives a list of nodes and returns a list of nodes but with an added property for those that share a variable_name
+ * Function which receives a list of nodes and adds property for those that share a variable_name
  *
  * @param nodes graphData nodes before parsing
  * @returns
