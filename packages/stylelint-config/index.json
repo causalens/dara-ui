@@ -1,7 +1,6 @@
 {
   "extends": [
     "stylelint-config-standard",
-    "stylelint-config-styled-components",
     "stylelint-config-clean-order"
   ],
   "customSyntax": "postcss-styled-syntax",
