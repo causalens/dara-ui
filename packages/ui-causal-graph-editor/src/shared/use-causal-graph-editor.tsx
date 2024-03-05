@@ -42,8 +42,8 @@ export type GraphApi = {
 /**
  * Function which receives a list of nodes and adds property for those that share a variable_name
  *
- * @param nodes graphData nodes before parsing
- * @returns
+ * @param graph Simulation graph
+ * @param api Graph API
  */
 export function updateNodesForTimeSeries(graph: SimulationGraph, api: GraphApi): void {
     // Step 1: Group nodes by variable_name
