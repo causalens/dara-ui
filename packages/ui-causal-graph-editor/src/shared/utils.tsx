@@ -18,7 +18,8 @@ import { hasCycle } from 'graphology-dag';
 
 import { DefaultTheme } from '@darajs/styled-components';
 
-import { EdgeType, GraphTiers, NodeGroup, SimulationGraph } from '../types';
+import { CausalGraphNode, EdgeType, GraphTiers, NodeGroup, SimulationGraph, SimulationNode } from '../types';
+import { GraphApi } from './use-causal-graph-editor';
 
 /**
  * Check if adding an edge to the graph will create a cycle.
@@ -288,4 +289,36 @@ export function getTiersArray(tiers: GraphTiers, graph: SimulationGraph): string
         }
     }
     return tiersArray;
+}
+
+/**
+ * Function which receives a list of nodes and returns a list of nodes but with an added property for those that share a variable_name
+ *
+ * @param nodes graphData nodes before parsing
+ * @returns
+ */
+export function updateNodesForTimeSeries(graph: SimulationGraph, api: GraphApi): void {
+    // Step 1: Group nodes by variable_name
+    const groupedNodes = new Map<string, string[]>();
+    graph.nodes().forEach((nodeId) => {
+        const variableName = graph.getNodeAttribute(nodeId, 'extras')?.variable_name;
+        if (variableName) {
+            // Check if variableName is not undefined
+            if (!groupedNodes.has(variableName)) {
+                groupedNodes.set(variableName, []);
+            }
+            groupedNodes.get(variableName)?.push(nodeId);
+        }
+    });
+
+    // Step 2: Add 'time_series_variable' to nodes that share the same variable_name
+    groupedNodes.forEach((group, variableName) => {
+        if (group.length > 1) {
+            group.forEach((nodeId) => {
+                const newExtras = graph.getNodeAttribute(nodeId, 'extras');
+                newExtras.time_series_variable = variableName;
+                api.updateNode(nodeId, newExtras);
+            });
+        }
+    });
 }

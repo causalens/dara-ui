@@ -21,6 +21,7 @@ import { CausalGraph, EditorMode, GraphState } from '../types';
 import { GraphActionCreators, GraphActionType, GraphReducer } from './causal-graph-store';
 import { GraphLayout } from './graph-layout';
 import { causalGraphParser } from './parsers';
+import { updateNodesForTimeSeries } from './utils';
 
 export interface UseCausalGraphEditorApi {
     api: GraphApi;
@@ -49,6 +50,7 @@ export default function useCausalGraphEditor(
     availableInputs?: string[]
 ): UseCausalGraphEditorApi {
     const newNodesRequirePosition = graphLayout.requiresPosition;
+
     const [state, dispatch] = useReducer(
         GraphReducer,
         {
@@ -63,26 +65,6 @@ export default function useCausalGraphEditor(
         }
     );
 
-    const isTimeSeriesCausalGraph = useMemo(() => {
-        const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
-        return nodeClass === 'TimeSeriesNode';
-    }, [state.graph]);
-
-    const layout = useMemo(() => {
-        // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
-        const newLayout = graphLayout;
-        if (
-            isTimeSeriesCausalGraph &&
-            'tiers' in newLayout &&
-            'orientation' in newLayout &&
-            newLayout.tiers === undefined
-        ) {
-            // We set tiers based on TimeSeriesCausalGraph structure of node lags
-            newLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
-        }
-        return newLayout;
-    }, [isTimeSeriesCausalGraph, graphLayout]);
-
     // bind each action creator to dispatch
     const api = useMemo(() => {
         return actionNames.reduce<GraphApi>((acc, actionName) => {
@@ -92,6 +74,26 @@ export default function useCausalGraphEditor(
             return acc;
         }, {} as GraphApi);
     }, [dispatch]);
+
+    const isTimeSeriesCausalGraph = useMemo(() => {
+        const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
+        return nodeClass === 'TimeSeriesNode';
+    }, [state.graph]);
+
+    const layout = useMemo(() => {
+        const newLayout = graphLayout;
+
+        if (
+            isTimeSeriesCausalGraph &&
+            'tiers' in newLayout &&
+            'orientation' in newLayout &&
+            newLayout.tiers === undefined
+        ) {
+            updateNodesForTimeSeries(state.graph, api);
+            newLayout.tiers = { group: 'extras.time_series_variable', order_nodes_by: 'time_lag' };
+        }
+        return newLayout;
+    }, [isTimeSeriesCausalGraph, api, graphLayout, state.graph]);
 
     // Init graph data, update when outside graph nodes/edges changes
     const lastParentData = useRef(graphData); // keep track of last parent data to skip unnecessary updates
@@ -108,7 +110,7 @@ export default function useCausalGraphEditor(
 
         lastParentData.current = graphData;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [graphData]);
+    }, []);
 
     return {
         api,

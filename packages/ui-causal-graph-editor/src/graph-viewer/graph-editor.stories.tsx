@@ -185,7 +185,7 @@ MarketingCenter.args = {
 };
 
 export const MarketingTiers = Template.bind({});
-const marketingLayout = SpringLayout.Builder.build();
+const marketingLayout = MarketingLayout.Builder.build();
 marketingLayout.tiers = nodeTiersList;
 
 MarketingTiers.args = {
@@ -693,8 +693,11 @@ VisualEdgeEncoder.args = {
 };
 
 export const TimeSeries = Template.bind({});
+
+const timeSeriesLayout = FcoseLayout.Builder.build();
+
 TimeSeries.args = {
     editable: true,
     graphData: timeSeriesCausalGraph,
-    graphLayout: MarketingLayout.Builder.build(),
+    graphLayout: timeSeriesLayout,
 };
