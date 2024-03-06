@@ -23,7 +23,7 @@ import { GetReferenceClientRect } from 'tippy.js';
 import styled, { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
 import { Notification, NotificationPayload } from '@darajs/ui-notifications';
-import { Status, useUpdateEffect } from '@darajs/ui-utils';
+import { Status, useOnClickOutside, useUpdateEffect } from '@darajs/ui-utils';
 import { ConfirmationModal } from '@darajs/ui-widgets';
 
 import {
@@ -40,6 +40,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
+import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
@@ -92,6 +93,20 @@ const NotificationWrapper = styled.div`
     }
 `;
 
+const GraphPane = styled.div<{ $hasFocus: boolean }>`
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    /* We set a minHeight so that at least some of the graph will always appear within the container */
+    min-height: 100px;
+    position: relative;
+
+    border: 2px solid transparent;
+    border-radius: 6px;
+    border-color: ${(props) => (props.$hasFocus ? props.theme.colors.grey3 : 'transparent')};
+    box-shadow: ${(props) => (props.$hasFocus ? props.theme.shadow.light : 'none')};
+`;
+
 export interface CausalGraphEditorProps extends Settings {
     /** Optional additional legends to show */
     additionalLegends?: GraphLegendDefinition[];
@@ -123,6 +138,8 @@ export interface CausalGraphEditorProps extends Settings {
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
     /** Optional handler to process the edge style */
     processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+    /** Whether focusing the graph is required before mousewheel zooming is enabled */
+    requireFocusToZoom?: boolean;
     /** Optional boolean defining whether a node and an edge can be selected simultaneously */
     simultaneousEdgeNodeSelection?: boolean;
     /** Pass through of the native style prop */
@@ -139,7 +156,7 @@ export interface CausalGraphEditorProps extends Settings {
  *
  * @param props the component props
  */
-function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
+function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphEditorProps): JSX.Element {
     const theme = useTheme();
 
     const canvasParentRef = React.useRef<HTMLDivElement>(null);
@@ -170,17 +187,39 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         onEdgeSelected,
         onSearchResults,
         onUpdateConstraints,
-    } = useRenderEngine(
-        canvasParentRef,
-        state.graph,
-        layout,
-        props.editable,
+        onSetFocus,
+    } = useRenderEngine({
+        constraints: props.initialConstraints,
+        editable: props.editable,
         editorMode,
-        props.initialConstraints,
-        handleError,
-        props.processEdgeStyle,
-        props.zoomThresholds
-    );
+        errorHandler: handleError,
+        graph: state.graph,
+        layout,
+        parentRef: canvasParentRef,
+        processEdgeStyle: props.processEdgeStyle,
+        requireFocusToZoom,
+        zoomThresholds: props.zoomThresholds,
+    });
+
+    const paneRef = React.useRef<HTMLDivElement>(null);
+    const [showZoomPrompt, setShowZoomPrompt] = useState(() => {
+        // Show the prompt if the user has not dismissed it before
+        return localStorage.getItem('showGraphZoomPrompt') !== 'false';
+    });
+
+    function onDismiss(): void {
+        setShowZoomPrompt(false);
+        localStorage.setItem('showGraphZoomPrompt', 'false');
+    }
+
+    const [hasFocus, setHasFocus] = useState(false);
+
+    function onPaneFocus(focus: boolean): void {
+        setHasFocus(focus);
+        onSetFocus(focus);
+    }
+
+    useOnClickOutside(paneRef.current, () => onPaneFocus(false));
 
     // track selection
     const [selectedEdge, setSelectedEdge] = useState<[string, string]>(null);
@@ -609,17 +648,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
             }}
         >
             <PointerContext.Provider value={{ disablePointerEvents: isDragging, onPanelEnter, onPanelExit }}>
-                {/* We set a minHeight so that at least some of the graph will alwyas appear within the container */}
-                <div
-                    style={{
-                        display: 'flex',
-                        flex: '1 1 auto',
-                        flexDirection: 'column',
-                        minHeight: '100px',
-                        position: 'relative',
-                        ...props.style,
-                    }}
-                >
+                <GraphPane $hasFocus={hasFocus} onClick={() => onPaneFocus(true)} ref={paneRef} style={props.style}>
                     <Graph
                         onMouseEnter={() => setShowFrameButtons(true)}
                         onMouseLeave={() => setShowFrameButtons(false)}
@@ -633,8 +662,19 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}
-                            showFrameButtons={!isDragging && showFrameButtons}
+                            showFrameButtons={!isDragging && (showFrameButtons || hasFocus)}
                             title={panelTitle}
+                            topCenter={
+                                <>
+                                    {showZoomPrompt && (
+                                        <ZoomPrompt
+                                            hasFocus={hasFocus}
+                                            onClose={() => setShowZoomPrompt(false)}
+                                            onDismiss={onDismiss}
+                                        />
+                                    )}
+                                </>
+                            }
                             topLeft={<RecalculateLayoutButton onResetLayout={resetLayout} />}
                             topRight={
                                 <>
@@ -702,7 +742,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         />
                         <ConfirmationModal title="Confirm Removal" {...removeEdgeProps} />
                     </Graph>
-                </div>
+                </GraphPane>
             </PointerContext.Provider>
         </SettingsProvider>
     );

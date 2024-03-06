@@ -25,7 +25,7 @@ title: Changelog
 -   Added `onKeyDown` prop to NumericInput to bubble up keydown events
 -   Added the `onChange` property to the `onChange` callback dependency
 
-## 1.4.3
+## 1.4.3
 
 -   Pinned fortawesome to `~6.4.0`
 
