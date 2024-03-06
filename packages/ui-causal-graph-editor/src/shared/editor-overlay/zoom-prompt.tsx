@@ -14,7 +14,7 @@ interface ZoomPromptProps {
 }
 
 const PromptWrapper = styled.div`
-    padding: 0 0.5rem;
+    padding: 0.25rem 0.5rem;
     background-color: ${({ theme }) => mix(0.1, theme.colors.grey2, theme.colors.blue1)};
     border: 1px solid ${({ theme }) => theme.colors.grey2};
     color: ${({ theme }) => theme.colors.grey4};
@@ -40,13 +40,19 @@ const DismissText = styled.span`
 const DismissButton = styled(Button)`
     background-color: transparent;
     font-size: 0.875rem;
-    flex-shrink: 0;
     padding: 0.25rem;
+    height: auto;
 
     &:hover:not(:disabled) {
         background-color: transparent;
         text-decoration: underline;
     }
+`;
+
+const DismissButtonText = styled.span`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 `;
 
 const CloseButton = styled(Button)`
@@ -90,15 +96,15 @@ export default function ZoomPrompt(props: ZoomPromptProps): React.ReactElement {
 
     return (
         <PromptWrapper onMouseEnter={onPanelEnter} onMouseLeave={onPanelExit} style={style}>
+            <CloseButton onClick={props.onClose} styling="ghost">
+                <Xmark size="lg" />
+            </CloseButton>
             <Tooltip content={textContent} disabled={!showTooltip}>
                 <DismissText ref={textRef}>{textContent}</DismissText>
             </Tooltip>
             <DismissButton onClick={props.onDismiss} styling="ghost">
-                Don&apos;t show again
+                <DismissButtonText>Don&apos;t show again</DismissButtonText>
             </DismissButton>
-            <CloseButton onClick={props.onClose} styling="ghost">
-                <Xmark size="lg" />
-            </CloseButton>
         </PromptWrapper>
     );
 }

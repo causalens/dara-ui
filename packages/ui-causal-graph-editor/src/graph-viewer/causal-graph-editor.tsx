@@ -40,6 +40,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
+import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
@@ -137,6 +138,8 @@ export interface CausalGraphEditorProps extends Settings {
     onUpdate?: (data: CausalGraph) => void | Promise<void>;
     /** Optional handler to process the edge style */
     processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+    /** Whether focusing the graph is required before mousewheel zooming is enabled */
+    requireFocusToZoom?: boolean;
     /** Optional boolean defining whether a node and an edge can be selected simultaneously */
     simultaneousEdgeNodeSelection?: boolean;
     /** Pass through of the native style prop */
@@ -153,7 +156,7 @@ export interface CausalGraphEditorProps extends Settings {
  *
  * @param props the component props
  */
-function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
+function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphEditorProps): JSX.Element {
     const theme = useTheme();
 
     const canvasParentRef = React.useRef<HTMLDivElement>(null);
@@ -185,19 +188,30 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
         onSearchResults,
         onUpdateConstraints,
         onSetFocus,
-    } = useRenderEngine(
-        canvasParentRef,
-        state.graph,
-        layout,
-        props.editable,
+    } = useRenderEngine({
+        constraints: props.initialConstraints,
+        editable: props.editable,
         editorMode,
-        props.initialConstraints,
-        handleError,
-        props.processEdgeStyle,
-        props.zoomThresholds
-    );
+        errorHandler: handleError,
+        graph: state.graph,
+        layout,
+        parentRef: canvasParentRef,
+        processEdgeStyle: props.processEdgeStyle,
+        requireFocusToZoom,
+        zoomThresholds: props.zoomThresholds,
+    });
 
     const paneRef = React.useRef<HTMLDivElement>(null);
+    const [showZoomPrompt, setShowZoomPrompt] = useState(() => {
+        // Show the prompt if the user has not dismissed it before
+        return localStorage.getItem('showGraphZoomPrompt') !== 'false';
+    });
+
+    function onDismiss(): void {
+        setShowZoomPrompt(false);
+        localStorage.setItem('showGraphZoomPrompt', 'false');
+    }
+
     const [hasFocus, setHasFocus] = useState(false);
 
     function onPaneFocus(focus: boolean): void {
@@ -640,6 +654,17 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
+                            topCenter={
+                                <>
+                                    {showZoomPrompt && (
+                                        <ZoomPrompt
+                                            hasFocus={hasFocus}
+                                            onClose={() => setShowZoomPrompt(false)}
+                                            onDismiss={onDismiss}
+                                        />
+                                    )}
+                                </>
+                            }
                             bottomLeft={
                                 <Legend
                                     listItems={getLegendData(props.defaultLegends, editorMode, props.additionalLegends)}
@@ -648,7 +673,7 @@ function CausalGraphEditor(props: CausalGraphEditorProps): JSX.Element {
                             onDelete={onDelete}
                             onNext={onNext}
                             onPrev={onPrev}
-                            showFrameButtons={!isDragging && showFrameButtons}
+                            showFrameButtons={!isDragging && (showFrameButtons || hasFocus)}
                             title={panelTitle}
                             topLeft={<RecalculateLayoutButton onResetLayout={resetLayout} />}
                             topRight={
