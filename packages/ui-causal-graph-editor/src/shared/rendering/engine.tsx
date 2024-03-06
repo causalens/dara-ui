@@ -610,7 +610,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /**
      * Notify the engine about focus change on the graph canvas
      *
-     * This is used to enable/disable the wheel listener
+     * This is used to enable/disable behaviour depending on focus state, e.g. zoom on wheel
      *
      * @param isFocused - focus state
      */
@@ -621,6 +621,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.toggleWheelZoom(isFocused);
     }
 
+    /**
+     * Toggle zoom-on-wheel behaviour
+     *
+     * @param isEnabled - whether to enable or disable wheel zoom
+     */
     public toggleWheelZoom(isEnabled: boolean): void {
         if (isEnabled) {
             this.viewport.wheel();

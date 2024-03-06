@@ -88,14 +88,16 @@ export default function ZoomPrompt(props: ZoomPromptProps): React.ReactElement {
         };
     }, [textRef]);
 
-    const style: React.CSSProperties = {
-        pointerEvents: disablePointerEvents ? 'none' : 'all',
-    };
-
     const textContent = props.hasFocus ? focusedText : blurredText;
 
     return (
-        <PromptWrapper onMouseEnter={onPanelEnter} onMouseLeave={onPanelExit} style={style}>
+        <PromptWrapper
+            onMouseEnter={onPanelEnter}
+            onMouseLeave={onPanelExit}
+            style={{
+                pointerEvents: disablePointerEvents ? 'none' : 'all',
+            }}
+        >
             <CloseButton onClick={props.onClose} styling="ghost">
                 <Xmark size="lg" />
             </CloseButton>
