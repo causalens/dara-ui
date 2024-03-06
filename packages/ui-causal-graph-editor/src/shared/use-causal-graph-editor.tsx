@@ -19,7 +19,7 @@ import { useEffect, useMemo, useReducer, useRef } from 'react';
 
 import { CausalGraph, EditorMode, GraphState, SimulationGraph } from '../types';
 import { GraphActionCreators, GraphActionType, GraphReducer } from './causal-graph-store';
-import { GraphLayout } from './graph-layout';
+import { GraphLayout, PlanarLayout } from './graph-layout';
 import { causalGraphParser } from './parsers';
 
 export interface UseCausalGraphEditorApi {
@@ -111,20 +111,17 @@ export default function useCausalGraphEditor(
         return nodeClass === 'TimeSeriesNode';
     }, [state.graph]);
 
-    const layout = useMemo(() => {
-        const newLayout = graphLayout;
-
-        if (
-            isTimeSeriesCausalGraph &&
-            'tiers' in newLayout &&
-            'orientation' in newLayout &&
-            newLayout.tiers === undefined
-        ) {
-            updateNodesForTimeSeries(state.graph, api);
-            newLayout.tiers = { group: 'extras.time_series_variable', order_nodes_by: 'time_lag' };
-        }
-        return newLayout;
-    }, [isTimeSeriesCausalGraph, api, graphLayout, state.graph]);
+    // If the graph is a time series graph, tiers are not defined and is not a PlanarLayout, we update the tiers to show the time series in layers
+    if (
+        isTimeSeriesCausalGraph &&
+        'tiers' in graphLayout &&
+        'orientation' in graphLayout &&
+        graphLayout.tiers === undefined &&
+        !(graphLayout instanceof PlanarLayout)
+    ) {
+        updateNodesForTimeSeries(state.graph, api);
+        graphLayout.tiers = { group: 'extras.time_series_variable', order_nodes_by: 'time_lag' };
+    }
 
     // Init graph data, update when outside graph nodes/edges changes
     const lastParentData = useRef(graphData); // keep track of last parent data to skip unnecessary updates
@@ -141,11 +138,11 @@ export default function useCausalGraphEditor(
 
         lastParentData.current = graphData;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [graphData]);
 
     return {
         api,
-        layout,
+        layout: graphLayout,
         state,
     };
 }
