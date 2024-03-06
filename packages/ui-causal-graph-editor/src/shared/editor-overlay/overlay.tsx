@@ -31,8 +31,6 @@ import {
 } from './positional-divs';
 
 interface EditorOverlayProps {
-    /** Render prop for content which will be absolute positioned */
-    topCenter?: React.ReactNode;
     /** Render prop for content to place in the bottom left of the overlay */
     bottomLeft?: React.ReactNode;
     /** Render prop for content to place in the bottom right of the overlay */
@@ -51,6 +49,8 @@ interface EditorOverlayProps {
     showFrameButtons?: boolean;
     /** Panel title */
     title?: string;
+    /** Render prop for content to place in the top center of the overlay */
+    topCenter?: React.ReactNode;
     /** Render prop for content to place in the top left of the overlay */
     topLeft?: React.ReactNode;
     /** Render prop for content to place in the top right of the overlay */

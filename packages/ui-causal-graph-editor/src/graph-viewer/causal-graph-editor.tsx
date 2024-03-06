@@ -654,6 +654,16 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                         onMouseLeave={() => setShowFrameButtons(false)}
                     >
                         <Overlay
+                            bottomLeft={
+                                <Legend
+                                    listItems={getLegendData(props.defaultLegends, editorMode, props.additionalLegends)}
+                                />
+                            }
+                            onDelete={onDelete}
+                            onNext={onNext}
+                            onPrev={onPrev}
+                            showFrameButtons={!isDragging && (showFrameButtons || hasFocus)}
+                            title={panelTitle}
                             topCenter={
                                 <>
                                     {showZoomPrompt && (
@@ -665,16 +675,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                     )}
                                 </>
                             }
-                            bottomLeft={
-                                <Legend
-                                    listItems={getLegendData(props.defaultLegends, editorMode, props.additionalLegends)}
-                                />
-                            }
-                            onDelete={onDelete}
-                            onNext={onNext}
-                            onPrev={onPrev}
-                            showFrameButtons={!isDragging && (showFrameButtons || hasFocus)}
-                            title={panelTitle}
                             topLeft={<RecalculateLayoutButton onResetLayout={resetLayout} />}
                             topRight={
                                 <>
