@@ -60,8 +60,8 @@ const CloseButton = styled(Button)`
     height: auto;
 `;
 
-const blurredText = 'To enable zooming with scroll, click the viewer area' as const;
-const focusedText = 'To disable zooming on scroll, click out of the viewer area' as const;
+const blurredText = 'To zoom in/out with scroll, click the viewer area.' as const;
+const focusedText = 'To disable zoom in/out with scroll, click out of the viewer area.' as const;
 
 export default function ZoomPrompt(props: ZoomPromptProps): React.ReactElement {
     const { disablePointerEvents, onPanelEnter, onPanelExit } = React.useContext(PointerContext);
