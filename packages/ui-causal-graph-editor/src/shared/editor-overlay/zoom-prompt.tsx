@@ -15,9 +15,9 @@ interface ZoomPromptProps {
 
 const PromptWrapper = styled.div`
     padding: 0.25rem 0.5rem;
-    background-color: ${({ theme }) => mix(0.1, theme.colors.grey2, theme.colors.blue1)};
-    border: 1px solid ${({ theme }) => theme.colors.grey2};
-    color: ${({ theme }) => theme.colors.grey4};
+    background-color: ${({ theme }) => mix(0.1, theme.colors.primary, theme.colors.blue1)};
+    border: 1px solid ${({ theme }) => mix(0.5, theme.colors.primary, theme.colors.blue1)};
+    color: ${({ theme }) => theme.colors.primary};
     flex-shrink: 1;
     min-width: 0;
 
@@ -42,6 +42,7 @@ const DismissButton = styled(Button)`
     font-size: 0.875rem;
     padding: 0.25rem;
     height: auto;
+    color: ${({ theme }) => theme.colors.primary};
 
     &:hover:not(:disabled) {
         background-color: transparent;
@@ -58,6 +59,11 @@ const DismissButtonText = styled.span`
 const CloseButton = styled(Button)`
     padding: 0.25rem;
     height: auto;
+    color: ${({ theme }) => theme.colors.primary};
+
+    &:hover:not(:disabled) {
+        background-color: ${({ theme }) => mix(0.3, theme.colors.primary, theme.colors.blue1)};
+    }
 `;
 
 const blurredText = 'To zoom in/out with scroll, click the viewer area.' as const;
