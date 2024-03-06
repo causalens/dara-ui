@@ -20,7 +20,15 @@ import PointerContext from '@shared/pointer-context';
 import { useSettings } from '@shared/settings-context';
 
 import { PanelContent } from './panel-content';
-import { BottomDiv, BottomLeftDiv, BottomRightDiv, TopDiv, TopLeftDiv, TopRightDiv } from './positional-divs';
+import {
+    BottomDiv,
+    BottomLeftDiv,
+    BottomRightDiv,
+    TopCenterDiv,
+    TopDiv,
+    TopLeftDiv,
+    TopRightDiv,
+} from './positional-divs';
 
 interface EditorOverlayProps {
     /** Render prop for content to place in the bottom left of the overlay */
@@ -41,6 +49,8 @@ interface EditorOverlayProps {
     showFrameButtons?: boolean;
     /** Panel title */
     title?: string;
+    /** Render prop for content to place in the top center of the overlay */
+    topCenter?: React.ReactNode;
     /** Render prop for content to place in the top left of the overlay */
     topLeft?: React.ReactNode;
     /** Render prop for content to place in the top right of the overlay */
@@ -73,6 +83,9 @@ function EditorOverlay(props: EditorOverlayProps): JSX.Element {
                 <TopLeftDiv onMouseEnter={onPanelEnter} onMouseLeave={onPanelExit}>
                     {props.topLeft}
                 </TopLeftDiv>
+                <TopCenterDiv onMouseEnter={onPanelEnter} onMouseLeave={onPanelExit}>
+                    {props.topCenter}
+                </TopCenterDiv>
                 <TopRightDiv onMouseEnter={onPanelEnter} onMouseLeave={onPanelExit}>
                     {props.topRight}
                 </TopRightDiv>
