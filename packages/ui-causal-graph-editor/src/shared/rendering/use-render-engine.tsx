@@ -93,17 +93,29 @@ interface UseRenderEngineApi {
  * @param constraints initial edge constraints
  * @param zoomThresholds zoom thresholds
  */
-export function useRenderEngine(
-    parentRef: React.MutableRefObject<HTMLElement>,
-    graph: SimulationGraph,
-    layout: GraphLayout,
-    editable: boolean,
-    editorMode: EditorMode,
-    constraints?: EdgeConstraint[],
-    errorHandler?: (error: NotificationPayload) => void,
-    processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle,
-    zoomThresholds?: ZoomThresholds
-): UseRenderEngineApi {
+export function useRenderEngine({
+    parentRef,
+    graph,
+    layout,
+    editable,
+    editorMode,
+    constraints,
+    errorHandler,
+    processEdgeStyle,
+    zoomThresholds,
+    requireFocusToZoom,
+}: {
+    constraints?: EdgeConstraint[];
+    editable: boolean;
+    editorMode: EditorMode;
+    errorHandler?: (error: NotificationPayload) => void;
+    graph: SimulationGraph;
+    layout: GraphLayout;
+    parentRef: React.MutableRefObject<HTMLElement>;
+    processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle;
+    requireFocusToZoom?: boolean;
+    zoomThresholds?: ZoomThresholds;
+}): UseRenderEngineApi {
     const theme = useTheme();
     const engine = React.useRef<Engine>(null);
     const listeners = React.useRef<Partial<EngineEvents>>({});
@@ -118,7 +130,8 @@ export function useRenderEngine(
             constraints,
             zoomThresholds,
             errorHandler,
-            processEdgeStyle
+            processEdgeStyle,
+            requireFocusToZoom
         );
     }
 

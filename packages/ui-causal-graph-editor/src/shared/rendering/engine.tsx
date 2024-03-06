@@ -223,6 +223,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Optional user-provided zoom thresholds */
     private zoomThresholds?: ZoomThresholds;
 
+    /** whether zoom on scroll should be enabled only when the graph is focused */
+    private requireFocusToZoom: boolean;
+
     constructor(
         graph: SimulationGraph,
         layout: GraphLayout,
@@ -232,10 +235,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         constraints?: EdgeConstraint[],
         zoomThresholds?: ZoomThresholds,
         errorHandler?: (error: NotificationPayload) => void,
-        processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle
+        processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle,
+        requireFocusToZoom?: boolean
     ) {
         super();
         this.graph = graph;
+        this.requireFocusToZoom = requireFocusToZoom;
         this.editable = editable;
         this.editorMode = editorMode;
         this.layout = layout;
@@ -523,6 +528,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // enable viewport features
         this.viewport.drag({ wheel: false }).pinch().decelerate().clampZoom({ maxScale: 2 });
 
+        // always enable wheel zoom if focus is not required
+        if (!this.requireFocusToZoom) {
+            this.toggleWheelZoom(true);
+        }
+
         this.viewport.addEventListener('frame-end', () => {
             if (this.viewport.dirty) {
                 this.requestRender();
@@ -605,12 +615,19 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * @param isFocused - focus state
      */
     public setFocus(isFocused: boolean): void {
-        if (!isFocused) {
-            this.viewport.plugins.remove('wheel');
-            this.app.view.removeEventListener('wheel', Engine.wheelListener);
-        } else {
+        if (!this.requireFocusToZoom) {
+            return;
+        }
+        this.toggleWheelZoom(isFocused);
+    }
+
+    public toggleWheelZoom(isEnabled: boolean): void {
+        if (isEnabled) {
             this.viewport.wheel();
             this.app.view.addEventListener('wheel', Engine.wheelListener);
+        } else {
+            this.viewport.plugins.remove('wheel');
+            this.app.view.removeEventListener('wheel', Engine.wheelListener);
         }
     }
 
