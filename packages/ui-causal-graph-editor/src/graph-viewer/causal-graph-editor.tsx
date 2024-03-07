@@ -414,6 +414,44 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     const tooltipRef = React.useRef<GetReferenceClientRect>(null);
     const [tooltipContent, setTooltipContent] = useState<React.ReactNode>(null);
 
+    const isPaneVisible = React.useRef(false);
+
+    React.useEffect(() => {
+        // make intersection observer to check if the graph pane is visible
+        const observer = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                isPaneVisible.current = entry.isIntersecting;
+
+                // if the pane is not visible, ensure tooltips are hidden
+                if (!isPaneVisible.current) {
+                    setTooltipContent(null);
+                }
+            }
+        });
+
+        observer.observe(paneRef.current);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
+
+    /**
+     * Show a tooltip at the current mouse position
+     *
+     * Makes sure the tooltip is only shown when the pane is visible
+     *
+     * @param content the content to show in the tooltip
+     */
+    function showTooltip(content: React.ReactNode): void {
+        if (!isPaneVisible.current) {
+            setTooltipContent(null);
+            return;
+        }
+
+        setTooltipContent(content);
+    }
+
     // keep track of when a drag action is happening
     const [isDragging, setIsDragging] = useState(false);
 
@@ -447,7 +485,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 width: 0,
             } as DOMRect);
 
-        setTooltipContent(
+        showTooltip(
             getTooltipContent(
                 nodeId,
                 nodeAttributes['meta.rendering_properties.tooltip'],
@@ -459,7 +497,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     });
 
     useEngineEvent('nodeMouseout', () => {
-        setTooltipContent(null);
+        showTooltip(null);
     });
 
     useEngineEvent('edgeMouseover', (event, edgeKey) => {
@@ -491,11 +529,11 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 top: event.clientY,
                 width: 0,
             } as DOMRect);
-        setTooltipContent(edgeTooltipContent);
+        showTooltip(edgeTooltipContent);
     });
 
     useEngineEvent('edgeMouseout', () => {
-        setTooltipContent(null);
+        showTooltip(null);
     });
 
     // Sync state to engine events
@@ -504,21 +542,21 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setSelectedNode(null);
     });
 
-    useEngineEvent('nodeClick', (event, nodeId) => {
+    useEngineEvent('nodeClick', (_event, nodeId) => {
         if (!props.simultaneousEdgeNodeSelection) {
             setSelectedEdge(null);
         }
         setSelectedNode(nodeId);
     });
 
-    useEngineEvent('edgeClick', (event, source, target) => {
+    useEngineEvent('edgeClick', (_event, source, target) => {
         if (!props.simultaneousEdgeNodeSelection) {
             setSelectedNode(null);
         }
         setSelectedEdge([source, target]);
     });
 
-    useEngineEvent('createEdge', (event, source, target) => {
+    useEngineEvent('createEdge', (_event, source, target) => {
         onAddEdge([source, target]);
     });
 
@@ -594,7 +632,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     function onMouseLeave(): void {
         setShowFrameButtons(false);
         // ensure tooltip is hidden when mouse leaves
-        setTooltipContent(null);
+        showTooltip(null);
     }
 
     const { nextNode, prevNode } = useIterateNodes(selectedNode, setSelectedNode, state);
