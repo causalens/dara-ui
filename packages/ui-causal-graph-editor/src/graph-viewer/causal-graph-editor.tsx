@@ -587,6 +587,16 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
 
     const [showFrameButtons, setShowFrameButtons] = useState(false);
 
+    function onMouseEnter(): void {
+        setShowFrameButtons(true);
+    }
+
+    function onMouseLeave(): void {
+        setShowFrameButtons(false);
+        // ensure tooltip is hidden when mouse leaves
+        setTooltipContent(null);
+    }
+
     const { nextNode, prevNode } = useIterateNodes(selectedNode, setSelectedNode, state);
     const { nextEdge, prevEdge } = useIterateEdges(selectedEdge, setSelectedEdge, state);
 
@@ -649,10 +659,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         >
             <PointerContext.Provider value={{ disablePointerEvents: isDragging, onPanelEnter, onPanelExit }}>
                 <GraphPane $hasFocus={hasFocus} onClick={() => onPaneFocus(true)} ref={paneRef} style={props.style}>
-                    <Graph
-                        onMouseEnter={() => setShowFrameButtons(true)}
-                        onMouseLeave={() => setShowFrameButtons(false)}
-                    >
+                    <Graph onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                         <Overlay
                             bottomLeft={
                                 <Legend
