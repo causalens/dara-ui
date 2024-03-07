@@ -6,8 +6,6 @@ title: Changelog
 
 -   Fixed an issue with `NumericInput` where one could not enter decimal numbers ending in 0.
 -   Fixed an issue where one was not able to type a negative number in `NumericInput` in controlled mode unless they started with the number before the sign.
--   Updated so that `TimeSeriesCausalGraph` now only adds to layers nodes which have at least one other node with the same `variable_name`.
--   Updated so that is `PlanarLayout` is chosen we do not add the tiers for `TimeSeriesCausalGraph`.
 
 ## 1.6.1
 

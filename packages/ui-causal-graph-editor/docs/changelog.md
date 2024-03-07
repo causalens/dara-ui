@@ -2,6 +2,12 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Updated so that `TimeSeriesCausalGraph` now only adds to layers nodes which have at least one other node with the same `variable_name`.
+-   Updated so that is `PlanarLayout` is chosen we do not add the tiers for `TimeSeriesCausalGraph`.
+-   Fixed an issue where one could not add nodes to a `TimeSeriesCausalGraph`.
+
 ## 1.6.0
 
 -   Updated the type of `additionalLegends` to also allow defining nodes

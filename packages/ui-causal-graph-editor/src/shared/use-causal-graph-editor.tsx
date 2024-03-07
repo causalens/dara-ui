@@ -40,38 +40,6 @@ export type GraphApi = {
 };
 
 /**
- * Function which receives a list of nodes and adds property for those that share a variable_name
- *
- * @param graph Simulation graph
- * @param api Graph API
- */
-export function updateNodesForTimeSeries(graph: SimulationGraph, api: GraphApi): void {
-    // Step 1: Group nodes by variable_name
-    const groupedNodes = new Map<string, string[]>();
-    graph.nodes().forEach((nodeId) => {
-        const variableName = graph.getNodeAttribute(nodeId, 'extras')?.variable_name;
-        if (variableName) {
-            // Check if variableName is not undefined
-            if (!groupedNodes.has(variableName)) {
-                groupedNodes.set(variableName, []);
-            }
-            groupedNodes.get(variableName)?.push(nodeId);
-        }
-    });
-
-    // Step 2: Add 'time_series_variable' to nodes that share the same variable_name
-    groupedNodes.forEach((group, variableName) => {
-        if (group.length > 1) {
-            group.forEach((nodeId) => {
-                const newExtras = graph.getNodeAttribute(nodeId, 'extras');
-                newExtras.time_series_variable = variableName;
-                api.updateNode(nodeId, newExtras);
-            });
-        }
-    });
-}
-
-/**
  * A helper hook to inject causal graph editor API for given initial graphdata
  */
 export default function useCausalGraphEditor(
@@ -107,21 +75,24 @@ export default function useCausalGraphEditor(
     }, [dispatch]);
 
     const isTimeSeriesCausalGraph = useMemo(() => {
-        const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
+        const nodeClass = Object.values(graphData.nodes)[0]?.node_class;
         return nodeClass === 'TimeSeriesNode';
-    }, [state.graph]);
+    }, [graphData]);
 
-    // If the graph is a time series graph, tiers are not defined and is not a PlanarLayout, we update the tiers to show the time series in layers
-    if (
-        isTimeSeriesCausalGraph &&
-        'tiers' in graphLayout &&
-        'orientation' in graphLayout &&
-        graphLayout.tiers === undefined &&
-        !(graphLayout instanceof PlanarLayout)
-    ) {
-        updateNodesForTimeSeries(state.graph, api);
-        graphLayout.tiers = { group: 'extras.time_series_variable', order_nodes_by: 'time_lag' };
-    }
+    const layout = useMemo(() => {
+        const newLayout = graphLayout;
+        // If the graph is a time series graph, tiers are not defined and is not a PlanarLayout, we update the tiers to show the time series in layers
+        if (
+            isTimeSeriesCausalGraph &&
+            'tiers' in newLayout &&
+            'orientation' in newLayout &&
+            newLayout.tiers === undefined &&
+            !(newLayout instanceof PlanarLayout)
+        ) {
+            newLayout.tiers = { group: 'extras.time_series_variable', order_nodes_by: 'time_lag' };
+        }
+        return newLayout;
+    }, [isTimeSeriesCausalGraph, graphLayout]);
 
     // Init graph data, update when outside graph nodes/edges changes
     const lastParentData = useRef(graphData); // keep track of last parent data to skip unnecessary updates
@@ -142,7 +113,7 @@ export default function useCausalGraphEditor(
 
     return {
         api,
-        layout: graphLayout,
+        layout,
         state,
     };
 }

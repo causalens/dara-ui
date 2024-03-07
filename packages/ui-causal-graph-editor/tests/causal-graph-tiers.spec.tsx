@@ -100,13 +100,6 @@ describe('CausalGraphTiers', () => {
                 { gap: 100, left: 'Crime Rate', right: 'Fraud' },
             ]);
         });
-        it('Throws error on invalid path for group', () => {
-            const parsedGraph = causalGraphParser(FRAUD);
-            const tiers = { group: 'meta.foo.group' };
-            expect(() => getTieredLayoutProperties(parsedGraph, tiers, 'horizontal', 100)).toThrow(
-                'Could not find path for rank or group within Node'
-            );
-        });
         it('Accepts rank and creates correct relative placements', () => {
             const parsedGraph = causalGraphParser(FRAUD);
             const tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };

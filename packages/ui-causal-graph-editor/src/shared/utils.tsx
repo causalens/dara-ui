@@ -182,9 +182,9 @@ export function isDag(graph: SimulationGraph): boolean {
  *  */
 export function getPathInNodeAttribute(attributes: Record<string, any>, path: string): any {
     let searchablePath = path;
-    // If attribute becomes undefined we have a non valid path within the node
+    // If there are no attributes return early, could be either a typo from the user within a node or a new node that has been added
     if (attributes === undefined) {
-        throw new Error('Could not find path for rank or group within Node');
+        return undefined;
     }
     // If path is in meta change it to originalMeta
     if (searchablePath === 'meta') {
