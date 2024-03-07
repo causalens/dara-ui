@@ -18,7 +18,6 @@ import debounce from 'lodash/debounce';
 import noop from 'lodash/noop';
 import { useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
-import { GetReferenceClientRect } from 'tippy.js';
 
 import styled, { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
@@ -41,6 +40,7 @@ import {
     useSearch,
 } from '@shared/editor-overlay';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
+import useGraphTooltip from '@shared/use-graph-tooltip';
 import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
@@ -66,7 +66,6 @@ import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
-import usePaneVisibility from '@shared/use-pane-visibility';
 
 const NotificationWrapper = styled.div`
     position: relative;
@@ -412,33 +411,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         }
     }
 
-    const tooltipRef = React.useRef<GetReferenceClientRect>(null);
-    const [tooltipContent, setTooltipContent] = useState<React.ReactNode>(null);
-
-    // force tooltip to hide when the pane becomes invisible
-    const onPaneVisibilityChange = React.useCallback((isVisible: boolean) => {
-        if (!isVisible) {
-            setTooltipContent(null);
-        }
-    }, []);
-    // Keep track of whether the graph pane is visible
-    const { isRectVisible } = usePaneVisibility(paneRef, onPaneVisibilityChange);
-
-    /**
-     * Show a tooltip at the current mouse position
-     *
-     * Makes sure the tooltip is only shown when the pane is visible
-     *
-     * @param content the content to show in the tooltip
-     */
-    function showTooltip(content: React.ReactNode): void {
-        // NOTE: This is technically async but will resolve immediately as it's resolved
-        // in response to IntersectionObserver callback, which is guaranteed to fire
-        // the next render cycle
-        isRectVisible(tooltipRef.current()).then((isVisible) => {
-            setTooltipContent(isVisible ? content : null);
-        });
-    }
+    const { tooltipContent, setTooltipContent, tooltipRef } = useGraphTooltip(paneRef);
 
     // keep track of when a drag action is happening
     const [isDragging, setIsDragging] = useState(false);
@@ -473,7 +446,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 width: 0,
             } as DOMRect);
 
-        showTooltip(
+        setTooltipContent(
             getTooltipContent(
                 nodeId,
                 nodeAttributes['meta.rendering_properties.tooltip'],
@@ -485,7 +458,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     });
 
     useEngineEvent('nodeMouseout', () => {
-        showTooltip(null);
+        setTooltipContent(null);
     });
 
     useEngineEvent('edgeMouseover', (event, edgeKey) => {
@@ -517,11 +490,11 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 top: event.clientY,
                 width: 0,
             } as DOMRect);
-        showTooltip(edgeTooltipContent);
+        setTooltipContent(edgeTooltipContent);
     });
 
     useEngineEvent('edgeMouseout', () => {
-        showTooltip(null);
+        setTooltipContent(null);
     });
 
     // Sync state to engine events
@@ -620,7 +593,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     function onMouseLeave(): void {
         setShowFrameButtons(false);
         // ensure tooltip is hidden when mouse leaves
-        showTooltip(null);
+        setTooltipContent(null);
     }
 
     const { nextNode, prevNode } = useIterateNodes(selectedNode, setSelectedNode, state);
