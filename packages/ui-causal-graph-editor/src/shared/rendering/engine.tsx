@@ -223,6 +223,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Optional user-provided zoom thresholds */
     private zoomThresholds?: ZoomThresholds;
 
+    /** whether zoom on scroll should be enabled only when the graph is focused */
+    private requireFocusToZoom: boolean;
+
     constructor(
         graph: SimulationGraph,
         layout: GraphLayout,
@@ -232,10 +235,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         constraints?: EdgeConstraint[],
         zoomThresholds?: ZoomThresholds,
         errorHandler?: (error: NotificationPayload) => void,
-        processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle
+        processEdgeStyle?: (edge: PixiEdgeStyle, attributes: SimulationEdge) => PixiEdgeStyle,
+        requireFocusToZoom?: boolean
     ) {
         super();
         this.graph = graph;
+        this.requireFocusToZoom = requireFocusToZoom;
         this.editable = editable;
         this.editorMode = editorMode;
         this.layout = layout;
@@ -515,17 +520,18 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         container.appendChild(this.app.view as HTMLCanvasElement);
         this.textureCache = new TextureCache(this.app.renderer);
 
-        this.app.view.addEventListener('wheel', (event) => {
-            event.preventDefault();
-        });
-
         // Create viewport and add it to the app
         this.viewport = new Viewport({
             events: this.app.renderer.events,
         });
 
         // enable viewport features
-        this.viewport.drag().pinch().wheel().decelerate().clampZoom({ maxScale: 2 });
+        this.viewport.drag({ wheel: false }).pinch().decelerate().clampZoom({ maxScale: 2 });
+
+        // always enable wheel zoom if focus is not required
+        if (!this.requireFocusToZoom) {
+            this.toggleWheelZoom(true);
+        }
 
         this.viewport.addEventListener('frame-end', () => {
             if (this.viewport.dirty) {
@@ -599,6 +605,44 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.updateStyles();
         this.initialized = true;
         this.resetViewport();
+    }
+
+    /**
+     * Notify the engine about focus change on the graph canvas
+     *
+     * This is used to enable/disable behaviour depending on focus state, e.g. zoom on wheel
+     *
+     * @param isFocused - focus state
+     */
+    public setFocus(isFocused: boolean): void {
+        if (!this.requireFocusToZoom) {
+            return;
+        }
+        this.toggleWheelZoom(isFocused);
+    }
+
+    /**
+     * Toggle zoom-on-wheel behaviour
+     *
+     * @param isEnabled - whether to enable or disable wheel zoom
+     */
+    public toggleWheelZoom(isEnabled: boolean): void {
+        if (isEnabled) {
+            this.viewport.wheel();
+            this.app.view.addEventListener('wheel', Engine.wheelListener);
+        } else {
+            this.viewport.plugins.remove('wheel');
+            this.app.view.removeEventListener('wheel', Engine.wheelListener);
+        }
+    }
+
+    /**
+     * Wheel listener which disables the default browser scrolling behaviour
+     *
+     * @param event - mouse wheel event
+     */
+    private static wheelListener(event: WheelEvent): void {
+        event.preventDefault();
     }
 
     /**
