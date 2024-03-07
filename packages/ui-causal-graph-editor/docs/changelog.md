@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Graph layout is now recalculated after every resize of the graph window detected, preventing scenarios where the initially computed layout is not optimal for the new window size due to a sudden graph pane resize
+
 ## 1.6.0
 
 -   Updated the type of `additionalLegends` to also allow defining nodes
@@ -13,8 +17,8 @@ title: Changelog
 
 ## 1.5.1
 
--   Added `simultaneousEdgeNodeSelection` prop to `CausalGraphEditor` which when set to true allows for both an edge and a node to be selected simultaneously. 
--   If `TimeSeriesCausalGraph` object is passed to `CausalGraphEditor` and no tiers are defines, it now uses `time_lag` and `variable_name` to define the `order_nodes_by` and `group` respectively. 
+-   Added `simultaneousEdgeNodeSelection` prop to `CausalGraphEditor` which when set to true allows for both an edge and a node to be selected simultaneously.
+-   If `TimeSeriesCausalGraph` object is passed to `CausalGraphEditor` and no tiers are defines, it now uses `time_lag` and `variable_name` to define the `order_nodes_by` and `group` respectively.
 -   Fixed an issue where we couldn't set `tiers` to the `PlanarLayoutBuilder`.
 
 ## 1.5.0
