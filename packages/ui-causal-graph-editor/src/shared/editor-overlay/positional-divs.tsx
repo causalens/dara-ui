@@ -50,6 +50,8 @@ export const BottomDiv = styled(OverlayDiv)<{ padding: string }>`
 
 export const TopDiv = styled(OverlayDiv)<{ padding: string }>`
     pointer-events: none;
+    gap: 1.5rem;
+
     top: ${applyPadding};
     right: ${applyPadding};
     left: ${applyPadding};
@@ -75,6 +77,14 @@ export const TopLeftDiv = styled(CornerDiv)`
     z-index: 5;
     align-items: flex-start;
     justify-content: end;
+`;
+export const TopCenterDiv = styled(CornerDiv)`
+    z-index: 5;
+    align-items: flex-start;
+    justify-content: center;
+    /* Allow the center to shrink */
+    min-width: 0;
+    flex-shrink: 1;
 `;
 export const BottomRightDiv = styled(CornerDiv)`
     z-index: 5;
