@@ -1,14 +1,23 @@
 import * as React from 'react';
-
-import usePaneVisibility from './use-pane-visibility';
 import { GetReferenceClientRect } from 'tippy.js';
 
-export default function useGraphTooltip(pane: React.RefObject<HTMLElement>): {
+import usePaneVisibility from './use-pane-visibility';
+
+/**
+ * Helper hook to manage a tooltip for the graph pane
+ *
+ * Handles showing and hiding the tooltip based on the visibility of the pane
+ *
+ * @param pane - pane to observe visibility of
+ * @param tooltipRef - ref to the tooltip position
+ */
+export default function useGraphTooltip(
+    pane: React.RefObject<HTMLElement>,
+    tooltipRef: React.MutableRefObject<GetReferenceClientRect>
+): {
     setTooltipContent: (content: React.ReactNode) => void;
     tooltipContent: React.ReactNode;
-    tooltipRef: React.MutableRefObject<GetReferenceClientRect>;
 } {
-    const tooltipRef = React.useRef<GetReferenceClientRect>(null);
     const [tooltipContent, setTooltipContent] = React.useState<React.ReactNode>(null);
 
     // force tooltip to hide when the pane becomes invisible
@@ -44,6 +53,16 @@ export default function useGraphTooltip(pane: React.RefObject<HTMLElement>): {
      * @param content the content to show in the tooltip
      */
     function showTooltip(content: React.ReactNode): void {
+        // if simply setting the content to null, don't bother with the visibility check
+        if (!content) {
+            setTooltipContent(null);
+            return;
+        }
+
+        if (content === tooltipContent) {
+            return;
+        }
+
         // NOTE: This is technically async but will resolve immediately as it's resolved
         // in response to IntersectionObserver callback, which is guaranteed to fire
         // the next render cycle
@@ -55,6 +74,5 @@ export default function useGraphTooltip(pane: React.RefObject<HTMLElement>): {
     return {
         setTooltipContent: showTooltip,
         tooltipContent,
-        tooltipRef,
     };
 }

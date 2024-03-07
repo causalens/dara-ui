@@ -18,6 +18,7 @@ import debounce from 'lodash/debounce';
 import noop from 'lodash/noop';
 import { useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
+import { GetReferenceClientRect } from 'tippy.js';
 
 import styled, { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
@@ -411,7 +412,8 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         }
     }
 
-    const { tooltipContent, setTooltipContent, tooltipRef } = useGraphTooltip(paneRef);
+    const tooltipRef = React.useRef<GetReferenceClientRect>(null);
+    const { tooltipContent, setTooltipContent } = useGraphTooltip(paneRef, tooltipRef);
 
     // keep track of when a drag action is happening
     const [isDragging, setIsDragging] = useState(false);

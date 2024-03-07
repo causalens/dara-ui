@@ -169,7 +169,7 @@ Collapsed.args = {
 
 export const Scrollable = (args: CausalGraphEditorProps): JSX.Element => {
     return (
-        <div style={{ height: '500px', display: 'flex', overflow: 'auto', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '500px', overflow: 'auto' }}>
             {Array(50)
                 .fill(0)
                 .map((_, idx) => (

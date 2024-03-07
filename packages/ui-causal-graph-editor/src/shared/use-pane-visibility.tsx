@@ -70,7 +70,13 @@ export default function usePaneVisibility(
             return false;
         }
 
-        // once the observer produces a record, check if the domRect is within the intersectionRect
+        // fully on screen - assume visible
+        if (rec.intersectionRatio === 1) {
+            return true;
+        }
+
+        // otherwise, partially on screen
+        // check if the domRect is within the intersectionRect
         // i.e. it's on a visible part of the pane
         return (
             rec.intersectionRect.top <= domRect.top &&
