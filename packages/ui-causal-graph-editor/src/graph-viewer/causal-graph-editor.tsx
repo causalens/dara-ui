@@ -66,6 +66,7 @@ import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
+import usePaneVisibility from '@shared/use-pane-visibility';
 
 const NotificationWrapper = styled.div`
     position: relative;
@@ -414,27 +415,14 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     const tooltipRef = React.useRef<GetReferenceClientRect>(null);
     const [tooltipContent, setTooltipContent] = useState<React.ReactNode>(null);
 
-    const isPaneVisible = React.useRef(false);
-
-    React.useEffect(() => {
-        // make intersection observer to check if the graph pane is visible
-        const observer = new IntersectionObserver((entries) => {
-            for (const entry of entries) {
-                isPaneVisible.current = entry.isIntersecting;
-
-                // if the pane is not visible, ensure tooltips are hidden
-                if (!isPaneVisible.current) {
-                    setTooltipContent(null);
-                }
-            }
-        });
-
-        observer.observe(paneRef.current);
-
-        return () => {
-            observer.disconnect();
-        };
+    // force tooltip to hide when the pane becomes invisible
+    const onPaneVisibilityChange = React.useCallback((isVisible: boolean) => {
+        if (!isVisible) {
+            setTooltipContent(null);
+        }
     }, []);
+    // Keep track of whether the graph pane is visible
+    const { isRectVisible } = usePaneVisibility(paneRef, onPaneVisibilityChange);
 
     /**
      * Show a tooltip at the current mouse position
@@ -444,12 +432,12 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
      * @param content the content to show in the tooltip
      */
     function showTooltip(content: React.ReactNode): void {
-        if (!isPaneVisible.current) {
-            setTooltipContent(null);
-            return;
-        }
-
-        setTooltipContent(content);
+        // NOTE: This is technically async but will resolve immediately as it's resolved
+        // in response to IntersectionObserver callback, which is guaranteed to fire
+        // the next render cycle
+        isRectVisible(tooltipRef.current()).then((isVisible) => {
+            setTooltipContent(isVisible ? content : null);
+        });
     }
 
     // keep track of when a drag action is happening
