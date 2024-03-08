@@ -2,8 +2,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { causalGraphParser } from '../src/shared/parsers';
 import { serializeGraphEdge, serializeGraphNode } from '../src/shared/serializer';
-import { CausalGraph, EdgeType } from '../src/types';
-import { default as MockCausalGraphWithExtras } from './mocks/extras-graph';
+import { CausalGraph, CausalGraphNode, EdgeType } from '../src/types';
+import { MockCausalGraphWithExtras, MockTimeSeriesCausalGraph } from './mocks/extras-graph';
 import { MockCausalGraph } from './utils';
 
 describe('CausalGraphParser', () => {
@@ -83,6 +83,43 @@ describe('CausalGraphParser', () => {
 
         // Check that any extras in top level go to base extras
         expect(parsedGraph.getAttributes().extras).toEqual({ defaults });
+    });
+
+    it('should check that for TimeSeriesCausalGraph an attribute for layering is added', () => {
+        const parsedGraph = causalGraphParser(MockTimeSeriesCausalGraph as CausalGraph);
+
+        const { nodes } = MockTimeSeriesCausalGraph;
+
+        // group nodes by variable name
+        const groupedByVariableName: Record<string, Array<CausalGraphNode>> = Object.values(nodes).reduce(
+            (acc, node) => {
+                acc[node.variable_name] = acc[node.variable_name] || [];
+                acc[node.variable_name].push(node);
+                return acc;
+            },
+            {}
+        );
+
+        // get a list of node names that share a variable_name
+        const identifiersOfDuplicates = Object.values(groupedByVariableName)
+            .filter((group: CausalGraphNode[]) => group.length > 1)
+            .flatMap((group: CausalGraphNode[]) => group.map((obj: CausalGraphNode) => obj.identifier));
+
+        // check that the time_series_variable attribute is added to the nodes that share a variable_name
+        identifiersOfDuplicates.forEach((id) => {
+            const variableName = parsedGraph.getNodeAttributes(id).extras?.variable_name;
+            expect(parsedGraph.getNodeAttributes(id).extras?.time_series_variable).toEqual(variableName);
+        });
+
+        // get a list of node names that do not share a variable_name
+        const identifiersOfSingles = Object.values(groupedByVariableName)
+            .filter((group: CausalGraphNode[]) => group.length === 1)
+            .flatMap((group: CausalGraphNode[]) => group.map((obj: CausalGraphNode) => obj.identifier));
+
+        // check that the time_series_variable attribute is not added to the nodes that do not share a variable_name
+        identifiersOfSingles.forEach((id) => {
+            expect(parsedGraph.getNodeAttributes(id).extras?.time_series_variable).toBeUndefined();
+        });
     });
 
     it('should mark latent nodes when available inputs is present', () => {
