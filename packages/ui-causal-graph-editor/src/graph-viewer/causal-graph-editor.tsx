@@ -41,6 +41,7 @@ import {
     useSearch,
 } from '@shared/editor-overlay';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
+import useGraphTooltip from '@shared/use-graph-tooltip';
 import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
 import {
     CausalGraph,
@@ -412,7 +413,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     }
 
     const tooltipRef = React.useRef<GetReferenceClientRect>(null);
-    const [tooltipContent, setTooltipContent] = useState<React.ReactNode>(null);
+    const { tooltipContent, setTooltipContent } = useGraphTooltip(paneRef, tooltipRef);
 
     // keep track of when a drag action is happening
     const [isDragging, setIsDragging] = useState(false);
@@ -504,21 +505,21 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setSelectedNode(null);
     });
 
-    useEngineEvent('nodeClick', (event, nodeId) => {
+    useEngineEvent('nodeClick', (_event, nodeId) => {
         if (!props.simultaneousEdgeNodeSelection) {
             setSelectedEdge(null);
         }
         setSelectedNode(nodeId);
     });
 
-    useEngineEvent('edgeClick', (event, source, target) => {
+    useEngineEvent('edgeClick', (_event, source, target) => {
         if (!props.simultaneousEdgeNodeSelection) {
             setSelectedNode(null);
         }
         setSelectedEdge([source, target]);
     });
 
-    useEngineEvent('createEdge', (event, source, target) => {
+    useEngineEvent('createEdge', (_event, source, target) => {
         onAddEdge([source, target]);
     });
 
@@ -587,6 +588,16 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
 
     const [showFrameButtons, setShowFrameButtons] = useState(false);
 
+    function onMouseEnter(): void {
+        setShowFrameButtons(true);
+    }
+
+    function onMouseLeave(): void {
+        setShowFrameButtons(false);
+        // ensure tooltip is hidden when mouse leaves
+        setTooltipContent(null);
+    }
+
     const { nextNode, prevNode } = useIterateNodes(selectedNode, setSelectedNode, state);
     const { nextEdge, prevEdge } = useIterateEdges(selectedEdge, setSelectedEdge, state);
 
@@ -649,10 +660,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         >
             <PointerContext.Provider value={{ disablePointerEvents: isDragging, onPanelEnter, onPanelExit }}>
                 <GraphPane $hasFocus={hasFocus} onClick={() => onPaneFocus(true)} ref={paneRef} style={props.style}>
-                    <Graph
-                        onMouseEnter={() => setShowFrameButtons(true)}
-                        onMouseLeave={() => setShowFrameButtons(false)}
-                    >
+                    <Graph onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                         <Overlay
                             bottomLeft={
                                 <Legend

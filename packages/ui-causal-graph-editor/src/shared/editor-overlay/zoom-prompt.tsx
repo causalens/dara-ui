@@ -104,13 +104,25 @@ export default function ZoomPrompt(props: ZoomPromptProps): React.ReactElement {
                 pointerEvents: disablePointerEvents ? 'none' : 'all',
             }}
         >
-            <CloseButton onClick={props.onClose} styling="ghost">
+            <CloseButton
+                onClick={() => {
+                    onPanelExit();
+                    props.onClose();
+                }}
+                styling="ghost"
+            >
                 <Xmark size="lg" />
             </CloseButton>
             <Tooltip content={textContent} disabled={!showTooltip}>
                 <DismissText ref={textRef}>{textContent}</DismissText>
             </Tooltip>
-            <DismissButton onClick={props.onDismiss} styling="ghost">
+            <DismissButton
+                onClick={() => {
+                    onPanelExit();
+                    props.onDismiss();
+                }}
+                styling="ghost"
+            >
                 <DismissButtonText>Don&apos;t show again</DismissButtonText>
             </DismissButton>
         </PromptWrapper>
