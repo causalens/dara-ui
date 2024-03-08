@@ -4,8 +4,10 @@ title: Changelog
 
 ## NEXT
 
--   Zooming the graph with mousewheel is now disabled by default and requires first focusing the graph by clicking on it. This is to prevent accidental zooming when scrolling through the page.
-The previous behaviour can be restored by setting `requireFocusToZoom` prop to true.
+-   Updated so that `TimeSeriesCausalGraph` now only adds to layers nodes which have at least one other node with the same `variable_name`.
+-   Updated so that is `PlanarLayout` is chosen we do not add the tiers for `TimeSeriesCausalGraph`.
+-   Fixed an issue where one could not add nodes to a `TimeSeriesCausalGraph`.
+-   Zooming the graph with mousewheel is now disabled by default and requires first focusing the graph by clicking on it. This is to prevent accidental zooming when scrolling through the page. The previous behaviour can be restored by setting `requireFocusToZoom` prop to true.
 
 ## 1.6.0
 

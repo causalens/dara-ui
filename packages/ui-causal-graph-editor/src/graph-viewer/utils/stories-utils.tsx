@@ -315,6 +315,34 @@ export const timeSeriesCausalGraph = {
                 },
             },
         },
+        'X1 lag(n=2)': {
+            X1: {
+                destination: {
+                    identifier: 'X1',
+                    meta: {
+                        time_lag: 0,
+                        variable_name: 'X1',
+                    },
+                    node_class: 'TimeSeriesNode',
+                    time_lag: 0,
+                    variable_name: 'X1',
+                    variable_type: 'unspecified',
+                },
+                edge_type: '->',
+                meta: {},
+                source: {
+                    identifier: 'X1 lag(n=2)',
+                    meta: {
+                        time_lag: -2,
+                        variable_name: 'X1',
+                    },
+                    node_class: 'TimeSeriesNode',
+                    time_lag: -2,
+                    variable_name: 'X1',
+                    variable_type: 'unspecified',
+                },
+            },
+        },
         X2: {
             X3: {
                 destination: {
@@ -392,6 +420,17 @@ export const timeSeriesCausalGraph = {
             },
             node_class: 'TimeSeriesNode',
             time_lag: -1,
+            variable_name: 'X1',
+            variable_type: 'unspecified',
+        },
+        'X1 lag(n=2)': {
+            identifier: 'X1 lag(n=2)',
+            meta: {
+                time_lag: -2,
+                variable_name: 'X1',
+            },
+            node_class: 'TimeSeriesNode',
+            time_lag: -2,
             variable_name: 'X1',
             variable_type: 'unspecified',
         },
