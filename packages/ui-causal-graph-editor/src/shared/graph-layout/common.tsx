@@ -69,8 +69,6 @@ export abstract class GraphLayout {
         return true;
     }
 
-    abstract clone(): GraphLayout;
-
     /**
      * Apply a layout to a given graph data.
      *

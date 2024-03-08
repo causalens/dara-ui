@@ -80,7 +80,11 @@ export default function useCausalGraphEditor(
     }, [graphData]);
 
     const layout = useMemo(() => {
-        const newLayout = graphLayout.clone();
+        const newLayout = Object.create(
+            Object.getPrototypeOf(graphLayout),
+            Object.getOwnPropertyDescriptors(graphLayout)
+        ) as GraphLayout;
+
         // If the graph is a time series graph, tiers are not defined and is not a PlanarLayout, we update the tiers to show the time series in layers
         if (
             isTimeSeriesCausalGraph &&

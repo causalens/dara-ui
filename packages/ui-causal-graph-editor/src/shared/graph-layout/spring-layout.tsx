@@ -235,22 +235,6 @@ export default class SpringLayout extends GraphLayout {
         this.tiers = builder.tiers;
     }
 
-    clone(): SpringLayout {
-        const builder = new SpringLayoutBuilder()
-            .nodeSize(this.nodeSize)
-            .nodeFontSize(this.nodeFontSize)
-            .collisionForce(this.collisionForce)
-            .linkForce(this.linkForce)
-            .gravity(this.gravity)
-            .warmupTicks(this.warmupTicks)
-            .tierSeparation(this.tierSeparation);
-
-        builder.orientation = this.orientation;
-        builder.tiers = this.tiers;
-
-        return new SpringLayout(builder);
-    }
-
     applyLayout(
         graph: SimulationGraph,
         forceUpdate: (layout: LayoutMapping<XYPosition>) => void

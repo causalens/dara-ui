@@ -326,27 +326,6 @@ export default class FcoseLayout extends GraphLayout {
         return false;
     }
 
-    clone(): FcoseLayout {
-        const builder = new FcoseLayoutBuilder()
-            .nodeSize(this.nodeSize)
-            .nodeFontSize(this.nodeFontSize)
-            .edgeElasticity(this.edgeElasticity)
-            .edgeLength(this.edgeLength)
-            .energy(this.energy)
-            .gravity(this.gravity)
-            .gravityRange(this.gravityRange)
-            .highQuality(this.highQuality)
-            .iterations(this.iterations)
-            .nodeRepulsion(this.nodeRepulsion)
-            .nodeSeparation(this.nodeSeparation)
-            .tierSeparation(this.tierSeparation);
-
-        builder.orientation = this.orientation;
-        builder.tiers = this.tiers;
-
-        return new FcoseLayout(builder);
-    }
-
     applyLayout(graph: SimulationGraph): Promise<{
         layout: LayoutMapping<XYPosition>;
     }> {

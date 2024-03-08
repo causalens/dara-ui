@@ -152,17 +152,6 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
         return false;
     }
 
-    clone(): PlanarLayout {
-        const builder = new PlanarLayoutBuilder()
-            .nodeSize(this.nodeSize)
-            .nodeFontSize(this.nodeFontSize)
-            .orientation(this.orientation)
-            .tiers(this.tiers)
-            .layeringAlgorithm(this.layeringAlgorithm);
-
-        return new PlanarLayout(builder);
-    }
-
     applyLayout(
         graph: SimulationGraph,
         forceUpdate?: (layout: LayoutMapping<XYPosition>, edgePoints: LayoutMapping<XYPosition[]>) => void

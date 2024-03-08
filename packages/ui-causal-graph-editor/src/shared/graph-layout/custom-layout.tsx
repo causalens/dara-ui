@@ -33,12 +33,6 @@ class CustomLayoutBuilder extends GraphLayoutBuilder<CustomLayout> {
  * Currently does nothing, and passes back the current positions of nodes.
  */
 export default class CustomLayout extends GraphLayout {
-    clone(): CustomLayout {
-        const builder = new CustomLayoutBuilder().nodeSize(this.nodeSize).nodeFontSize(this.nodeFontSize);
-
-        return new CustomLayout(builder);
-    }
-
     applyLayout(graph: SimulationGraph): Promise<{
         layout: LayoutMapping<XYPosition>;
     }> {
