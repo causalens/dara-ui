@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { causalGraphParser } from '../src/shared/parsers';
 import { serializeGraphEdge, serializeGraphNode } from '../src/shared/serializer';
 import { CausalGraph, EdgeType } from '../src/types';
-import { default as MockCausalGraphWithExtras } from './mocks/extras-graph';
+import { MockCausalGraphWithExtras, MockTimeSeriesCausalGraph } from './mocks/extras-graph';
 import { MockCausalGraph } from './utils';
 
 describe('CausalGraphParser', () => {
@@ -83,6 +83,27 @@ describe('CausalGraphParser', () => {
 
         // Check that any extras in top level go to base extras
         expect(parsedGraph.getAttributes().extras).toEqual({ defaults });
+    });
+
+    it('should check that for TimeSeriesCausalGraph an attribute for layering is added', () => {
+        const parsedGraph = causalGraphParser(MockTimeSeriesCausalGraph as CausalGraph);
+
+        const { nodes } = MockTimeSeriesCausalGraph;
+
+        const groupedNodes = nodes.reduce((acc, node) => {
+            acc[node.variable_name] = acc[node.variable_name] || [];
+            acc[node.variable_name].push(node);
+            return acc;
+        }, {});
+
+        Object.values(groupedNodes).forEach((group) => {
+            if (group.length > 1) {
+                const firstXValue = group[0].x;
+                group.forEach((node) => {
+                    expect(node.x).toBe(firstXValue);
+                });
+            }
+        });
     });
 
     it('should mark latent nodes when available inputs is present', () => {
