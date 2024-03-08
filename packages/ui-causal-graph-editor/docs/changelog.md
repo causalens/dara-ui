@@ -6,6 +6,7 @@ title: Changelog
 
 -   Zooming the graph with mousewheel is now disabled by default and requires first focusing the graph by clicking on it. This is to prevent accidental zooming when scrolling through the page.
 The previous behaviour can be restored by setting `requireFocusToZoom` prop to true.
+-   Fixed issues with graph viewer tooltip appearing even over parts of the graph which are not currently visible on the screen
 
 ## 1.6.0
 
