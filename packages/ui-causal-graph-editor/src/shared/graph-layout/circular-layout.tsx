@@ -32,6 +32,12 @@ class CircularLayoutBuilder extends GraphLayoutBuilder<CircularLayout> {
  * The circle's radius scales with the size and number of nodes so that they don't collide.
  */
 export default class CircularLayout extends GraphLayout {
+    clone(): CircularLayout {
+        const builder = new CircularLayoutBuilder().nodeSize(this.nodeSize).nodeFontSize(this.nodeFontSize);
+
+        return new CircularLayout(builder);
+    }
+
     applyLayout(graph: SimulationGraph): Promise<{
         layout: LayoutMapping<XYPosition>;
     }> {

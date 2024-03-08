@@ -89,6 +89,19 @@ export default class MarketingLayout extends GraphLayout {
         this.tiers = builder.tiers;
     }
 
+    clone(): MarketingLayout {
+        const builder = new MarketingLayoutBuilder()
+            .nodeSize(this.nodeSize)
+            .nodeFontSize(this.nodeFontSize)
+            .targetLocation(this.targetLocation)
+            .tierSeparation(this.tierSeparation);
+
+        builder.orientation = this.orientation;
+        builder.tiers = this.tiers;
+
+        return new MarketingLayout(builder);
+    }
+
     applyLayout(graph: SimulationGraph): Promise<{
         layout: LayoutMapping<XYPosition>;
     }> {

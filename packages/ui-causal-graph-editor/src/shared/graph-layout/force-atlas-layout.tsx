@@ -154,6 +154,22 @@ export default class ForceAtlasLayout extends GraphLayout {
         this.strongGravityMode = builder._strongGravityMode;
     }
 
+    clone(): ForceAtlasLayout {
+        const builder = new ForceAtlasLayoutBuilder()
+            .nodeSize(this.nodeSize)
+            .nodeFontSize(this.nodeFontSize)
+            .barnesHutOptimize(this.barnesHutOptimize)
+            .edgeWeightInfluence(this.edgeWeightInfluence)
+            .gravity(this.gravity)
+            .iterations(this.iterations)
+            .linLogMode(this.linLogMode)
+            .outboundAttractionDistribution(this.outboundAttractionDistribution)
+            .scalingRatio(this.scalingRatio)
+            .strongGravityMode(this.strongGravityMode);
+
+        return new ForceAtlasLayout(builder);
+    }
+
     applyLayout(graph: SimulationGraph): Promise<{
         layout: LayoutMapping<XYPosition>;
     }> {
