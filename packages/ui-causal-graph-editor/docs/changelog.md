@@ -4,6 +4,7 @@ title: Changelog
 
 ## NEXT
 
+-   Graph layout is now recalculated after every resize of the graph window detected, preventing scenarios where the initially computed layout is not optimal for the new window size due to a sudden graph pane resize
 -   Zooming the graph with mousewheel is now disabled by default and requires first focusing the graph by clicking on it. This is to prevent accidental zooming when scrolling through the page.
 The previous behaviour can be restored by setting `requireFocusToZoom` prop to true.
 -   Fixed issues with graph viewer tooltip appearing even over parts of the graph which are not currently visible on the screen
