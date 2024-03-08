@@ -2,11 +2,11 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.7.0
 
 -   Graph layout is now recalculated after every resize of the graph window detected, preventing scenarios where the initially computed layout is not optimal for the new window size due to a sudden graph pane resize
 -   Zooming the graph with mousewheel is now disabled by default and requires first focusing the graph by clicking on it. This is to prevent accidental zooming when scrolling through the page.
-The previous behaviour can be restored by setting `requireFocusToZoom` prop to true.
+The previous behaviour can be restored by setting `requireFocusToZoom` prop to false.
 -   Fixed issues with graph viewer tooltip appearing even over parts of the graph which are not currently visible on the screen
 -   Updated so that `TimeSeriesCausalGraph` now only adds to layers nodes which have at least one other node with the same `variable_name`.
 -   Updated so that is `PlanarLayout` is chosen we do not add the tiers for `TimeSeriesCausalGraph`.
