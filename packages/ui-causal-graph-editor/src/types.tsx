@@ -292,8 +292,11 @@ export type ZoomState = Record<keyof ZoomThresholds, boolean>;
 export type DirectionType = 'horizontal' | 'vertical';
 
 export interface TiersConfig {
+    /** The path for the property in the node that should be used for defining their layer */
     group: string;
+    /** The path for the property in the node that should be used for defining their order within each layer */
     order_nodes_by?: string;
+    /** A list of layer names to define the order in which they appear */
     rank?: string[];
 }
 

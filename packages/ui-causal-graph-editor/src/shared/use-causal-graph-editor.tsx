@@ -19,7 +19,7 @@ import { useEffect, useMemo, useReducer, useRef } from 'react';
 
 import { CausalGraph, EditorMode, GraphState } from '../types';
 import { GraphActionCreators, GraphActionType, GraphReducer } from './causal-graph-store';
-import { GraphLayout } from './graph-layout';
+import { GraphLayout, PlanarLayout } from './graph-layout';
 import { causalGraphParser } from './parsers';
 
 export interface UseCausalGraphEditorApi {
@@ -48,6 +48,7 @@ export default function useCausalGraphEditor(
     availableInputs?: string[]
 ): UseCausalGraphEditorApi {
     const newNodesRequirePosition = graphLayout.requiresPosition;
+
     const [state, dispatch] = useReducer(
         GraphReducer,
         {
@@ -62,26 +63,6 @@ export default function useCausalGraphEditor(
         }
     );
 
-    const isTimeSeriesCausalGraph = useMemo(() => {
-        const nodeClass = state.graph.getNodeAttribute(state.graph.nodes()[0], 'extras')?.node_class;
-        return nodeClass === 'TimeSeriesNode';
-    }, [state.graph]);
-
-    const layout = useMemo(() => {
-        // If we have a time series causasl graph and if the layout chosen supports tiers and these are not defined
-        const newLayout = graphLayout;
-        if (
-            isTimeSeriesCausalGraph &&
-            'tiers' in newLayout &&
-            'orientation' in newLayout &&
-            newLayout.tiers === undefined
-        ) {
-            // We set tiers based on TimeSeriesCausalGraph structure of node lags
-            newLayout.tiers = { group: 'variable_name', order_nodes_by: 'time_lag' };
-        }
-        return newLayout;
-    }, [isTimeSeriesCausalGraph, graphLayout]);
-
     // bind each action creator to dispatch
     const api = useMemo(() => {
         return actionNames.reduce<GraphApi>((acc, actionName) => {
@@ -91,6 +72,30 @@ export default function useCausalGraphEditor(
             return acc;
         }, {} as GraphApi);
     }, [dispatch]);
+
+    const isTimeSeriesCausalGraph = useMemo(() => {
+        const nodeClass = Object.values(graphData.nodes)[0]?.node_class;
+        return nodeClass === 'TimeSeriesNode';
+    }, [graphData]);
+
+    const layout = useMemo(() => {
+        const newLayout = Object.create(
+            Object.getPrototypeOf(graphLayout),
+            Object.getOwnPropertyDescriptors(graphLayout)
+        ) as GraphLayout;
+
+        // If the graph is a time series graph, tiers are not defined and is not a PlanarLayout, we update the tiers to show the time series in layers
+        if (
+            isTimeSeriesCausalGraph &&
+            'tiers' in newLayout &&
+            'orientation' in newLayout &&
+            newLayout.tiers === undefined &&
+            !(newLayout instanceof PlanarLayout)
+        ) {
+            newLayout.tiers = { group: 'extras.time_series_variable', order_nodes_by: 'time_lag' };
+        }
+        return newLayout;
+    }, [isTimeSeriesCausalGraph, graphLayout]);
 
     // Init graph data, update when outside graph nodes/edges changes
     const lastParentData = useRef(graphData); // keep track of last parent data to skip unnecessary updates

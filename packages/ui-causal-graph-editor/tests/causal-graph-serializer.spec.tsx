@@ -2,7 +2,7 @@ import { GraphActionCreators, GraphReducer } from '../src/shared/causal-graph-st
 import { causalGraphParser } from '../src/shared/parsers';
 import { causalGraphSerializer } from '../src/shared/serializer';
 import { CausalGraph, CausalGraphEdge, EdgeType, EditorMode } from '../src/types';
-import { default as MockCausalGraphWithExtras } from './mocks/extras-graph';
+import { MockCausalGraphWithExtras } from './mocks/extras-graph';
 import { MockCausalGraph } from './utils';
 
 const getExpectedNodes = (mockCausalGraph: CausalGraph): Record<string, any> => {
