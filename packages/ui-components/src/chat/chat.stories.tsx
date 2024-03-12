@@ -17,7 +17,7 @@
 import { Meta } from '@storybook/react';
 import * as React from 'react';
 
-import { default as ChatComponent, ChatProps } from './chat';
+import { default as ChatComponent } from './chat';
 
 export default {
     component: ChatComponent,
@@ -37,20 +37,33 @@ const messages = [
             'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
         timestamp: '12:01',
     },
+    {
+        id: '3',
+        message:
+            'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
+        timestamp: '12:00',
+    },
+    {
+        id: '4',
+        message:
+            'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
+        timestamp: '12:01',
+    },
+    {
+        id: '5',
+        message:
+            'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
+        timestamp: '12:00',
+    },
+    {
+        id: '6',
+        message:
+            'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
+        timestamp: '12:01',
+    },
 ];
 
-export const ChatUncontrolled = (props: ChatProps): JSX.Element => {
-    return (
-        <div style={{ backgroundColor: 'black', display: 'flex' }}>
-            <ChatComponent {...props} />
-        </div>
-    );
-};
-ChatUncontrolled.args = {
-    value: messages,
-};
-
-export const ChatControlled = (): JSX.Element => {
+export const Chat = (): JSX.Element => {
     const [value, setValue] = React.useState(messages);
 
     const DeleteMessage = (messageId: string): void => {
@@ -58,19 +71,9 @@ export const ChatControlled = (): JSX.Element => {
         setValue(newMessages);
     };
 
-    console.log('value', value);
-
     return (
         <div style={{ backgroundColor: 'black', display: 'flex' }}>
-            <ChatComponent
-                onAdd={setValue}
-                onClose={() => {
-                    console.log('CLOSE');
-                }}
-                onDelete={DeleteMessage}
-                onEdit={setValue}
-                value={value}
-            />
+            <ChatComponent onAdd={setValue} onDelete={DeleteMessage} onEdit={setValue} value={value} />
         </div>
     );
 };
