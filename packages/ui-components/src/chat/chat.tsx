@@ -36,7 +36,7 @@ const ChatWrapper = styled.div`
     margin: 1rem;
     padding: 1.5rem;
 
-    background-color: #f8f9ffb2;
+    background-color: ${(props) => props.theme.colors.background}e6;
     border-radius: 0.4rem;
     box-shadow: ${(props) => props.theme.shadow.medium};
 `;
@@ -65,7 +65,8 @@ const ChatBody = styled.div`
     gap: 1rem;
 
     max-height: calc(100% - 9.6rem);
-    padding-bottom: 0.5rem;
+    margin: -1rem;
+    padding: 1rem;
 `;
 
 const ChatTop = styled.div`
@@ -138,7 +139,7 @@ function scrollToBottom(): void {
 function Chat({ ...props }: ChatProps): JSX.Element {
     const [reply, setReply] = React.useState('');
 
-    const [value, setValue] = React.useState(props.value ?? []);
+    const [messages, setMessages] = React.useState(props.value ?? []);
 
     const onSubmitMessage = (): void => {
         if (reply) {
@@ -148,14 +149,13 @@ function Chat({ ...props }: ChatProps): JSX.Element {
                 message: reply,
                 timestamp: getFormattedTimestamp(),
             };
-            const newMessages = value;
-            newMessages.push(newMessage);
+            const newMessages = [...messages, newMessage];
 
             // Add the new message to the chat
             if (props.value !== undefined) {
                 props.onAdd?.(newMessages);
             } else {
-                setValue(newMessages);
+                setMessages(newMessages);
             }
 
             // Clear the reply field and scroll to the bottom of the chat to show latest message
@@ -166,7 +166,7 @@ function Chat({ ...props }: ChatProps): JSX.Element {
 
     const onEditMessage = (message: Message): void => {
         // Find the message to edit and replace it with the new message
-        const newMessages = value.map((m) => {
+        const newMessages = messages.map((m) => {
             if (m.id === message.id) {
                 return message;
             }
@@ -176,18 +176,18 @@ function Chat({ ...props }: ChatProps): JSX.Element {
         if (props.value !== undefined) {
             props.onEdit?.(newMessages);
         } else {
-            setValue(newMessages);
+            setMessages(newMessages);
         }
     };
 
     const onDeleteMessage = (id: string): void => {
         // Remove the message with the given id
-        const newMessages = value.filter((message) => message.id !== id);
+        const newMessages = messages.filter((message) => message.id !== id);
         // Update the chat
         if (props.value !== undefined) {
             props.onDelete?.(id);
         } else {
-            setValue(newMessages);
+            setMessages(newMessages);
         }
     };
 
@@ -197,7 +197,7 @@ function Chat({ ...props }: ChatProps): JSX.Element {
     }, []);
 
     React.useEffect(() => {
-        setValue(props.value ?? []);
+        setMessages(props.value ?? []);
     }, [props.value]);
 
     return (
@@ -207,7 +207,7 @@ function Chat({ ...props }: ChatProps): JSX.Element {
                 <CloseIcon onClick={props.onClose} />
             </ChatTop>
             <ChatBody id="scrollContainer">
-                {value.map((message) => (
+                {messages.map((message) => (
                     <MessageComponent
                         key={message.id}
                         onChange={onEditMessage}
