@@ -61,12 +61,11 @@ const ChatBody = styled.div`
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
     gap: 1rem;
 
-    max-height: calc(100% - 9.6rem);
-    margin: -1rem;
-    padding: 1rem;
+    max-height: calc(100% - 10.225rem);
+    margin: -0.25rem;
+    padding: 0.25rem;
 `;
 
 const ChatTop = styled.div`
@@ -128,7 +127,7 @@ function scrollToBottom(): void {
         if (scrollContainer) {
             scrollContainer.scrollTop = scrollContainer.scrollHeight;
         }
-    }, 0); // Timeout of 0ms to allow the DOM to update
+    }, 100); // Timeout of 100ms to allow the DOM to update with latest values
 }
 
 /**
