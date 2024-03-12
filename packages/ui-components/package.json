@@ -51,6 +51,7 @@
     "@types/react-window-infinite-loader": "^1.0.3",
     "@types/shortid": "0.0.29",
     "@types/styled-components": "^5.1.26",
+    "@types/uuid": "^9.0.8",
     "babel-jest": "^29.5.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.13.2",
@@ -94,7 +95,8 @@
     "react-virtualized-auto-sizer": "1.0.6",
     "react-window": "1.8.6",
     "shortid": "2.2.15",
-    "tippy.js": "6.2.6"
+    "tippy.js": "6.2.6",
+    "uuid": "^9.0.1"
   },
   "files": [
     "dist"
