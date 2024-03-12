@@ -140,33 +140,39 @@ function Chat({ ...props }: ChatProps): JSX.Element {
 
     const [value, setValue] = React.useState(props.value ?? []);
 
-    const onSubmit = (): void => {
+    const onSubmitMessage = (): void => {
         if (reply) {
+            // Create a new message
             const newMessage = {
                 id: uuidv4(),
                 message: reply,
                 timestamp: getFormattedTimestamp(),
             };
-            setReply('');
             const newMessages = value;
             newMessages.push(newMessage);
-            scrollToBottom();
 
+            // Add the new message to the chat
             if (props.value !== undefined) {
                 props.onAdd?.(newMessages);
             } else {
                 setValue(newMessages);
             }
+
+            // Clear the reply field and scroll to the bottom of the chat to show latest message
+            setReply('');
+            scrollToBottom();
         }
     };
 
     const onEditMessage = (message: Message): void => {
+        // Find the message to edit and replace it with the new message
         const newMessages = value.map((m) => {
             if (m.id === message.id) {
                 return message;
             }
             return m;
         });
+        // Update the chat
         if (props.value !== undefined) {
             props.onEdit?.(newMessages);
         } else {
@@ -175,7 +181,9 @@ function Chat({ ...props }: ChatProps): JSX.Element {
     };
 
     const onDeleteMessage = (id: string): void => {
+        // Remove the message with the given id
         const newMessages = value.filter((message) => message.id !== id);
+        // Update the chat
         if (props.value !== undefined) {
             props.onDelete?.(id);
         } else {
@@ -189,7 +197,6 @@ function Chat({ ...props }: ChatProps): JSX.Element {
     }, []);
 
     React.useEffect(() => {
-        // Scroll to the bottom of the chat
         setValue(props.value ?? []);
     }, [props.value]);
 
@@ -212,7 +219,7 @@ function Chat({ ...props }: ChatProps): JSX.Element {
             <ReplyWrapper>
                 <TextArea onChange={setReply} placeholder="Add a comment" resize="none" value={reply} />
                 <ReplyButtons>
-                    <Button onClick={onSubmit}>Send</Button>
+                    <Button onClick={onSubmitMessage}>Send</Button>
                 </ReplyButtons>
             </ReplyWrapper>
         </ChatWrapper>
