@@ -564,8 +564,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             this.app.resize();
             this.viewport.resize(this.container.clientWidth, this.container.clientHeight);
             this.background.updatePosition(this.container);
-            this.updateGraphVisibility();
-            this.requestRender();
+
+            // keep layout in sync - invoke a debounced update to only update it once resizing is done rather than
+            // re-running a potentially expensive layout computation on every resize event
+            this.debouncedUpdateLayout();
         });
 
         this.resizeObserver.observe(this.container);

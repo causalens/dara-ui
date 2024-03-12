@@ -260,6 +260,37 @@ function getExtraGraphFields(graphData: CausalGraph): Record<string, any> {
 }
 
 /**
+ * Function which receives a list of nodes and adds property for those that share a variable_name
+ *
+ * @param graph Simulation graph
+ */
+export function updateNodesForTimeSeries(graph: SimulationGraph): void {
+    // Step 1: Group nodes by variable_name
+    const groupedNodes = new Map<string, string[]>();
+    graph.nodes().forEach((nodeId) => {
+        const variableName = graph.getNodeAttribute(nodeId, 'extras')?.variable_name;
+        if (variableName) {
+            // Check if variableName is not undefined
+            if (!groupedNodes.has(variableName)) {
+                groupedNodes.set(variableName, []);
+            }
+            groupedNodes.get(variableName)?.push(nodeId);
+        }
+    });
+
+    // Step 2: Add 'time_series_variable' to nodes that share the same variable_name
+    groupedNodes.forEach((group, variableName) => {
+        if (group.length > 1) {
+            group.forEach((nodeId) => {
+                const attributes = graph.getNodeAttributes(nodeId);
+                attributes.extras.time_series_variable = variableName;
+                graph.updateNode(nodeId, () => attributes);
+            });
+        }
+    });
+}
+
+/**
  * Parses CausalGraph structure into a SimulationGraph representation
  *
  * @param data input CausalGraph structure
@@ -302,6 +333,11 @@ export function causalGraphParser(
             resultGraph.addNode(nodeKey, attributes);
         }
     });
+
+    // If the graph is a time series graph, we add a property to the nodes that share the same variable_name so that they can be later grouped into layers if needed
+    if (Object.values(data.nodes)[0]?.node_class === 'TimeSeriesNode') {
+        updateNodesForTimeSeries(resultGraph);
+    }
 
     // Remove edges which no longer exist
     resultGraph.forEachEdge((edgeKey, edgeData, source, target) => {

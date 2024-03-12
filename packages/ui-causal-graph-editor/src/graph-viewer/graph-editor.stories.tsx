@@ -19,7 +19,10 @@ import Graph from 'graphology';
 import clusters from 'graphology-generators/random/clusters';
 import deepCopy from 'lodash/cloneDeep';
 import set from 'lodash/set';
+import * as React from 'react';
 import { useEffect, useState } from 'react';
+
+import { Accordion } from '@darajs/ui-components';
 
 import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import {
@@ -143,6 +146,50 @@ Interactive.args = {
     graphLayout: PlanarLayout.Builder.build(),
 };
 
+/**
+ * Tests scenario where the graph is collapsed, to ensure e.g. tooltips don't bleed out of the container
+ */
+export const Collapsed = (args: CausalGraphEditorProps): JSX.Element => {
+    return (
+        <Accordion
+            items={[
+                {
+                    content: <CausalGraphViewerComponent {...args} style={{ height: '300px' }} />,
+                    label: 'Graph',
+                },
+            ]}
+        />
+    );
+};
+Collapsed.args = {
+    editable: true,
+    graphData: causalGraph,
+    graphLayout: PlanarLayout.Builder.build(),
+};
+
+export const Scrollable = (args: CausalGraphEditorProps): JSX.Element => {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '500px', overflow: 'auto' }}>
+            {Array(50)
+                .fill(0)
+                .map((_, idx) => (
+                    <span key={idx}>{idx}</span>
+                ))}
+            <CausalGraphViewerComponent {...args} style={{ minHeight: '500px' }} />
+            {Array(50)
+                .fill(0)
+                .map((_, idx) => (
+                    <span key={idx}>{idx}</span>
+                ))}
+        </div>
+    );
+};
+Scrollable.args = {
+    editable: true,
+    graphData: causalGraph,
+    graphLayout: PlanarLayout.Builder.build(),
+};
+
 export const MarketingBottom = Template.bind({});
 MarketingBottom.args = {
     additionalLegends: [
@@ -185,7 +232,7 @@ MarketingCenter.args = {
 };
 
 export const MarketingTiers = Template.bind({});
-const marketingLayout = SpringLayout.Builder.build();
+const marketingLayout = MarketingLayout.Builder.build();
 marketingLayout.tiers = nodeTiersList;
 
 MarketingTiers.args = {
@@ -693,8 +740,11 @@ VisualEdgeEncoder.args = {
 };
 
 export const TimeSeries = Template.bind({});
+
+const timeSeriesLayout = FcoseLayout.Builder.build();
+
 TimeSeries.args = {
     editable: true,
     graphData: timeSeriesCausalGraph,
-    graphLayout: MarketingLayout.Builder.build(),
+    graphLayout: timeSeriesLayout,
 };
