@@ -66,3 +66,13 @@ export interface InteractiveComponentProps<T> {
     /** An optional value field to put the component into controlled mode */
     value?: T;
 }
+
+/** Type for a Chat message */
+export interface Message {
+    /** Unique identifier for the message */
+    id: string;
+    /** The message content */
+    message: string;
+    /** The timestamp of the message */
+    timestamp: string;
+}
