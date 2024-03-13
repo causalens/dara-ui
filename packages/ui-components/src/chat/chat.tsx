@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { isEqual } from 'lodash';
+import { nanoid } from 'nanoid';
 import * as React from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import styled from '@darajs/styled-components';
 import { Xmark } from '@darajs/ui-icons';
@@ -93,14 +94,10 @@ const CloseIcon = styled(Xmark)`
 `;
 
 export interface ChatProps extends InteractiveComponentProps<Message[]> {
-    /** Event triggered when a message is added */
-    onAdd?: (value: Message[]) => void | Promise<void>;
     /** Event triggered when the chat sidebar is closed */
     onClose?: () => void | Promise<void>;
-    /** Event triggered when a message is deleted */
-    onDelete?: (id: string) => void | Promise<void>;
-    /** Event triggered when a message is edited */
-    onEdit?: (value: Message[]) => void | Promise<void>;
+    /** Event triggered when the chat is changed */
+    onUpdate?: (value: Message[]) => void | Promise<void>;
 }
 
 /**
@@ -121,13 +118,12 @@ function getFormattedTimestamp(): string {
 /**
  * A function to scroll to the bottom of the chat so that the latest message is visible
  */
-function scrollToBottom(): void {
+function scrollToBottom(node: HTMLElement | null): void {
     setTimeout(() => {
-        const scrollContainer = document.getElementById('scrollContainer');
-        if (scrollContainer) {
-            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        if (node) {
+            node.scrollTop = node.scrollHeight;
         }
-    }, 100); // Timeout of 100ms to allow the DOM to update with latest values
+    }, 100);
 }
 
 /**
@@ -135,69 +131,60 @@ function scrollToBottom(): void {
  *
  * @param {ChatProps} props - the component props
  */
-function Chat({ ...props }: ChatProps): JSX.Element {
+function Chat(props: ChatProps): JSX.Element {
     const [reply, setReply] = React.useState('');
 
-    const [messages, setMessages] = React.useState(props.value ?? []);
+    const [localMessages, setLocalMessages] = React.useState(props.value ?? []);
+    if (!isEqual(props.value, localMessages)) {
+        setLocalMessages(props.value);
+    }
+
+    const chatBodyRef = React.useRef<HTMLDivElement>(null);
 
     const onSubmitMessage = (): void => {
         if (reply) {
             // Create a new message
             const newMessage = {
-                id: uuidv4(),
+                id: nanoid(),
                 message: reply,
                 timestamp: getFormattedTimestamp(),
             };
-            const newMessages = [...messages, newMessage];
+            const newMessages = [...localMessages, newMessage];
 
             // Add the new message to the chat
-            if (props.value !== undefined) {
-                props.onAdd?.(newMessages);
-            } else {
-                setMessages(newMessages);
-            }
+            props.onUpdate?.(newMessages);
+            setLocalMessages(newMessages);
 
             // Clear the reply field and scroll to the bottom of the chat to show latest message
             setReply('');
-            scrollToBottom();
+            scrollToBottom(chatBodyRef?.current);
         }
     };
 
     const onEditMessage = (message: Message): void => {
         // Find the message to edit and replace it with the new message
-        const newMessages = messages.map((m) => {
+        const newMessages = localMessages.map((m) => {
             if (m.id === message.id) {
                 return message;
             }
             return m;
         });
         // Update the chat
-        if (props.value !== undefined) {
-            props.onEdit?.(newMessages);
-        } else {
-            setMessages(newMessages);
-        }
+        props.onUpdate?.(newMessages);
+        setLocalMessages(newMessages);
     };
 
     const onDeleteMessage = (id: string): void => {
         // Remove the message with the given id
-        const newMessages = messages.filter((message) => message.id !== id);
+        const newMessages = localMessages.filter((message) => message.id !== id);
         // Update the chat
-        if (props.value !== undefined) {
-            props.onDelete?.(id);
-        } else {
-            setMessages(newMessages);
-        }
+        props.onUpdate?.(newMessages);
+        setLocalMessages(newMessages);
     };
 
-    React.useEffect(() => {
-        // Scroll to the bottom of the chat
-        scrollToBottom();
+    React.useLayoutEffect(() => {
+        scrollToBottom(chatBodyRef?.current);
     }, []);
-
-    React.useEffect(() => {
-        setMessages(props.value ?? []);
-    }, [props.value]);
 
     return (
         <ChatWrapper className={props.className} style={props.style}>
@@ -205,8 +192,8 @@ function Chat({ ...props }: ChatProps): JSX.Element {
                 <span>Chat</span>
                 <CloseIcon onClick={props.onClose} />
             </ChatTop>
-            <ChatBody id="scrollContainer">
-                {messages.map((message) => (
+            <ChatBody ref={chatBodyRef}>
+                {localMessages.map((message) => (
                     <MessageComponent
                         key={message.id}
                         onChange={onEditMessage}

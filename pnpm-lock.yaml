@@ -413,7 +413,6 @@ importers:
       '@types/react-window-infinite-loader': ^1.0.3
       '@types/shortid': 0.0.29
       '@types/styled-components': ^5.1.26
-      '@types/uuid': ^9.0.8
       babel-jest: ^29.5.0
       babel-loader: ^8.2.2
       babel-plugin-styled-components: ^1.13.2
@@ -448,7 +447,6 @@ importers:
       stylelint: ^13.5.0
       tippy.js: 6.2.6
       typescript: ^5.0.4
-      uuid: ^9.0.1
     dependencies:
       '@darajs/styled-components': link:../styled-components
       '@darajs/ui-icons': link:../ui-icons
@@ -477,7 +475,6 @@ importers:
       react-window: 1.8.6_react-dom@18.2.0+react@18.2.0
       shortid: 2.2.15
       tippy.js: 6.2.6
-      uuid: 9.0.1
     devDependencies:
       '@babel/core': 7.22.9
       '@babel/preset-env': 7.22.9_@babel+core@7.22.9
@@ -511,7 +508,6 @@ importers:
       '@types/react-window-infinite-loader': 1.0.6
       '@types/shortid': 0.0.29
       '@types/styled-components': 5.1.26
-      '@types/uuid': 9.0.8
       babel-jest: 29.6.1_@babel+core@7.22.9
       babel-loader: 8.3.0_@babel+core@7.22.9
       babel-plugin-styled-components: 1.13.3
@@ -9245,10 +9241,6 @@ packages:
 
   /@types/unist/2.0.7:
     resolution: {integrity: sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==}
-
-  /@types/uuid/9.0.8:
-    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
-    dev: true
 
   /@types/webpack-env/1.18.1:
     resolution: {integrity: sha512-D0HJET2/UY6k9L6y3f5BL+IDxZmPkYmPT4+qBrRdmRLYRuV0qNKizMgTvYxXZYn+36zjPeoDZAEYBCM6XB+gww==}
@@ -21231,11 +21223,6 @@ packages:
     resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
     hasBin: true
     dev: true
-
-  /uuid/9.0.1:
-    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
-    hasBin: true
-    dev: false
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}

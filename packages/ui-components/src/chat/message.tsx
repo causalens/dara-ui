@@ -116,7 +116,7 @@ export interface MessageProps extends InteractiveComponentProps<Message> {
  *
  * @param {MessageProps} props - the component props
  */
-function MessageComponent({ ...props }: MessageProps): JSX.Element {
+function MessageComponent(props: MessageProps): JSX.Element {
     const [editMode, setEditMode] = React.useState(false);
     const [value, setValue] = React.useState(props.value);
     const [editMessage, setEditMessage] = React.useState(props.value.message);

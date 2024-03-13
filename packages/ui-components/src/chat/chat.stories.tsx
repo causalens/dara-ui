@@ -66,14 +66,9 @@ const messages = [
 export const Chat = (): JSX.Element => {
     const [value, setValue] = React.useState(messages);
 
-    const DeleteMessage = (messageId: string): void => {
-        const newMessages = value.filter((message) => message.id !== messageId);
-        setValue(newMessages);
-    };
-
     return (
         <div style={{ backgroundColor: 'black', display: 'flex' }}>
-            <ChatComponent onAdd={setValue} onDelete={DeleteMessage} onEdit={setValue} value={value} />
+            <ChatComponent onUpdate={setValue} value={value} />
         </div>
     );
 };
