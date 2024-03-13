@@ -152,8 +152,8 @@ function MessageComponent({ ...props }: MessageProps): JSX.Element {
                 {props.value.timestamp}
                 {!editMode && (
                     <InteractiveIcons>
-                        <EditIcon onClick={() => setEditMode(true)} />
-                        <DeleteIcon onClick={onDelete} />
+                        <EditIcon data-testid="message-edit-button" onClick={() => setEditMode(true)} role="button" />
+                        <DeleteIcon data-testid="message-delete-button" onClick={onDelete} role="button" />
                     </InteractiveIcons>
                 )}
             </MessageTop>
