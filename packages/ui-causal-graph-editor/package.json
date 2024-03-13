@@ -98,7 +98,7 @@
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-layout-noverlap": "^0.4.2",
     "graphology-types": "^0.24.7",
-    "immer": "^9.0.6",
+    "immer": "^10.0.4",
     "lodash": "4.17.21",
     "pixi-viewport": "~5.0.0",
     "pixi.js": "~7.2.0",
@@ -109,7 +109,7 @@
     "shortid": "2.2.15",
     "svg-path-parser": "^1.1.0",
     "tippy.js": "6.2.6",
-    "use-immer": "^0.6.0",
+    "use-immer": "^0.9.0",
     "vis-data": "^7.1.2",
     "vis-network": "^9.1.0"
   },
