@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Added a new `Chat` component.
+
 ## 1.7.0
 
 -   Fixed an issue with `NumericInput` where one could not enter decimal numbers ending in 0.
