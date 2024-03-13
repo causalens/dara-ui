@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { isEqual } from 'lodash';
 import * as React from 'react';
 
 import styled from '@darajs/styled-components';
@@ -118,21 +119,21 @@ export interface MessageProps extends InteractiveComponentProps<Message> {
  */
 function MessageComponent(props: MessageProps): JSX.Element {
     const [editMode, setEditMode] = React.useState(false);
-    const [value, setValue] = React.useState(props.value);
     const [editMessage, setEditMessage] = React.useState(props.value.message);
+    const [localMessage, setLocalMessage] = React.useState(props.value);
+    if (props.value && !isEqual(props.value, localMessage)) {
+        setLocalMessage(props.value);
+    }
 
     const onAccept = (): void => {
         // if the message hasn't changed, don't do anything
-        if (editMessage === value.message) {
+        if (editMessage === localMessage.message) {
             return;
         }
-        const newMessage = { ...value, message: editMessage };
-        if (props.onChange) {
-            props.onChange(newMessage);
-        } else {
-            // Update internal state only if it's uncontrolled
-            setValue(newMessage);
-        }
+        const newMessage = { ...localMessage, message: editMessage };
+
+        props?.onChange(newMessage);
+        setLocalMessage(newMessage);
         setEditMode(false);
     };
 
@@ -141,10 +142,6 @@ function MessageComponent(props: MessageProps): JSX.Element {
             props.onDelete(props.value.id);
         }
     };
-
-    React.useEffect(() => {
-        setValue(props.value);
-    }, [props.value]);
 
     return (
         <MessageWrapper className={props.className} style={props.style}>
@@ -168,7 +165,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
                     </EditButtons>
                 </div>
             )}
-            {!editMode && <MessageBody>{value.message}</MessageBody>}
+            {!editMode && <MessageBody>{localMessage.message}</MessageBody>}
         </MessageWrapper>
     );
 }
