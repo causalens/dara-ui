@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.7.1
 
 -   Added a new `Chat` component.
 
