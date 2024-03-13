@@ -22,6 +22,7 @@ export {
     ComponentSelectItem,
     InteractiveComponentProps,
     CarouselItem,
+    Message,
 } from './types';
 
 export { default as Accordion } from './accordion/accordion';
@@ -29,6 +30,7 @@ export { default as Badge } from './badge/badge';
 export { default as Button } from './button/button';
 export { default as ButtonBar } from './button-bar/button-bar';
 export { default as Carousel } from './carousel/carousel';
+export { default as Chat } from './chat/chat';
 export { default as CategoricalFilter } from './filter/categorical-filter';
 export { default as Checkbox } from './checkbox/checkbox';
 export { default as CheckboxGroup } from './checkbox/checkbox-group';
