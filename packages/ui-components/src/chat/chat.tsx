@@ -135,7 +135,7 @@ function Chat(props: ChatProps): JSX.Element {
     const [reply, setReply] = React.useState('');
 
     const [localMessages, setLocalMessages] = React.useState(props.value ?? []);
-    if (!isEqual(props.value, localMessages)) {
+    if (props.value && !isEqual(props.value, localMessages)) {
         setLocalMessages(props.value);
     }
 

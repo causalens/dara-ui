@@ -63,9 +63,9 @@ describe('Chat', () => {
         expect(getByText('Hello')).toBeInTheDocument();
     });
 
-    it('onAdd should be called when submiting a message in controlled mode', () => {
-        const onAdd = jest.fn();
-        const { getByRole } = render(<RenderChat onAdd={onAdd} value={mockMessages} />);
+    it('onUpdate should be called when submiting a message', () => {
+        const onUpdate = jest.fn();
+        const { getByRole } = render(<RenderChat onUpdate={onUpdate} value={mockMessages} />);
 
         // Write a new message
         const textArea = getByRole('textbox');
@@ -76,16 +76,16 @@ describe('Chat', () => {
         const button = getByRole('button', { name: /send/i });
         fireEvent.click(button);
 
-        // Check that onAdd was called with the new message
-        expect(onAdd).toHaveBeenCalledWith(
+        // Check that onUpdate was called with the new message
+        expect(onUpdate).toHaveBeenCalledWith(
             expect.arrayContaining([...mockMessages, expect.objectContaining({ message: 'Test' })])
         );
     });
 
-    it('cancel edited message should not trigger onEdit', () => {
-        const onEdit = jest.fn();
+    it('cancel edited message should not trigger onUpdate', () => {
+        const onUpdate = jest.fn();
         const { getByRole, getAllByTestId, getAllByRole, getByDisplayValue } = render(
-            <RenderChat onEdit={onEdit} value={mockMessages} />
+            <RenderChat onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Check that there is only one textarea which is to add new messages
@@ -100,16 +100,16 @@ describe('Chat', () => {
         // Change the message value
         fireEvent.change(editArea, { target: { value: 'Hello2' } });
 
-        // Click cancel and check onEdit is not called
+        // Click cancel and check onUpdate is not called
         const cancelButton = getByRole('button', { name: /cancel/i });
         fireEvent.click(cancelButton);
-        expect(onEdit).toHaveBeenCalledTimes(0);
+        expect(onUpdate).toHaveBeenCalledTimes(0);
     });
 
-    it('save edited message should trigger onEdit', () => {
-        const onEdit = jest.fn();
+    it('save edited message should trigger onUpdate', () => {
+        const onUpdate = jest.fn();
         const { getByRole, getAllByTestId, getAllByRole, getByDisplayValue } = render(
-            <RenderChat onEdit={onEdit} value={mockMessages} />
+            <RenderChat onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Check no messages are currently in edit mode
@@ -126,19 +126,19 @@ describe('Chat', () => {
         const saveButton = getByRole('button', { name: /save/i });
         fireEvent.click(saveButton);
 
-        // Check that onEdit was called with the new message value
+        // Check that onUpdate was called with the new message value
         mockMessages[0].message = 'Hello2';
-        expect(onEdit).toHaveBeenCalledWith(mockMessages);
+        expect(onUpdate).toHaveBeenCalledWith(mockMessages);
     });
 
-    it('delete message should trigger onDelete', () => {
-        const onDelete = jest.fn();
-        const { getAllByTestId } = render(<RenderChat onDelete={onDelete} value={mockMessages} />);
+    it('delete message should trigger onUpdate', () => {
+        const onUpdate = jest.fn();
+        const { getAllByTestId } = render(<RenderChat onUpdate={onUpdate} value={mockMessages} />);
 
         // Delete the first message
         const deleteButton = getAllByTestId('message-delete-button');
         fireEvent.click(deleteButton[0]);
 
-        expect(onDelete).toHaveBeenCalledWith('1');
+        expect(onUpdate).toHaveBeenCalledWith(mockMessages.slice(1));
     });
 });
