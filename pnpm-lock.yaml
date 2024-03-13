@@ -435,7 +435,7 @@ importers:
       react-docgen-typescript-plugin: ^1.0.5
       react-dom: ^18.0
       react-dropzone: 11.0.1
-      react-popper: 2.2.5
+      react-popper: 2.3.0
       react-table: 7.7.0
       react-table-sticky: ^1.1.3
       react-test-renderer: ^17.0
@@ -468,7 +468,7 @@ importers:
       react-datepicker: 4.8.0_react-dom@18.2.0+react@18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-dropzone: 11.0.1_react@18.2.0
-      react-popper: 2.2.5_969a5d162a979d43a9068e272a4743f8
+      react-popper: 2.3.0_3d64b7be2882c124e16faa6277c76e4e
       react-table: 7.7.0_react@18.2.0
       react-table-sticky: 1.1.3
       react-virtualized-auto-sizer: 1.0.6_react-dom@18.2.0+react@18.2.0
@@ -500,7 +500,7 @@ importers:
       '@types/lodash': 4.14.195
       '@types/react': 18.2.15
       '@types/react-collapse': 5.0.1
-      '@types/react-datepicker': 4.11.2_react@18.2.0
+      '@types/react-datepicker': 4.11.2_react-dom@18.2.0+react@18.2.0
       '@types/react-dom': 18.2.7
       '@types/react-table': 7.7.14
       '@types/react-virtualized-auto-sizer': 1.0.1
@@ -9140,15 +9140,16 @@ packages:
       '@types/react': 18.2.15
     dev: true
 
-  /@types/react-datepicker/4.11.2_react@18.2.0:
+  /@types/react-datepicker/4.11.2_react-dom@18.2.0+react@18.2.0:
     resolution: {integrity: sha512-ELYyX3lb3K1WltqdlF1hbnaDGgzlF6PIR5T4W38cSEcfrQDIrPE+Ioq5pwRe/KEJ+ihHMjvTVZQkwJx0pWMNHQ==}
     dependencies:
       '@popperjs/core': 2.11.8
       '@types/react': 18.2.15
       date-fns: 2.30.0
-      react-popper: 2.2.5_c83e96b2679aaf109da65a406d6ced34
+      react-popper: 2.3.0_47d1cc49ad40b9295ede2b52dc5ed9a2
     transitivePeerDependencies:
       - react
+      - react-dom
     dev: true
 
   /@types/react-dom/18.2.7:
@@ -18532,7 +18533,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-onclickoutside: 6.13.0_react-dom@18.2.0+react@18.2.0
-      react-popper: 2.2.5_c83e96b2679aaf109da65a406d6ced34
+      react-popper: 2.3.0_47d1cc49ad40b9295ede2b52dc5ed9a2
     dev: false
 
   /react-dnd-html5-backend/14.1.0:
@@ -18690,26 +18691,30 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
-  /react-popper/2.2.5_969a5d162a979d43a9068e272a4743f8:
-    resolution: {integrity: sha512-kxGkS80eQGtLl18+uig1UIf9MKixFSyPxglsgLBxlYnyDf65BiY9B3nZSc6C9XUNDgStROB0fMQlTEz1KxGddw==}
+  /react-popper/2.3.0_3d64b7be2882c124e16faa6277c76e4e:
+    resolution: {integrity: sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==}
     peerDependencies:
       '@popperjs/core': ^2.0.0
-      react: ^16.8.0 || ^17
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: ^16.8.0 || ^17 || ^18
     dependencies:
       '@popperjs/core': 2.4.0
       react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
       react-fast-compare: 3.2.2
       warning: 4.0.3
     dev: false
 
-  /react-popper/2.2.5_c83e96b2679aaf109da65a406d6ced34:
-    resolution: {integrity: sha512-kxGkS80eQGtLl18+uig1UIf9MKixFSyPxglsgLBxlYnyDf65BiY9B3nZSc6C9XUNDgStROB0fMQlTEz1KxGddw==}
+  /react-popper/2.3.0_47d1cc49ad40b9295ede2b52dc5ed9a2:
+    resolution: {integrity: sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==}
     peerDependencies:
       '@popperjs/core': ^2.0.0
-      react: ^16.8.0 || ^17
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: ^16.8.0 || ^17 || ^18
     dependencies:
       '@popperjs/core': 2.11.8
       react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
       react-fast-compare: 3.2.2
       warning: 4.0.3
 
