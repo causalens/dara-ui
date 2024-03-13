@@ -410,7 +410,6 @@ importers:
       '@types/react-table': ^7.0.19
       '@types/react-virtualized-auto-sizer': ^1.0.0
       '@types/react-window': ^1.8.2
-      '@types/react-window-infinite-loader': ^1.0.3
       '@types/shortid': 0.0.29
       '@types/styled-components': ^5.1.26
       babel-jest: ^29.5.0
@@ -440,7 +439,7 @@ importers:
       react-table-sticky: ^1.1.3
       react-test-renderer: ^17.0
       react-virtualized-auto-sizer: 1.0.6
-      react-window: 1.8.6
+      react-window: 1.8.10
       rimraf: ^3.0.2
       shortid: 2.2.15
       storybook-dark-mode: ^2.1.1
@@ -472,7 +471,7 @@ importers:
       react-table: 7.7.0_react@18.2.0
       react-table-sticky: 1.1.3
       react-virtualized-auto-sizer: 1.0.6_react-dom@18.2.0+react@18.2.0
-      react-window: 1.8.6_react-dom@18.2.0+react@18.2.0
+      react-window: 1.8.10_react-dom@18.2.0+react@18.2.0
       shortid: 2.2.15
       tippy.js: 6.2.6
     devDependencies:
@@ -505,7 +504,6 @@ importers:
       '@types/react-table': 7.7.14
       '@types/react-virtualized-auto-sizer': 1.0.1
       '@types/react-window': 1.8.5
-      '@types/react-window-infinite-loader': 1.0.6
       '@types/shortid': 0.0.29
       '@types/styled-components': 5.1.26
       babel-jest: 29.6.1_@babel+core@7.22.9
@@ -9168,13 +9166,6 @@ packages:
     resolution: {integrity: sha512-GH8sAnBEM5GV9LTeiz56r4ZhMOUSrP43tAQNSRVxNexDjcNKLCEtnxusAItg1owFUFE6k0NslV26gqVClVvong==}
     dependencies:
       '@types/react': 18.2.15
-    dev: true
-
-  /@types/react-window-infinite-loader/1.0.6:
-    resolution: {integrity: sha512-V8g8sBDLVeJJAfEENJS7VXZK+DRJ+jzPNtk8jpj2G+obhf+iqGNUDGwNWCbBhLiD+KpHhf3kWQlKBRi0tAeU4Q==}
-    dependencies:
-      '@types/react': 18.2.15
-      '@types/react-window': 1.8.5
     dev: true
 
   /@types/react-window/1.8.5:
@@ -18782,12 +18773,12 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
-  /react-window/1.8.6_react-dom@18.2.0+react@18.2.0:
-    resolution: {integrity: sha512-8VwEEYyjz6DCnGBsd+MgkD0KJ2/OXFULyDtorIiTz+QzwoP94tBoA7CnbtyXMm+cCeAUER5KJcPtWl9cpKbOBg==}
+  /react-window/1.8.10_react-dom@18.2.0+react@18.2.0:
+    resolution: {integrity: sha512-Y0Cx+dnU6NLa5/EvoHukUD0BklJ8qITCtVEPY1C/nL8wwoZ0b5aEw8Ff1dOVHw7fCzMt55XfJDd8S8W8LCaUCg==}
     engines: {node: '>8.0.0'}
     peerDependencies:
-      react: ^15.0.0 || ^16.0.0 || ^17.0.0
-      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
     dependencies:
       '@babel/runtime': 7.22.6
       memoize-one: 5.2.1
