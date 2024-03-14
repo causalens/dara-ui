@@ -23,16 +23,16 @@ const Row = styled.div.withConfig({ shouldForwardProp })<RowProps>`
     cursor: ${(props) => (props.onClickRow ? 'pointer' : 'default')};
     display: flex;
 
+    :hover {
+        div {
+            background-color: ${(props) => props.theme.colors.grey1};
+        }
+    }
+
     :active,
     :focus {
         div {
             background-color: ${(props) => props.theme.colors.grey2};
-        }
-    }
-
-    :hover {
-        div {
-            background-color: ${(props) => props.theme.colors.grey1};
         }
     }
 `;
