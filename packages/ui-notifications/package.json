@@ -10,8 +10,7 @@
     "lint": "eslint src --ext .tsx --max-warnings 0 && stylelint './src/**/*.tsx'",
     "format": "prettier src",
     "format:check": "prettier src --check",
-    "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix",
-    "package": "yarn build && yarn publish --no-git-tag-version",
+    "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix && stylelint './src/**/*.tsx' --fix",
     "test-watch": "jest --watch",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"

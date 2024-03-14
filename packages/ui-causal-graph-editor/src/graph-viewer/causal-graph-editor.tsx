@@ -95,16 +95,18 @@ const NotificationWrapper = styled.div`
 `;
 
 const GraphPane = styled.div<{ $hasFocus: boolean }>`
+    position: relative;
+
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
+
     /* We set a minHeight so that at least some of the graph will always appear within the container */
     min-height: 100px;
-    position: relative;
 
     border: 2px solid transparent;
-    border-radius: 6px;
     border-color: ${(props) => (props.$hasFocus ? props.theme.colors.grey3 : 'transparent')};
+    border-radius: 6px;
     box-shadow: ${(props) => (props.$hasFocus ? props.theme.shadow.light : 'none')};
 `;
 
