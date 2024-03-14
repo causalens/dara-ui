@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /* eslint-disable max-classes-per-file */
+
 /* eslint-disable react/prefer-stateless-function */
 import { HandlesProps, RailProps, TracksProps } from 'react-compound-slider';
 
