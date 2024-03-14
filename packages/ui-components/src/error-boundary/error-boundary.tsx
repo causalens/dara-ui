@@ -37,7 +37,7 @@ const ErrorInfo = styled.div`
 
     width: 100%;
     max-height: 125px;
-    margin: 2rem 0rem;
+    margin: 2rem 0;
     padding: 0.5rem;
 
     color: ${(props) => props.theme.colors.background};

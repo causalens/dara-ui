@@ -123,7 +123,7 @@ const Input = styled.input<InputProps>`
     flex: 1 1 auto;
 
     margin-right: 0.5rem;
-    padding: 0rem;
+    padding: 0;
 
     font-size: ${(props) => (props.size ? `${props.size}rem` : props.theme.font.size)};
     font-weight: 300;
@@ -209,7 +209,7 @@ const NoItemsLabel = styled.span`
 `;
 
 const DropdownList = styled(List)`
-    border-radius: 0px 0px 0.25rem 0.25rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     outline: 0;
     box-shadow: ${(props) => props.theme.shadow.light};
 `;

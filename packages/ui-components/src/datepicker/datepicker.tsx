@@ -72,6 +72,7 @@ interface DatepickerWrapperProps {
 }
 
 const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
+    /* stylelint-disable selector-class-pattern */
     display: flex;
     flex-direction: ${(props) => (props.inline ? 'column' : 'row')};
     align-items: ${(props) => (props.inline ? 'baseline' : 'center')};
@@ -109,7 +110,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
         width: 16.45rem;
         height: 18.5rem;
 
-        font-family: 'Manrope';
+        font-family: Manrope, sans-serif;
         font-size: 0.75rem;
 
         background-color: ${(props) => props.theme.colors.grey1};
@@ -131,7 +132,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
 
             float: none;
 
-            margin: 0px;
+            margin: 0;
 
             color: ${(props) => props.theme.colors.text};
 
@@ -144,7 +145,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
             .react-datepicker__header {
                 margin-right: 3px;
                 margin-left: 3px;
-                padding: 1.25em 0.75em 0em 0.75em;
+                padding: 1.25em 0.75em 0;
 
                 color: ${(props) => props.theme.colors.text};
 
@@ -155,12 +156,12 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
                     display: flex;
                     gap: 0.125rem;
                     justify-content: space-around;
-                    margin-bottom: 0rem;
+                    margin-bottom: 0;
 
                     .react-datepicker__day-name {
                         width: 2rem;
                         height: 2rem;
-                        margin: 0rem;
+                        margin: 0;
 
                         line-height: 2rem;
                         color: ${(props) => props.theme.colors.text};
@@ -171,9 +172,10 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
             .react-datepicker__month {
                 display: grid;
                 gap: 0.125rem;
+
                 /* Switch default margin to padding so it applies background color completely */
                 margin: 0;
-                padding: 0.125rem 0.75rem 0rem 0.75rem;
+                padding: 0.125rem 0.75rem 0;
 
                 color: ${(props) => props.theme.colors.text};
 
@@ -187,7 +189,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
                 .react-datepicker__day {
                     width: 2rem;
                     height: 2rem;
-                    margin: 0rem;
+                    margin: 0;
 
                     line-height: 2rem;
                     color: ${(props) => props.theme.colors.text};
@@ -218,7 +220,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
                             background-color: ${(props) => transparentize(0.6, props.theme.colors.primary)};
                         }
                     }
-                
+
                     &.react-datepicker__day--in-range {
                         color: ${(props) => props.theme.colors.blue1};
                         background-color: ${(props) => transparentize(0.2, props.theme.colors.primary)};
@@ -237,6 +239,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
 
                     &.react-datepicker__day--disabled {
                         color: ${(props) => props.theme.colors.grey3};
+
                         :hover {
                             background-color: ${(props) => props.theme.colors.grey1};
                         }
@@ -245,6 +248,7 @@ const DatepickerWrapper = styled.div<DatepickerWrapperProps>`
             }
         }
     }
+    /* stylelint-enable selector-class-pattern */
 `;
 
 const DatepickerInputs = styled.div`
@@ -272,9 +276,9 @@ const DropdownsWrapper = styled.div`
 `;
 
 const MonthButton = styled(Button)`
-    min-width: 0rem;
+    min-width: 0;
     height: 1.5rem;
-    margin: 0px;
+    margin: 0;
     padding: 0.75rem 0.37rem;
 
     svg {
@@ -367,6 +371,7 @@ interface TimeInputProps {
 
 const TimeInput = styled(Input)<TimeInputProps>`
     width: ${(props) => (props.isRange ? '8.5rem' : '5rem')};
+
     input {
         position: relative;
 
@@ -380,6 +385,7 @@ const TimeInput = styled(Input)<TimeInputProps>`
         text-align: center;
 
         border-radius: ${(props) => (props.isRange ? '0rem 0rem 0.25rem 0.25rem' : '0.25rem')};
+
         :focus:not(:disabled) {
             border: 1px solid ${(props) => props.theme.colors.grey3};
         }
@@ -389,11 +395,11 @@ const TimeInput = styled(Input)<TimeInputProps>`
             background: none;
         }
 
-        :after {
+        ::after {
             content: '';
 
             position: absolute;
-            top: 0px;
+            top: 0;
             left: 1.2rem;
 
             display: block;

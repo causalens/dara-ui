@@ -35,7 +35,7 @@ const CheckboxWrapper = styled.label<CheckboxWrapperProps>`
     align-items: center;
 
     width: ${(props) => (props.isListStyle ? '100%' : 'fit-content')};
-    padding: 0.5625rem 0rem 0.5625rem 2rem;
+    padding: 0.5625rem 0 0.5625rem 2rem;
 
     font-size: 1rem;
 
@@ -59,8 +59,8 @@ const CheckboxWrapper = styled.label<CheckboxWrapperProps>`
         }
     }}
 
-    // sets checkmark indicator
-    span:after {
+    /* sets checkmark indicator */
+    span::after {
         top: 0.05rem;
         left: 0.3rem;
         transform: rotate(45deg);
@@ -72,8 +72,8 @@ const CheckboxWrapper = styled.label<CheckboxWrapperProps>`
         border-width: 0 2px 2px 0;
     }
 
-    // Show the checkmark when checked
-    input:checked ~ span:after {
+    /* Show the checkmark when checked */
+    input:checked ~ span::after {
         display: block;
     }
 
@@ -93,6 +93,7 @@ const CheckboxWrapper = styled.label<CheckboxWrapperProps>`
         }
     }
 
+    /* stylelint-disable -- messy specificity ordering */
     :active {
         span,
         input:checked ~ span {
@@ -111,6 +112,7 @@ const CheckboxWrapper = styled.label<CheckboxWrapperProps>`
 
 const StyledCheckbox = styled.input<CheckboxWrapperProps>`
     cursor: pointer;
+
     /* Hide the browser's default checkbox */
     position: absolute;
 

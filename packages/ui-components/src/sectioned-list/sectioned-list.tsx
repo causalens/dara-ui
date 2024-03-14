@@ -30,7 +30,7 @@ const { stateChangeTypes } = useCombobox;
 
 const ListWrapper = styled(List)`
     margin-left: -1px;
-    border-radius: 0px 0px 0.25rem 0.25rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     box-shadow: ${(props) => props.theme.shadow.light};
 `;
 

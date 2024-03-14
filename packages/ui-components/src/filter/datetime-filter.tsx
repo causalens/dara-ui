@@ -27,8 +27,10 @@ import { FilterHeader } from './numeric-filter';
 
 const GlobalStyle = createGlobalStyle<{ theme: DefaultTheme }>`
     body {
+        /* stylelint-disable-next-line -- external classname */
         .DatetimeFilterSelect {
             background-color: ${(props) => props.theme.colors.grey1};
+
             span {
                 background-color: ${(props) => props.theme.colors.grey1};
                 border-bottom: 1px solid ${(props) => props.theme.colors.grey1};
@@ -50,7 +52,7 @@ const GlobalStyle = createGlobalStyle<{ theme: DefaultTheme }>`
 `;
 
 const DatetimeFilterWrapper = styled(FilterWrapper)`
-    gap: 0rem;
+    gap: 0;
 `;
 const DatepickerWrapper = styled.div`
     height: auto;
@@ -61,11 +63,11 @@ const DatepickerWrapper = styled.div`
 
     input {
         width: 6.7rem;
-        padding: 0px;
+        padding: 0;
         background-color: ${(props) => props.theme.colors.background};
         border: 1px solid ${(props) => props.theme.colors.background};
 
-        :after {
+        ::after {
             width: 5rem;
         }
 
@@ -103,6 +105,7 @@ const DatepickerWrapper = styled.div`
         border: none;
         box-shadow: none;
 
+        /* stylelint-disable -- external classnames */
         .react-datepicker__month-container {
             .react-datepicker__header {
                 background-color: ${(props) => props.theme.colors.grey1};
@@ -131,7 +134,7 @@ const StyledSelect = styled(Select)`
 const StyledApply = styled(ApplyButton)`
     width: 4rem;
     height: 2rem;
-    padding: 0px;
+    padding: 0;
 `;
 
 export interface FilterResults {

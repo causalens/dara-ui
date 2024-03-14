@@ -33,9 +33,9 @@ const StepperWrapper = styled.div<StepperWrapperProps>`
     justify-content: space-around;
 
     box-sizing: border-box;
-    padding: 0.25rem 0rem;
+    padding: 0.25rem 0;
 
-    border-radius: 0rem 0.25rem 0.25rem 0rem;
+    border-radius: 0 0.25rem 0.25rem 0;
 `;
 
 const StepperButton = styled(Button)`

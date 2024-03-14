@@ -24,7 +24,7 @@ import { InteractiveComponentProps } from '../types';
 
 const Wrapper = styled.div`
     display: flex;
-    margin: 0rem 0.5rem;
+    margin: 0 0.5rem;
 `;
 
 const SearchBarComponent = styled(Input)`

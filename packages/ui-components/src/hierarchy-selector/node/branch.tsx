@@ -17,7 +17,7 @@
 import { useState } from 'react';
 import * as React from 'react';
 
-import styled, { css, keyframes, useTheme } from '@darajs/styled-components';
+import styled, { keyframes, useTheme } from '@darajs/styled-components';
 import { Circle } from '@darajs/ui-icons';
 
 import { Chevron } from '../../utils';
@@ -25,13 +25,8 @@ import { Chevron } from '../../utils';
 const NodeContent = styled.li`
     margin-left: 0.35rem;
     border-left: thin solid ${(props) => props.theme.colors.grey6};
-    &:last-child {
-        border-left: none;
-        &:before {
-            border-left: thin solid ${(props) => props.theme.colors.grey6};
-        }
-    }
-    &:before {
+
+    &::before {
         content: '';
 
         display: inline-block;
@@ -43,6 +38,14 @@ const NodeContent = styled.li`
         vertical-align: top;
 
         border-bottom: thin solid ${(props) => props.theme.colors.grey6};
+    }
+
+    &:last-child {
+        border-left: none;
+
+        &::before {
+            border-left: thin solid ${(props) => props.theme.colors.grey6};
+        }
     }
 `;
 
@@ -110,14 +113,8 @@ export const NodeWrapper = styled.ul<DisplayProp>`
 
     list-style: none;
 
-    animation: ${(props) =>
-        props.open ?
-            css`
-                ${grow} 300ms ease-out forwards
-            `
-        :   css`
-                ${contract} 300ms ease-in forwards
-            `};
+    animation: ${(props) => (props.open ? grow : contract)} 300ms
+        ${(props) => (props.open ? 'ease-out forwards' : 'ease-in forwards')};
 `;
 
 export interface HierarchyNode {

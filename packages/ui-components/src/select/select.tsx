@@ -94,7 +94,7 @@ const SelectButton = styled.button<SelectButtonProps>`
 
     width: 100%;
     height: 100%;
-    padding: 0 0.5rem 0rem 1rem;
+    padding: 0 0.5rem 0 1rem;
 
     font-size: 1rem;
     color: ${(props) => props.theme.colors.text};
@@ -108,6 +108,15 @@ const SelectButton = styled.button<SelectButtonProps>`
         cursor: not-allowed;
     }
 
+    :hover:enabled {
+        background-color: ${(props) => props.theme.colors.grey2};
+    }
+
+    svg {
+        width: 1rem !important;
+        height: 0.8rem;
+    }
+
     :disabled {
         color: ${(props) => props.theme.colors.grey2};
         background-color: ${(props) => props.theme.colors.grey1};
@@ -117,19 +126,11 @@ const SelectButton = styled.button<SelectButtonProps>`
         }
     }
 
-    :hover:enabled {
-        background-color: ${(props) => props.theme.colors.grey2};
-    }
-
-    svg {
-        width: 1rem !important;
-        height: 0.8rem;
-    }
 `;
 
 const DropdownList = styled(List)`
     margin-left: -1px;
-    border-radius: 0px 0px 0.25rem 0.25rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     outline: 0;
     box-shadow: ${(props) => props.theme.shadow.light};
 `;

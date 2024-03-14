@@ -58,37 +58,37 @@ const Wrapper = styled.div<{ $hasMaxRows: boolean }>`
     width: 100%;
     max-width: 100%;
     padding: 1rem;
+
     ${(props) => !props.$hasMaxRows && `flex: 1 1 auto;`}
     &.sticky {
         [data-sticky-td] {
             position: sticky;
         }
+
         [data-sticky-last-left-td] {
-            box-shadow: 4px 0px 4px -3px ${(props) => props.theme.colors.shadowMedium};
+            box-shadow: 4px 0 4px -3px ${(props) => props.theme.colors.shadowMedium};
         }
+
         [data-sticky-first-right-td] {
-            box-shadow: -4px 0px 4px -3px ${(props) => props.theme.colors.shadowMedium};
+            box-shadow: -4px 0 4px -3px ${(props) => props.theme.colors.shadowMedium};
         }
     }
 `;
 
 const StyledFixedSizeList = styled(FixedSizeList)`
     /* this adds a fixed box shadow underneath the header */
-    :before {
+    ::before {
         content: '';
 
         position: sticky;
         z-index: 5;
-        top: calc(2.5rem - 2px);
-        right: 0;
-        bottom: 0;
-        left: 0;
+        inset: calc(2.5rem - 2px) 0 0 0;
 
         display: block;
 
         height: 1px;
 
-        box-shadow: 0px 3px 3px ${(props) => props.theme.colors.shadowLight};
+        box-shadow: 0 3px 3px ${(props) => props.theme.colors.shadowLight};
     }
 `;
 
@@ -101,6 +101,7 @@ const Header = styled.div`
 
     width: fit-content;
     min-width: 80px;
+
     /* needed as before box shadow pushes this dows by 1px */
     margin-top: -1px;
 `;
@@ -122,11 +123,13 @@ const HeaderCell = styled.div`
     color: ${(props) => props.theme.colors.text};
 
     background-color: ${(props) => props.theme.colors.blue3};
+
     :not(:last-child) {
         border-right: 1px solid ${(props) => props.theme.colors.background};
     }
 
     :hover {
+        /* stylelint-disable-next-line -- hard-coded classname */
         .tableSortArrow {
             color: ${(props) => props.theme.colors.grey3};
         }
