@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { createContext } from 'react';
 
 import { GraphApi } from '@shared/use-causal-graph-editor';
+
 import { EdgeConstraintItem, GraphState } from '@types';
 
 interface GraphContext {

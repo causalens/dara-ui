@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "lint": "eslint src --ext .tsx --max-warnings 0 && stylelint './src/**/*.tsx'",
-    "format": "prettier src",
+    "format": "prettier src --write",
     "format:check": "prettier src --check",
     "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix && stylelint './src/**/*.tsx' --fix",
     "test-watch": "jest --watch",

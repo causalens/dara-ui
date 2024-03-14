@@ -19,6 +19,7 @@ import { Button } from '@darajs/ui-components';
 import { ArrowLeft, ArrowRight } from '@darajs/ui-icons';
 
 import { useSettings } from '@shared/settings-context';
+
 import { EdgeType, EditorMode } from '@types';
 
 const EdgeName = styled.h6`

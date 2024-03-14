@@ -125,7 +125,6 @@ const SelectButton = styled.button<SelectButtonProps>`
             color: ${(props) => props.theme.colors.grey2};
         }
     }
-
 `;
 
 const DropdownList = styled(List)`

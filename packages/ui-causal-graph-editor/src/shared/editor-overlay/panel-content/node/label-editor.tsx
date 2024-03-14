@@ -21,6 +21,7 @@ import styled from '@darajs/styled-components';
 import { Input } from '@darajs/ui-components';
 
 import { useSettings } from '@shared/settings-context';
+
 import { SimulationNode } from '@types';
 
 const StyledInput = styled(Input)`
