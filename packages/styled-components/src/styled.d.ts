@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * File is needed to properly define the types for the default theme and give you type checking for accessing the theme
  *

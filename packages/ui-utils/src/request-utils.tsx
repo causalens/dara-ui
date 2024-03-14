@@ -108,7 +108,7 @@ export const getQueryStr = (options?: RequestOptions, extras?: { [k: string]: st
  */
 export const isValidResponse = (res: Response): boolean => {
     return res.status >= 100 && res.status < 400;
-}
+};
 
 /**
  * Request helper to check whether a response is valid and throw a Service error instance if it is not.
