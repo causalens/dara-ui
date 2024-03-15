@@ -46,15 +46,15 @@ const RadioWrapper = styled.label<RadioWrapperProps>`
 
     width: ${(props) => (props.isListStyle ? 'auto' : 'fit-content')};
     height: 2.5rem;
-    padding: 0rem 0.5rem;
+    padding: 0 0.5rem;
 
     color: ${(props) => (props['aria-disabled'] ? props.theme.colors.grey3 : props.theme.colors.text)};
 
     border: none;
     border-radius: 0.25rem;
 
-    // sets checkmark indicator
-    span:after {
+    /* sets checkmark indicator */
+    span::after {
         top: calc(0.25rem - 1px);
         left: calc(0.25rem - 1px);
 
@@ -65,12 +65,12 @@ const RadioWrapper = styled.label<RadioWrapperProps>`
         border-radius: 50%;
     }
 
-    // Show the checkmark when checked
-    input:checked ~ span:after {
+    /* Show the checkmark when checked */
+    input:checked ~ span::after {
         display: block;
     }
 
-    // Controls background color change depending on style
+    /* Controls background color change depending on style */
     ${(props) => {
         if (props.isListStyle) {
             return `:hover {
@@ -95,7 +95,7 @@ const RadioWrapper = styled.label<RadioWrapperProps>`
         `;
     }}
 
-    // Sets the outer rim color of radio button
+    /* Sets the outer rim color of radio button */
     :hover {
         span {
             border: 1px solid
@@ -134,7 +134,7 @@ const StyledCheckmark = styled.span<StyledCheckmarkProps>`
     border: 1px solid ${(props) => (props.disabled ? props.theme.colors.grey2 : props.theme.colors.grey3)};
     border-radius: 50%;
 
-    :after {
+    ::after {
         content: '';
         position: relative;
         display: none;

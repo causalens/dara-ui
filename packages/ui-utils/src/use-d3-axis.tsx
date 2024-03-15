@@ -104,10 +104,8 @@ export function useD3TimeAxis(data: Array<Date>, domain?: [Date, Date]): (axisSi
  * @param mapping a mapping dict that translates the numeric value to a label
  */
 export function useD3OrdinalAxis(mapping: { [k: number]: string }): (axisSize?: number) => AxisProps<string> {
-    return (): AxisProps<string> => {
-        return {
-            tickFormatter: (tick: number): string => mapping[tick],
-            type: 'category',
-        };
-    };
+    return (): AxisProps<string> => ({
+        tickFormatter: (tick: number): string => mapping[tick],
+        type: 'category',
+    });
 }

@@ -30,6 +30,7 @@ const SwitchWrapper = styled.div<EnabledProp>`
     cursor: pointer;
 
     position: relative;
+
     display: flex;
     align-items: center;
     justify-content: ${(props) => (props.enabled ? 'flex-start' : 'flex-end')};

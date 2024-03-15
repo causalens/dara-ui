@@ -31,6 +31,7 @@ const InputWrapper = styled.div<InputWrapperProps>`
     display: flex;
     flex: 1 1 auto;
     height: 3rem;
+
     div {
         flex: 1 1 auto;
     }

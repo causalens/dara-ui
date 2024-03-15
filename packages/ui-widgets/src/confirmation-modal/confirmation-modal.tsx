@@ -23,8 +23,8 @@ import useConfirmationModal from './use-confirmation-modal';
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 12px;
     width: 400px;
+    padding: 12px;
 `;
 
 const Footer = styled.div`

@@ -67,14 +67,17 @@ function useInfiniteLoader<T>(
         overscanStopIndex: 50,
     });
 
-    const getItem = useCallback((index: number) => {
-        const adjustedIndex = index - currentStartIdx;
-        if (adjustedIndex < 0 || adjustedIndex > internalData.length) {
-            return;
-        }
-        return internalData[adjustedIndex];
+    const getItem = useCallback(
+        (index: number) => {
+            const adjustedIndex = index - currentStartIdx;
+            if (adjustedIndex < 0 || adjustedIndex > internalData.length) {
+                return;
+            }
+            return internalData[adjustedIndex];
+        },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, useDeepCompare([currentStartIdx, internalData]));
+        useDeepCompare([currentStartIdx, internalData])
+    );
 
     const onItemsRendered = useCallback(
         async (
@@ -136,10 +139,13 @@ function useInfiniteLoader<T>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onLoadData]);
 
-    const refresh = useCallback(() => {
-        onItemsRendered(currentRange, true);
+    const refresh = useCallback(
+        () => {
+            onItemsRendered(currentRange, true);
+        },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, useDeepCompare([currentRange]));
+        useDeepCompare([currentRange])
+    );
 
     return {
         getItem,

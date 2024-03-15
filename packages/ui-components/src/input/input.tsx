@@ -38,10 +38,7 @@ const PrimaryInput = styled.input<PrimaryInputProps>`
     color: ${(props) => (props.disabled ? props.theme.colors.grey2 : props.theme.colors.text)};
 
     background-color: ${(props) => props.theme.colors.grey1};
-    border: 1px solid
-        ${(props) => {
-            return props.isErrored ? props.theme.colors.error : props.theme.colors.grey1;
-        }};
+    border: 1px solid ${(props) => (props.isErrored ? props.theme.colors.error : props.theme.colors.grey1)};
     border-radius: 0.25rem;
     outline: 0;
 

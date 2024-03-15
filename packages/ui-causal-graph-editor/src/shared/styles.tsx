@@ -38,10 +38,7 @@ export const Graph = styled.div`
 
     /* This is a CSS trick for the graph to fill the available space of the flex container */
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
 
     overflow: hidden;
     flex: 1 1 auto;

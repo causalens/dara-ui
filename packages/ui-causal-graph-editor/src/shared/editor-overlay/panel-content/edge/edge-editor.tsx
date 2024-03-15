@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { useSettings } from '@shared/settings-context';
+
 import { EditorMode } from '@types';
 
 import { ColumnWrapper } from '../styled';

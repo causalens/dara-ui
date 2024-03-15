@@ -50,6 +50,7 @@ export const HeaderIconWrapper = styled.div<HeaderIconWrapperProp>`
 
     :hover {
         background-color: ${(props) => transparentize(0.9, props.theme.colors.primaryHover)};
+
         svg {
             color: ${(props) => (props.hasFilter ? props.theme.colors.primary : props.theme.colors.grey3)};
         }

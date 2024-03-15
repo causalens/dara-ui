@@ -32,6 +32,7 @@ const AccordionItemWrapper = styled.div<WrapperProps>`
     border-radius: 0.25rem;
 
     /* Define the animation used for collapsing */
+    /* stylelint-disable-next-line -- external classname */
     .ReactCollapse--collapse {
         transition: height 0.35s ease;
     }
@@ -73,6 +74,7 @@ const ContentWrapper = styled.dd`
 
     width: 100%;
     height: 100%;
+
     /*
     We have to use padding for the gap between items rather than margin
     because margin doesn't work well with react-collapse and causes jumping

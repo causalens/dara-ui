@@ -189,9 +189,9 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
                     .nodeSize(() => [this.nodeSize * 3, this.nodeSize * 6])
                     .coord(coordQuad())
                     .layering(
-                        this.tiers
-                            ? layeringSimplex().group(groupAccessor).rank(rankAccessor)
-                            : getLayeringAlgorithm(this.layeringAlgorithm)
+                        this.tiers ?
+                            layeringSimplex().group(groupAccessor).rank(rankAccessor)
+                        :   getLayeringAlgorithm(this.layeringAlgorithm)
                     )
                     .decross(this.tiers ? customDecross : decrossTwoLayer());
 
@@ -200,13 +200,16 @@ export default class PlanarLayout extends GraphLayout implements TieredGraphLayo
                 throw new Error('d3-dag failed to resolve the layering of graph nodes for PlanarLayout.');
             }
 
-            const edgePoints: LayoutMapping<XYPosition[]> = Array.from(dag.links()).reduce((acc, link) => {
-                acc[`${link.source.data.id}||${link.target.data.id}`] = link.points.map((point: number[]) => ({
-                    x: this.orientation === 'vertical' ? point[0] : point[1],
-                    y: this.orientation === 'vertical' ? point[1] : point[0],
-                }));
-                return acc;
-            }, {} as LayoutMapping<XYPosition[]>);
+            const edgePoints: LayoutMapping<XYPosition[]> = Array.from(dag.links()).reduce(
+                (acc, link) => {
+                    acc[`${link.source.data.id}||${link.target.data.id}`] = link.points.map((point: number[]) => ({
+                        x: this.orientation === 'vertical' ? point[0] : point[1],
+                        y: this.orientation === 'vertical' ? point[1] : point[0],
+                    }));
+                    return acc;
+                },
+                {} as LayoutMapping<XYPosition[]>
+            );
 
             const newLayout: LayoutMapping<XYPosition> = Array.from(dag.nodes()).reduce((layout, node) => {
                 layout[node.data.id] = {

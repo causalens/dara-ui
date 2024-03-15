@@ -46,6 +46,8 @@ jobs:
         run: make prepare
       - name: Run linting
         run: make lint
+      - name: Run format check
+        run: make format-check
       - name: Run JS security - Bearer
         run: make bearer
       - name: Run tests

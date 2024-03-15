@@ -34,7 +34,7 @@ const NODE_LABEL = 'NODE_LABEL';
 /**
  * Represents a drawn Node object
  */
-export class NodeObject extends PIXI.utils.EventEmitter<typeof MOUSE_EVENTS[number]> {
+export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[number]> {
     nodeGfx: PIXI.Container;
 
     nodeLabelGfx: PIXI.Container;

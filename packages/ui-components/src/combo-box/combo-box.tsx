@@ -92,6 +92,7 @@ export const InputWrapper = styled.div<InputWrapperProps>`
     :hover {
         background-color: ${(props) => (props.disabled ? props.theme.colors.grey1 : props.theme.colors.grey2)};
     }
+
     svg {
         height: 0.8rem;
     }
@@ -103,7 +104,7 @@ export const Input = styled.input`
 
     height: 100%;
     margin-right: 0.5rem;
-    padding: 0rem;
+    padding: 0;
 
     font-size: ${(props) => (props.size ? `${props.size}rem` : props.theme.font.size)};
     font-weight: 300;
@@ -138,7 +139,7 @@ export const NoItemsLabel = styled.span`
 
 const DropdownList = styled(List)`
     margin-left: -1px;
-    border-radius: 0px 0px 0.25rem 0.25rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     box-shadow: ${(props) => props.theme.shadow.light};
 `;
 

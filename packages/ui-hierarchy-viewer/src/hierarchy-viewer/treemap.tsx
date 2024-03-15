@@ -150,23 +150,26 @@ function Treemap(props: TreemapProps): JSX.Element {
 
     const [treemap, setTreemap] = useState<any>();
 
-    useEffect(() => {
-        if (props.data) {
-            const root = d3.hierarchy(props.data).sum((node) => {
-                return node.children && node.children.length > 0 ? 0 : node.weight;
-            });
-            d3
-                .treemap()
-                .size([props.width, props.height])
-                .paddingTop(28)
-                .paddingBottom(8)
-                .paddingRight(7)
-                .paddingLeft(7)
-                .paddingInner(3)(root);
-            setTreemap(root);
-        }
+    useEffect(
+        () => {
+            if (props.data) {
+                const root = d3.hierarchy(props.data).sum((node) => {
+                    return node.children && node.children.length > 0 ? 0 : node.weight;
+                });
+                d3
+                    .treemap()
+                    .size([props.width, props.height])
+                    .paddingTop(28)
+                    .paddingBottom(8)
+                    .paddingRight(7)
+                    .paddingLeft(7)
+                    .paddingInner(3)(root);
+                setTreemap(root);
+            }
+        },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, useDeepCompare([props.data, props.height, props.width]));
+        useDeepCompare([props.data, props.height, props.width])
+    );
 
     const color = d3
         .scaleOrdinal<string>()

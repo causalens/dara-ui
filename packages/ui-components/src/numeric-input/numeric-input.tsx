@@ -33,28 +33,8 @@ const InputWrapper = styled.div<NumericInputProps>`
     padding-right: 0.5rem;
 
     background-color: ${(props) => props.theme.colors.grey1};
-    border: 1px solid
-        ${(props) => {
-            if (props.errorMsg) {
-                return props.theme.colors.error;
-            }
-            return props.theme.colors.grey1;
-        }};
+    border: 1px solid ${(props) => (props.errorMsg ? props.theme.colors.error : props.theme.colors.grey1)};
     border-radius: 0.25rem;
-
-    :focus-within:not(:disabled) {
-        border: 1px solid
-            ${(props) => {
-                if (props.errorMsg) {
-                    return props.theme.colors.error;
-                }
-                return props.theme.colors.grey3;
-            }};
-
-        input {
-            border: none;
-        }
-    }
 
     input {
         height: calc(2.5rem - 2px);
@@ -65,6 +45,7 @@ const InputWrapper = styled.div<NumericInputProps>`
     div {
         border: none;
         border-radius: 0.25rem;
+
         div {
             border: none;
             border-radius: 0.25rem;
@@ -73,6 +54,7 @@ const InputWrapper = styled.div<NumericInputProps>`
 
     :hover {
         background-color: ${(props) => (props.disabled ? props.theme.colors.grey1 : props.theme.colors.grey2)};
+        /* stylelint-disable -- fails to parse the statement */
         border: 1px solid
             ${(props) => {
                 if (props.disabled) {
@@ -83,6 +65,7 @@ const InputWrapper = styled.div<NumericInputProps>`
                 }
                 return props.theme.colors.grey2;
             }};
+        /* stylelint-enable */
 
         input {
             background-color: ${(props) => (props.disabled ? props.theme.colors.grey1 : props.theme.colors.grey2)};
@@ -93,7 +76,15 @@ const InputWrapper = styled.div<NumericInputProps>`
         }
     }
 
-    // Fix: Overrides the 22ch default width of the nested regular input
+    :focus-within:not(:disabled) {
+        border: 1px solid ${(props) => (props.errorMsg ? props.theme.colors.error : props.theme.colors.grey3)};
+
+        input {
+            border: none;
+        }
+    }
+
+    /* Fix: Overrides the 22ch default width of the nested regular input */
     > div:first-child {
         width: 100%;
         height: auto;
