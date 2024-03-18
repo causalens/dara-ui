@@ -26,6 +26,7 @@ import { ApplyButton, FilterWrapper } from './categorical-filter';
 
 const StyledSelect = styled(Select)`
     margin: 1px solid ${(props) => props.theme.colors.background};
+
     button {
         background-color: ${(props) => props.theme.colors.background};
 
@@ -45,7 +46,7 @@ export const FilterHeader = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    padding: 0rem 0.5rem;
+    padding: 0 0.5rem;
 `;
 
 interface StyledInputProps {
@@ -55,6 +56,7 @@ interface StyledInputProps {
 
 const StyledInput = styled(Input)<StyledInputProps>`
     width: ${(props) => (props.showTwoInputs ? '106px' : '100%')};
+
     input {
         width: ${(props) => (props.showTwoInputs ? '106px' : '100%')};
         background-color: ${(props) => props.theme.colors.background};

@@ -54,7 +54,7 @@ const LabelStaticDisplay = styled.div<{ $viewOnly: boolean }>`
     user-select: none;
 
     overflow: hidden;
-    display: box;
+    display: box; /* stylelint-disable-line declaration-property-value-no-unknown */
 
     width: 20ch;
     max-width: 100%;
@@ -66,9 +66,9 @@ const LabelStaticDisplay = styled.div<{ $viewOnly: boolean }>`
 
     border-radius: 4px;
 
-    box-align: center;
-    box-orient: vertical;
-    box-pack: center;
+    box-align: center; /* stylelint-disable-line property-no-unknown */
+    box-orient: vertical; /* stylelint-disable-line property-no-unknown */
+    box-pack: center; /* stylelint-disable-line property-no-unknown */
 
     -webkit-line-clamp: 3;
 
@@ -120,15 +120,14 @@ function LayerLabelEditor(props: LayerLabelEditorProps): JSX.Element {
 
     return (
         <LabelEditorWrapper ref={ref}>
-            {editEnabled ? (
+            {editEnabled ?
                 <StyledInput
                     autoFocus
                     onChange={onLabelChange}
                     onComplete={() => setEditEnabled(false)}
                     value={labelToDisplay}
                 />
-            ) : (
-                <LabelStaticDisplay
+            :   <LabelStaticDisplay
                     $viewOnly={props.viewOnly}
                     onClick={() => onEnableEditing()}
                     onKeyDown={(k) => k.key === 'Enter' && onEnableEditing()}
@@ -137,7 +136,7 @@ function LayerLabelEditor(props: LayerLabelEditorProps): JSX.Element {
                 >
                     <span>{labelToDisplay}</span>
                 </LabelStaticDisplay>
-            )}
+            }
         </LabelEditorWrapper>
     );
 }

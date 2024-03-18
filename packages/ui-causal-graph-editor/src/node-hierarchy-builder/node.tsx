@@ -45,32 +45,31 @@ const NodeCircle = styled.div<NodeSizeProp & { $isDragging?: boolean; $isMatch: 
 
     opacity: ${(props) => (props.$isDragging ? 0.8 : 1)};
     background-color: ${(props) => props.theme.colors.blue4};
-    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 0 2px rgb(0 0 0 / 40%));
     border-color: ${(props) => props.theme.colors.primary};
     border-style: solid;
     border-width: ${(props) => (props.$isMatch ? '4px' : '1px')};
     border-radius: 50%;
 
     &:hover {
-        filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.4));
+        filter: drop-shadow(0 0 4px rgb(0 0 0 / 40%));
     }
 `;
 
 const NodeText = styled.span<{ $labelSize?: number; $wrapNodeText?: boolean }>`
     ${(props) =>
-        props.$wrapNodeText
-            ? `
+        props.$wrapNodeText ?
+            `
         display: flex;
         justify-content: center;
         align-items: center;
         text-align: center;
         overflow-wrap: anywhere;
     `
-            : `
+        :   `
         text-overflow: ellipsis;
         white-space: nowrap;
     `};
-
     user-select: none;
     overflow: hidden;
     font-size: ${(props) => (props.$labelSize ? `${props.$labelSize}px` : props.theme.font.size)};

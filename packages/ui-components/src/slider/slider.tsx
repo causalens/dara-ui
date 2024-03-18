@@ -309,17 +309,20 @@ function BaseSlider<T extends string | number | React.ReactNode>({
         [getErrorMsg]
     );
 
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-        if (validateValues(sliderValues)) {
-            const formattedValues = sliderValues.map(getValueLabel);
-            onChange?.(formattedValues);
-        }
+    useEffect(
+        () => {
+            if (isFirstRender.current) {
+                isFirstRender.current = false;
+                return;
+            }
+            if (validateValues(sliderValues)) {
+                const formattedValues = sliderValues.map(getValueLabel);
+                onChange?.(formattedValues);
+            }
+        },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, useDeepCompare([sliderValues]));
+        useDeepCompare([sliderValues])
+    );
 
     const onSliderChange = useCallback(
         (value: Array<number>): void => {
@@ -333,15 +336,14 @@ function BaseSlider<T extends string | number | React.ReactNode>({
     return (
         <SliderWrapper className={className}>
             <SliderInner>
-                {showInputs ? (
+                {showInputs ?
                     <SliderInputs
                         domain={domain}
                         getErrorMsg={getErrorMsg}
                         setSliderValues={setSliderValues}
                         sliderValues={sliderValues}
                     />
-                ) : (
-                    <StyledSlider
+                :   <StyledSlider
                         domain={domain}
                         onChange={onSliderChange}
                         rootStyle={style}
@@ -428,7 +430,7 @@ function BaseSlider<T extends string | number | React.ReactNode>({
                             </Ticks>
                         )}
                     </StyledSlider>
-                )}
+                }
             </SliderInner>
             {!disableInputAlternative && sliderValues && (
                 <Tooltip content={showInputs ? 'Use Slider?' : 'Use Input Alternative?'} placement="top">

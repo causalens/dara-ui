@@ -58,37 +58,37 @@ const Wrapper = styled.div<{ $hasMaxRows: boolean }>`
     width: 100%;
     max-width: 100%;
     padding: 1rem;
+
     ${(props) => !props.$hasMaxRows && `flex: 1 1 auto;`}
     &.sticky {
         [data-sticky-td] {
             position: sticky;
         }
+
         [data-sticky-last-left-td] {
-            box-shadow: 4px 0px 4px -3px ${(props) => props.theme.colors.shadowMedium};
+            box-shadow: 4px 0 4px -3px ${(props) => props.theme.colors.shadowMedium};
         }
+
         [data-sticky-first-right-td] {
-            box-shadow: -4px 0px 4px -3px ${(props) => props.theme.colors.shadowMedium};
+            box-shadow: -4px 0 4px -3px ${(props) => props.theme.colors.shadowMedium};
         }
     }
 `;
 
 const StyledFixedSizeList = styled(FixedSizeList)`
     /* this adds a fixed box shadow underneath the header */
-    :before {
+    ::before {
         content: '';
 
         position: sticky;
         z-index: 5;
-        top: calc(2.5rem - 2px);
-        right: 0;
-        bottom: 0;
-        left: 0;
+        inset: calc(2.5rem - 2px) 0 0 0;
 
         display: block;
 
         height: 1px;
 
-        box-shadow: 0px 3px 3px ${(props) => props.theme.colors.shadowLight};
+        box-shadow: 0 3px 3px ${(props) => props.theme.colors.shadowLight};
     }
 `;
 
@@ -101,6 +101,7 @@ const Header = styled.div`
 
     width: fit-content;
     min-width: 80px;
+
     /* needed as before box shadow pushes this dows by 1px */
     margin-top: -1px;
 `;
@@ -122,11 +123,13 @@ const HeaderCell = styled.div`
     color: ${(props) => props.theme.colors.text};
 
     background-color: ${(props) => props.theme.colors.blue3};
+
     :not(:last-child) {
         border-right: 1px solid ${(props) => props.theme.colors.background};
     }
 
     :hover {
+        /* stylelint-disable-next-line -- hard-coded classname */
         .tableSortArrow {
             color: ${(props) => props.theme.colors.grey3};
         }
@@ -424,10 +427,13 @@ const Table = forwardRef(
         // This state helps in retaining the current sorted column even if the data gets updated
         const [currentSortBy, setCurrentSortBy] = useState<Array<SortingRule<string>>>(initialSort);
 
-        useEffect(() => {
-            setCurrentSortBy(initialSort);
+        useEffect(
+            () => {
+                setCurrentSortBy(initialSort);
+            },
             // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, useDeepCompare([initialSort]));
+            useDeepCompare([initialSort])
+        );
 
         if (!data && !getItem) {
             throw new Error('One of data and getItem must be passed to the table component');
@@ -548,95 +554,105 @@ const Table = forwardRef(
         }, [onFilter, filters]);
 
         const tableProps = getTableBodyProps();
-        const renderTable = useCallback(({ children, style: tableStyle, ...rest }: any) => {
-            return (
-                <div key="table-inner">
-                    <Header style={{ width: `max(${totalColumnsWidth}px, 100%)` }}>
-                        {headerGroups.map((headerGroup, gidx) => (
-                            <HeaderRow {...headerGroup.getHeaderGroupProps()} key={`group-${gidx}`}>
-                                {headerGroup.headers.map((col: ColumnHeader, cidx) => {
-                                    const headerProps = col.getHeaderProps();
-                                    const sortProps = col.getSortByToggleProps();
-                                    const headerContent = col.render('Header');
-                                    const resizerProps = col.getResizerProps();
-                                    const numVisibleColumns = allColumns.filter((column) => column.isVisible).length;
-                                    const showSort = !col.disableSortBy;
-                                    const showFilter = col.canFilter && col.filter;
-                                    const showOptions = cidx === numVisibleColumns - 1 && showTableOptions;
-                                    const showHeaderCellButtonContainer = showSort || showFilter || showOptions;
-                                    return (
-                                        <HeaderCell
-                                            {...headerProps}
-                                            key={`col-${gidx}-${cidx}`}
-                                            style={{
-                                                ...headerProps.style,
+        const renderTable = useCallback(
+            ({ children, style: tableStyle, ...rest }: any) => {
+                return (
+                    <div key="table-inner">
+                        <Header style={{ width: `max(${totalColumnsWidth}px, 100%)` }}>
+                            {headerGroups.map((headerGroup, gidx) => (
+                                <HeaderRow {...headerGroup.getHeaderGroupProps()} key={`group-${gidx}`}>
+                                    {headerGroup.headers.map((col: ColumnHeader, cidx) => {
+                                        const headerProps = col.getHeaderProps();
+                                        const sortProps = col.getSortByToggleProps();
+                                        const headerContent = col.render('Header');
+                                        const resizerProps = col.getResizerProps();
+                                        const numVisibleColumns = allColumns.filter(
+                                            (column) => column.isVisible
+                                        ).length;
+                                        const showSort = !col.disableSortBy;
+                                        const showFilter = col.canFilter && col.filter;
+                                        const showOptions = cidx === numVisibleColumns - 1 && showTableOptions;
+                                        const showHeaderCellButtonContainer = showSort || showFilter || showOptions;
+                                        return (
+                                            <HeaderCell
+                                                {...headerProps}
+                                                key={`col-${gidx}-${cidx}`}
+                                                style={{
+                                                    ...headerProps.style,
 
-                                                maxWidth: col.maxWidth,
-                                                // If width calc has messed up then use the raw width from the column
-                                                width:
-                                                    (headerProps.style as any).width === 'NaNpx'
-                                                        ? mappedColumns[cidx].width
-                                                        : (headerProps.style as any).width,
-                                            }}
-                                        >
-                                            <HeaderTooltipContainer
-                                                isPrimitiveHeader={typeof headerContent === 'string'}
+                                                    maxWidth: col.maxWidth,
+                                                    // If width calc has messed up then use the raw width from the column
+                                                    width:
+                                                        (headerProps.style as any).width === 'NaNpx' ?
+                                                            mappedColumns[cidx].width
+                                                        :   (headerProps.style as any).width,
+                                                }}
                                             >
-                                                <HeaderContentWrapper
-                                                    {...sortProps}
+                                                <HeaderTooltipContainer
                                                     isPrimitiveHeader={typeof headerContent === 'string'}
-                                                    title={typeof headerContent === 'string' ? headerContent : ''}
                                                 >
-                                                    {headerContent}
-                                                </HeaderContentWrapper>
-                                                {col.tooltip && (
-                                                    <Tooltip content={col.tooltip}>
-                                                        <TooltipIcon icon={faCircleQuestion} />
-                                                    </Tooltip>
-                                                )}
-                                            </HeaderTooltipContainer>
-                                            {showHeaderCellButtonContainer && (
-                                                <HeaderCellButtonContainer>
-                                                    <HeaderIconsWrapper>
-                                                        {showSort && (
-                                                            <HeaderIconWrapper>
-                                                                <SortIcon
-                                                                    {...sortProps}
-                                                                    className="tableSortArrow"
-                                                                    icon={getSortIcon(col.isSorted, col.isSortedDesc)}
-                                                                    isSorted={col.isSorted}
-                                                                />
-                                                            </HeaderIconWrapper>
-                                                        )}
-                                                        {showFilter ? <FilterContainer col={col} /> : null}
+                                                    <HeaderContentWrapper
+                                                        {...sortProps}
+                                                        isPrimitiveHeader={typeof headerContent === 'string'}
+                                                        title={typeof headerContent === 'string' ? headerContent : ''}
+                                                    >
+                                                        {headerContent}
+                                                    </HeaderContentWrapper>
+                                                    {col.tooltip && (
+                                                        <Tooltip content={col.tooltip}>
+                                                            <TooltipIcon icon={faCircleQuestion} />
+                                                        </Tooltip>
+                                                    )}
+                                                </HeaderTooltipContainer>
+                                                {showHeaderCellButtonContainer && (
+                                                    <HeaderCellButtonContainer>
+                                                        <HeaderIconsWrapper>
+                                                            {showSort && (
+                                                                <HeaderIconWrapper>
+                                                                    <SortIcon
+                                                                        {...sortProps}
+                                                                        className="tableSortArrow"
+                                                                        icon={getSortIcon(
+                                                                            col.isSorted,
+                                                                            col.isSortedDesc
+                                                                        )}
+                                                                        isSorted={col.isSorted}
+                                                                    />
+                                                                </HeaderIconWrapper>
+                                                            )}
+                                                            {showFilter ?
+                                                                <FilterContainer col={col} />
+                                                            :   null}
 
-                                                        {showOptions && (
-                                                            <OptionsMenu
-                                                                allColumns={allColumns}
-                                                                allowColumnHiding={allowHiding}
-                                                                numVisibleColumns={numVisibleColumns}
-                                                                resetResizing={resetResizing}
-                                                                setAllFilters={setAllFilters}
-                                                                style={tableOptionsStyle}
-                                                            />
-                                                        )}
-                                                    </HeaderIconsWrapper>
-                                                    <ResizeBorder {...resizerProps} />
-                                                </HeaderCellButtonContainer>
-                                            )}
-                                        </HeaderCell>
-                                    );
-                                })}
-                            </HeaderRow>
-                        ))}
-                    </Header>
-                    <div {...tableProps} {...rest} key="table-body-inner" style={tableStyle}>
-                        {children}
+                                                            {showOptions && (
+                                                                <OptionsMenu
+                                                                    allColumns={allColumns}
+                                                                    allowColumnHiding={allowHiding}
+                                                                    numVisibleColumns={numVisibleColumns}
+                                                                    resetResizing={resetResizing}
+                                                                    setAllFilters={setAllFilters}
+                                                                    style={tableOptionsStyle}
+                                                                />
+                                                            )}
+                                                        </HeaderIconsWrapper>
+                                                        <ResizeBorder {...resizerProps} />
+                                                    </HeaderCellButtonContainer>
+                                                )}
+                                            </HeaderCell>
+                                        );
+                                    })}
+                                </HeaderRow>
+                            ))}
+                        </Header>
+                        <div {...tableProps} {...rest} key="table-body-inner" style={tableStyle}>
+                            {children}
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            },
             // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, useDeepCompare([tableProps, totalColumnsWidth, headerGroups]));
+            useDeepCompare([tableProps, totalColumnsWidth, headerGroups])
+        );
 
         return (
             <Wrapper

@@ -50,17 +50,17 @@ export const BottomDiv = styled(OverlayDiv)<{ padding: string }>`
 
 export const TopDiv = styled(OverlayDiv)<{ padding: string }>`
     pointer-events: none;
-    gap: 1.5rem;
 
     top: ${applyPadding};
     right: ${applyPadding};
     left: ${applyPadding};
+
+    gap: 1.5rem;
 `;
 
 const CornerDiv = styled.div`
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
     gap: 0.6rem;
 `;
 
@@ -80,11 +80,13 @@ export const TopLeftDiv = styled(CornerDiv)`
 `;
 export const TopCenterDiv = styled(CornerDiv)`
     z-index: 5;
+
+    flex-shrink: 1;
     align-items: flex-start;
     justify-content: center;
+
     /* Allow the center to shrink */
     min-width: 0;
-    flex-shrink: 1;
 `;
 export const BottomRightDiv = styled(CornerDiv)`
     z-index: 5;
@@ -125,12 +127,8 @@ export const PanelDiv = styled.div<{ $hide?: boolean }>`
 
     transition: opacity 0.2s ease-in-out;
 
-    @media (max-width: 576px) {
-        top: 10px;
-        right: 10px;
-        bottom: 10px;
-        left: 10px;
-
+    @media (width <= 576px) {
+        inset: 10px;
         width: 100%;
         max-height: calc(100% - 20px);
     }

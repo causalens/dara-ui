@@ -94,7 +94,7 @@ const SelectButton = styled.button<SelectButtonProps>`
 
     width: 100%;
     height: 100%;
-    padding: 0 0.5rem 0rem 1rem;
+    padding: 0 0.5rem 0 1rem;
 
     font-size: 1rem;
     color: ${(props) => props.theme.colors.text};
@@ -108,15 +108,6 @@ const SelectButton = styled.button<SelectButtonProps>`
         cursor: not-allowed;
     }
 
-    :disabled {
-        color: ${(props) => props.theme.colors.grey2};
-        background-color: ${(props) => props.theme.colors.grey1};
-
-        svg {
-            color: ${(props) => props.theme.colors.grey2};
-        }
-    }
-
     :hover:enabled {
         background-color: ${(props) => props.theme.colors.grey2};
     }
@@ -125,11 +116,20 @@ const SelectButton = styled.button<SelectButtonProps>`
         width: 1rem !important;
         height: 0.8rem;
     }
+
+    :disabled {
+        color: ${(props) => props.theme.colors.grey2};
+        background-color: ${(props) => props.theme.colors.grey1};
+
+        svg {
+            color: ${(props) => props.theme.colors.grey2};
+        }
+    }
 `;
 
 const DropdownList = styled(List)`
     margin-left: -1px;
-    border-radius: 0px 0px 0.25rem 0.25rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     outline: 0;
     box-shadow: ${(props) => props.theme.shadow.light};
 `;
@@ -253,9 +253,9 @@ function Select(props: SelectProps): JSX.Element {
                             ...styles.popper,
 
                             width:
-                                props.applySameWidthModifier === false
-                                    ? undefined
-                                    : parseFloat((styles.popper as any)?.width) + 2,
+                                props.applySameWidthModifier === false ?
+                                    undefined
+                                :   parseFloat((styles.popper as any)?.width) + 2,
                             zIndex: 9999,
                         }}
                     >

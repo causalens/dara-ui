@@ -21,6 +21,7 @@ import styled from '@darajs/styled-components';
 import { Input } from '@darajs/ui-components';
 
 import { useSettings } from '@shared/settings-context';
+
 import { SimulationNode } from '@types';
 
 const StyledInput = styled(Input)`
@@ -104,10 +105,9 @@ function LabelEditor(props: LabelEditorProps): JSX.Element {
 
     return (
         <LabelEditorWrapper $editable={editable}>
-            {editable && editEnabled ? (
+            {editable && editEnabled ?
                 <StyledInput onChange={onLabelChange} value={label} />
-            ) : (
-                <span
+            :   <span
                     onClick={() => onEnableEditing()}
                     onKeyDown={(k) => k.key === 'Enter' && onEnableEditing()}
                     role="button"
@@ -115,7 +115,7 @@ function LabelEditor(props: LabelEditorProps): JSX.Element {
                 >
                     {label}
                 </span>
-            )}
+            }
         </LabelEditorWrapper>
     );
 }

@@ -17,7 +17,7 @@
 import styled from '@darajs/styled-components';
 
 const SubtleLabel = styled.label`
-    margin-bottom: 0px;
+    margin-bottom: 0;
     font-size: 11px;
     color: ${(props) => props.theme.colors.grey6};
 `;

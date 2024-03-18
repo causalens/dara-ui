@@ -30,7 +30,7 @@ const Row = styled.div.withConfig({ shouldForwardProp })<RowProps>`
     }
 
     :active,
-    focused {
+    :focus {
         div {
             background-color: ${(props) => props.theme.colors.grey2};
         }
@@ -39,7 +39,7 @@ const Row = styled.div.withConfig({ shouldForwardProp })<RowProps>`
 
 const RowPlaceholder = styled(Row)`
     position: absolute;
-    left: 0px;
+    left: 0;
 
     display: flex;
     align-items: center;
@@ -58,12 +58,12 @@ const CellPlaceholder = styled.div`
     background-size: 50%;
     border-radius: 0.5rem;
 
-    animation-name: aniHorizontal;
+    animation-name: ani-horizontal;
     animation-duration: 3.5s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
 
-    @keyframes aniHorizontal {
+    @keyframes ani-horizontal {
         0% {
             background-position: -100% 0;
         }
@@ -180,9 +180,9 @@ const RenderRow = React.memo(
                                 const headerProps = col.getHeaderProps();
                                 // If width calc has messed up then use the raw width from the column
                                 const headerWidth =
-                                    headerProps.style.width === 'NaNpx'
-                                        ? mappedColumns[cidx].width
-                                        : headerProps.style.width;
+                                    headerProps.style.width === 'NaNpx' ?
+                                        mappedColumns[cidx].width
+                                    :   headerProps.style.width;
 
                                 return (
                                     <CellPlaceholder
@@ -233,9 +233,9 @@ const RenderRow = React.memo(
                                 maxWidth: cell.column?.maxWidth,
                                 width:
                                     // If width calc has messed up then use the raw width from the column
-                                    cellProps.style.width === 'NaNpx'
-                                        ? mappedColumns[colIdx].width
-                                        : cellProps.style.width,
+                                    cellProps.style.width === 'NaNpx' ?
+                                        mappedColumns[colIdx].width
+                                    :   cellProps.style.width,
                             }}
                         >
                             <CellContent>

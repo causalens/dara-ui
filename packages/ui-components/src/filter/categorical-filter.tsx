@@ -96,13 +96,16 @@ const OptionsWrapper = styled.div`
 const StyledCheckboxGroup = styled(CheckboxGroup)`
     div {
         height: 2rem;
-        padding: 0rem 0.75rem;
+        padding: 0 0.75rem;
     }
+
     label {
         font-size: 0.75rem;
+
         :hover {
             background: ${(props) => props.theme.colors.grey2} !important;
         }
+
         :active {
             background: ${(props) => props.theme.colors.grey3} !important;
         }

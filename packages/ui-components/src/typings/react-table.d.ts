@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * File is needed to provide typings for the plugins in react table, see github link for details
  *

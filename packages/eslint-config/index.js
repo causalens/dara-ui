@@ -11,15 +11,15 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
         'plugin:import/typescript',
-        'prettier/prettier',
-        'plugin:prettier/recommended',
+        // disables conflicting formatting rules but doesn't run prettier itself
+        'prettier',
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
     },
-    plugins: ['react', '@typescript-eslint', 'react-hooks', 'typescript-sort-keys', 'sort-keys-fix'],
+    plugins: ['react', '@typescript-eslint', 'react-hooks'],
     rules: {
         '@typescript-eslint/explicit-function-return-type': [
             'error',
@@ -77,24 +77,9 @@ module.exports = {
         ],
 
         'import/no-named-default': 'off',
-
-        // This sorts into groups
-        'import/order': [
-            'error',
-            {
-                alphabetize: { order: 'asc' },
-                groups: [['builtin', 'external'], 'internal', ['parent', 'sibling', 'index']],
-                'newlines-between': 'always',
-                pathGroups: [
-                    {
-                        group: 'internal',
-                        pattern: '@darajs/**',
-                        position: 'before',
-                    },
-                ],
-            },
-        ],
         'import/prefer-default-export': 'off',
+        'import/order': 'off',
+        'sort-imports': 'off',
         'jsx-a11y/anchor-is-valid': ['error', { components: [] }],
         'no-continue': 'off',
         'no-inner-declarations': 'off',
@@ -133,18 +118,6 @@ module.exports = {
         'react/jsx-key': ['error', { checkFragmentShorthand: true }],
         'react/jsx-no-bind': 'off',
         'react/jsx-props-no-spreading': 'off',
-        'react/jsx-sort-props': [
-            'error',
-            {
-                // Sort props alphabetically
-                callbacksLast: false,
-                ignoreCase: false,
-                noSortAlphabetically: false,
-                reservedFirst: false,
-                shorthandFirst: false,
-                shorthandLast: false,
-            },
-        ],
         'react/jsx-uses-react': 'off',
         'react/no-array-index-key': 'off',
         'react/prop-types': 'off',
@@ -152,17 +125,14 @@ module.exports = {
         'react/require-default-props': 'off',
 
         'require-await': 'off',
-        // This sorts within destructured imports
-        'sort-imports': [
-            'error',
+        /** Previously added by prettier plugin */
+        'arrow-body-style': [
+            'off',
+            'as-needed',
             {
-                allowSeparatedGroups: true,
-                ignoreDeclarationSort: true,
+                requireReturnForObjectLiteral: false,
             },
         ],
-        'sort-keys-fix/sort-keys-fix': 'warn',
-        'typescript-sort-keys/interface': 'error',
-        'typescript-sort-keys/string-enum': 'error',
     },
     settings: {
         'import/internal-regex': '^@darajs/',

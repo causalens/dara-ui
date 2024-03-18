@@ -81,7 +81,9 @@ const OpenSearchWrapper = styled.div`
     position: relative;
     transform-origin: right;
     overflow: hidden;
-    transition: opacity 0.3s, width 0.3s;
+    transition:
+        opacity 0.3s,
+        width 0.3s;
 `;
 
 const SearchInput = styled(Input)`

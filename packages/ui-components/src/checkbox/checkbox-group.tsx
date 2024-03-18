@@ -162,9 +162,9 @@ function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
                     <CheckboxWrapper aria-disabled={props.disabled} key={`item-${index}`}>
                         <Checkbox
                             disabled={
-                                isSelectPermitted
-                                    ? props.disabled
-                                    : checkedState.find((option) => option.value === item.value)?.state === false
+                                isSelectPermitted ?
+                                    props.disabled
+                                :   checkedState.find((option) => option.value === item.value)?.state === false
                             }
                             id={index}
                             isListStyle={props.isListStyle}

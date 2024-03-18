@@ -21,12 +21,13 @@ import styled from '@darajs/styled-components';
 const TabWrapper = styled.div`
     overflow: hidden;
     display: flex;
+
     /* This is needed as the content of a TabbedCard overflows for the wrapper to not shrink */
     flex-shrink: 0;
 
     width: 100%;
 
-    border-radius: 1rem 1rem 0px 0px;
+    border-radius: 1rem 1rem 0 0;
 `;
 
 interface TabProps {
@@ -51,10 +52,12 @@ const TabComponent = styled.span<TabProps>`
     background-color: ${(props) => props.theme.colors.blue1};
     border-bottom: ${(props) =>
         props.selected ? `2px solid ${props.theme.colors.primary}` : `1px solid ${props.theme.colors.grey3}`};
+
     :hover {
         color: ${(props) => (props.selected ? props.theme.colors.primary : props.theme.colors.text)};
         background-color: ${(props) => (props.selected ? props.theme.colors.blue1 : props.theme.colors.grey1)};
     }
+
     h2 {
         font-weight: ${(props) => (props.selected ? '700' : '400')};
     }
@@ -65,7 +68,7 @@ const Title = styled.h2`
 
     width: 100%;
     margin: 0;
-    padding: 0rem 1rem;
+    padding: 0 1rem;
 
     font-size: 1rem;
     font-weight: 300;

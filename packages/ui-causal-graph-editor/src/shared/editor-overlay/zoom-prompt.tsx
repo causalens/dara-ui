@@ -14,39 +14,41 @@ interface ZoomPromptProps {
 }
 
 const PromptWrapper = styled.div`
-    padding: 0.25rem 0.5rem;
-    background-color: ${({ theme }) => mix(0.1, theme.colors.primary, theme.colors.blue1)};
-    border: 1px solid ${({ theme }) => mix(0.5, theme.colors.primary, theme.colors.blue1)};
-    color: ${({ theme }) => theme.colors.primary};
+    display: flex;
     flex-shrink: 1;
-    min-width: 0;
+    gap: 0.25rem;
+    align-items: center;
 
-    border-radius: 4px;
+    min-width: 0;
+    padding: 0.25rem 0.5rem;
 
     font-size: 0.875rem;
+    color: ${({ theme }) => theme.colors.primary};
 
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
+    background-color: ${({ theme }) => mix(0.1, theme.colors.primary, theme.colors.blue1)};
+    border: 1px solid ${({ theme }) => mix(0.5, theme.colors.primary, theme.colors.blue1)};
+    border-radius: 4px;
 `;
 
 const DismissText = styled.span`
     overflow: hidden;
+    min-width: 5ch;
     text-overflow: ellipsis;
     white-space: nowrap;
-    min-width: 5ch;
 `;
 
 const DismissButton = styled(Button)`
-    background-color: transparent;
-    font-size: 0.875rem;
-    padding: 0.25rem;
     height: auto;
+    padding: 0.25rem;
+
+    font-size: 0.875rem;
     color: ${({ theme }) => theme.colors.primary};
 
+    background-color: transparent;
+
     &:hover:not(:disabled) {
-        background-color: transparent;
         text-decoration: underline;
+        background-color: transparent;
     }
 `;
 
@@ -57,8 +59,8 @@ const DismissButtonText = styled.span`
 `;
 
 const CloseButton = styled(Button)`
-    padding: 0.25rem;
     height: auto;
+    padding: 0.25rem;
     color: ${({ theme }) => theme.colors.primary};
 
     &:hover:not(:disabled) {

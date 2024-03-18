@@ -33,10 +33,12 @@ const EditorRoot = styled.div`
     flex-direction: column;
 
     border: 1px solid ${(props) => props.theme.colors.grey3};
+
     .cm-wrap {
         flex: 1 1 auto;
         color: ${(props) => props.theme.colors.text};
     }
+
     .cm-gutters {
         color: ${(props) => props.theme.colors.grey4};
         background-color: ${(props) => props.theme.colors.grey2};

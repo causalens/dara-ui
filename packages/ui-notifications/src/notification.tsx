@@ -52,7 +52,7 @@ const NotificationWrapper = styled.div<NotificationWrapperProps>`
         mix(0.1, getStatusColor(props.status, props.theme.colors), props.theme.colors.background)};
     border: 1px solid ${(props) => getStatusColor(props.status, props.theme.colors)};
     border-radius: 0.25rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 `;
 
 const Message = styled.div`
@@ -111,6 +111,7 @@ const MoreDetailsButton = styled.button`
 
     background: transparent;
     border: none;
+
     :hover {
         text-decoration: underline;
     }

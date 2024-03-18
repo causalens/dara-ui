@@ -8,8 +8,9 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "lint": "eslint src --ext .tsx --max-warnings 0 && stylelint './src/**/*.tsx'",
-    "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix",
-    "package": "yarn build && yarn publish --no-git-tag-version",
+    "format": "prettier src --write",
+    "format:check": "prettier src --check",
+    "lint:fix": "eslint src --ext .tsx --max-warnings 0 --fix && stylelint './src/**/*.tsx' --fix",
     "test-watch": "jest --watch",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
@@ -41,10 +42,10 @@
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.13.2",
     "eslint": "^7.2.0",
-    "prettier": "2.4.1",
+    "prettier": "^3.0.0",
     "rimraf": "^3.0.2",
     "storybook-dark-mode": "^1.0.8",
-    "stylelint": "^13.5.0",
+    "stylelint": "^15.0.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {

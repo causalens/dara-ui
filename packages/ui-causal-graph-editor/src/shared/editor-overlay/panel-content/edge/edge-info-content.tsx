@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { ReactElement } from 'react';
 
 import { useSettings } from '@shared/settings-context';
 import { GraphApi } from '@shared/use-causal-graph-editor';
+
 import { EdgeConstraintItem, GraphState } from '@types';
 
 import { ColumnWrapper } from '../styled';

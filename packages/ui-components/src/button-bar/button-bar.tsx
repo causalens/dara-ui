@@ -86,8 +86,8 @@ function getButtonStyle(buttonColor: string, disabled: boolean, selected: boolea
 
     ${
         !selected &&
-        (theme.themeType === 'dark'
-            ? `
+        (theme.themeType === 'dark' ?
+            `
         :hover:not(:disabled) {
             background-color: ${transparentize(0.8, buttonColor)};
         }
@@ -97,7 +97,7 @@ function getButtonStyle(buttonColor: string, disabled: boolean, selected: boolea
             background-color: ${transparentize(0.6, buttonColor)};
         }
     `
-            : `
+        :   `
         :hover:not(:disabled) {
             background-color: ${transparentize(0.9, buttonColor)};
         }

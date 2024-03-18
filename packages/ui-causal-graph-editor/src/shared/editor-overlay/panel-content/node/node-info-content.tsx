@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { GraphApi } from '@shared/use-causal-graph-editor';
+
 import { GraphState } from '@types';
 
 import { ColumnWrapper } from '../styled';

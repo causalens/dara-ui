@@ -30,7 +30,7 @@ const { stateChangeTypes } = useCombobox;
 
 const ListWrapper = styled(List)`
     margin-left: -1px;
-    border-radius: 0px 0px 0.25rem 0.25rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     box-shadow: ${(props) => props.theme.shadow.light};
 `;
 
@@ -217,9 +217,9 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             ) {
                 // This is a hack to change the highlight in the next render cycle so filteredItems had time to update
                 setPendingHighlight(
-                    changes.selectedItem
-                        ? props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
-                        : 0
+                    changes.selectedItem ?
+                        props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
+                    :   0
                 );
                 return {
                     ...changes,

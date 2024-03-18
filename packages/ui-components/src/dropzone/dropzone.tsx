@@ -53,7 +53,7 @@ const DropzoneMessage = styled.span`
     max-width: 400px;
     padding: 1.5rem;
 
-    font-family: Manrope;
+    font-family: Manrope, sans-serif;
     font-weight: 300;
     text-align: center;
 `;

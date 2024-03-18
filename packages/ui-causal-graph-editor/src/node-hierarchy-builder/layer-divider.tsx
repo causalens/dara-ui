@@ -39,7 +39,9 @@ const LayerBorder = styled.div`
 
         background: ${(props) => props.theme.colors.grey3};
 
-        transition: background-color 0.15s cubic-bezier(0.4, 0, 1, 1), height 0.15s cubic-bezier(0.4, 0, 1, 1);
+        transition:
+            background-color 0.15s cubic-bezier(0.4, 0, 1, 1),
+            height 0.15s cubic-bezier(0.4, 0, 1, 1);
     }
 `;
 
@@ -73,6 +75,7 @@ const DividerButton = styled.button`
 
 const LayerAddArea = styled.button<{ $viewOnly: boolean }>`
     cursor: ${(props) => (props.$viewOnly ? 'inherit' : 'pointer')};
+
     /* Make it centered on the line */
     position: absolute;
     z-index: 1;
@@ -106,8 +109,8 @@ const LayerAddArea = styled.button<{ $viewOnly: boolean }>`
 
 const LayerDividerWrapper = styled.div<{ $position: 'top' | 'bottom' }>`
     position: absolute;
-    right: 0px;
-    left: 0px;
+    right: 0;
+    left: 0;
 
     ${(props) => (props.$position === 'top' ? 'bottom: 100%;' : 'top: 100%;')}
 
