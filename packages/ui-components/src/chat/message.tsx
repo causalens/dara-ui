@@ -71,6 +71,7 @@ const MessageBody = styled.div`
     display: flex;
     width: 100%;
     color: ${(props) => props.theme.colors.text};
+    word-break: break-word; 
 `;
 
 const DeleteIcon = styled(Trash)`
