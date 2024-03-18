@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where if a word was too long, such as in an url, the `Chat` message would overflow instead of wrap.
+
 ## 1.7.1
 
 -   Added a new `Chat` component.
