@@ -131,10 +131,13 @@ function MessageComponent(props: MessageProps): JSX.Element {
         if (editMessage === localMessage.message) {
             return;
         }
-        const newMessage = { ...localMessage, message: editMessage };
+        // remove any /n and trailing whitespace
+        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').replace(/\s+$/, '') };
 
         props?.onChange(newMessage);
         setLocalMessage(newMessage);
+        // need to reset the textarea message to the message without the /n and trailing whitespace
+        setEditMessage(newMessage.message);
         setEditMode(false);
     };
 
