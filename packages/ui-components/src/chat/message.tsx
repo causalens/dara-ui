@@ -132,7 +132,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
             return;
         }
         // remove any /n and trailing whitespace
-        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').replace(/\s+$/, '') };
+        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').trim() };
 
         props?.onChange(newMessage);
         setLocalMessage(newMessage);

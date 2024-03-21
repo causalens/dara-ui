@@ -147,7 +147,7 @@ function Chat(props: ChatProps): JSX.Element {
             const newMessage = {
                 id: nanoid(),
                 // remove any /n and trailing whitespace
-                message: reply.replace(/\n/g, ' ').replace(/\s+$/, ''),
+                message: reply.replace(/\n/g, ' ').trim(),
                 timestamp: getFormattedTimestamp(),
             };
             const newMessages = [...localMessages, newMessage];
