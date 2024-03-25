@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.7.3
 
 -   Fixed an issue where graph rendering would enter an infinite loop and cause crashes in some circumstances
 
