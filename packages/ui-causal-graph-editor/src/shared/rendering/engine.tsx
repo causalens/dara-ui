@@ -340,13 +340,20 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         const worldWidth = graphWidth + WORLD_PADDING * 2;
         const worldHeight = graphHeight + WORLD_PADDING * 2;
 
-        this.viewport.resize(this.container.clientWidth, this.container.clientHeight, worldWidth, worldHeight);
+        try {
+            this.viewport.resize(this.container.clientWidth, this.container.clientHeight, worldWidth, worldHeight);
 
-        this.viewport.setZoom(1);
-        this.viewport.center = graphCenter;
-        this.viewport.fit(true);
+            this.viewport.setZoom(1);
+            this.viewport.center = graphCenter;
+            this.viewport.fit(true);
 
-        this.updateGraphVisibility();
+            this.updateGraphVisibility();
+        } catch (err) {
+            // Resizing can sometimes fail if e.g the canvas are temporarily not accessible due to an ongoing layout shift
+            // We're simply ignoring this error as it's not critical and a future reset will likely succeed on next layout update
+            // eslint-disable-next-line no-console
+            console.error('Error resetting viewport', err);
+        }
     }
 
     /**
@@ -1294,7 +1301,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /**
      * Recompute the layout and apply it
      */
-    private async updateLayout(): Promise<void> {
+    private async updateLayout(retry: boolean = false): Promise<void> {
         // Cleanup previous layout
         this.onCleanup?.();
 
@@ -1310,6 +1317,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.setLayout(layout, edgePoints);
         } catch (e) {
+            if (retry) {
+                // If we're already retrying, we should stop here to avoid infinite loops
+                // This should never happen but is a safety measure
+                // eslint-disable-next-line no-console
+                console.error('Layout failed even after retrying', e);
+                return;
+            }
             // TODO: remove console below once we have a nice way of showing more info with the stack trace
             // eslint-disable-next-line no-console
             console.error(e);
@@ -1340,7 +1354,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 (this.layout as GraphLayoutWithTiers).orientation = orientation;
             }
 
-            this.updateLayout();
+            this.updateLayout(true);
         }
     }
 
