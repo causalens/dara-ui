@@ -1321,6 +1321,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             if (retry) {
                 // If we're already retrying, we should stop here to avoid infinite loops
                 // This should never happen but is a safety measure
+                // eslint-disable-next-line no-console
                 console.error('Layout failed even after retrying', e);
                 return;
             }
