@@ -1302,7 +1302,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /**
      * Recompute the layout and apply it
      */
-    private async updateLayout(): Promise<void> {
+    private async updateLayout(retry: boolean = false): Promise<void> {
         // Cleanup previous layout
         this.onCleanup?.();
 
@@ -1318,6 +1318,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.setLayout(layout, edgePoints);
         } catch (e) {
+            if (retry) {
+                // If we're already retrying, we should stop here to avoid infinite loops
+                // This should never happen but is a safety measure
+                console.error('Layout failed even after retrying', e);
+                return;
+            }
             // TODO: remove console below once we have a nice way of showing more info with the stack trace
             // eslint-disable-next-line no-console
             console.error(e);
@@ -1348,7 +1354,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 (this.layout as GraphLayoutWithTiers).orientation = orientation;
             }
 
-            this.updateLayout();
+            this.updateLayout(true);
         }
     }
 
