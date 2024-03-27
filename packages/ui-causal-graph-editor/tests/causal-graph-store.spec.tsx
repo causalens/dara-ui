@@ -27,6 +27,44 @@ const initialState = (): GraphState => ({
     }),
 });
 
+const dagInitialState = (): GraphState => ({
+    editorMode: EditorMode.DEFAULT,
+    graph: new Graph<SimulationNode, SimulationEdge>().import({
+        edges: [
+            {
+                attributes: {
+                    edge_type: EdgeType.DIRECTED_EDGE,
+                    originalMeta: {},
+                },
+                source: 'node1',
+                target: 'node2',
+            },
+            {
+                attributes: {
+                    edge_type: EdgeType.DIRECTED_EDGE,
+                    originalMeta: {},
+                },
+                source: 'node2',
+                target: 'node3',
+            },
+            {
+                attributes: {
+                    edge_type: EdgeType.DIRECTED_EDGE,
+                    originalMeta: {},
+                },
+                source: 'node3',
+                target: 'node1',
+            },
+        ],
+        nodes: [
+            { attributes: DEFAULT_NODE('node1'), key: 'node1' },
+            { attributes: DEFAULT_NODE('node2'), key: 'node2' },
+            { attributes: DEFAULT_NODE('node3'), key: 'node3' },
+            { attributes: DEFAULT_NODE('node4'), key: 'node4' },
+        ],
+    }),
+});
+
 const linkedState = (): GraphState => ({
     editorMode: EditorMode.DEFAULT,
     graph: new Graph<SimulationNode, SimulationEdge>().import({
@@ -78,6 +116,20 @@ describe('CausalGraphStore', () => {
             const modifiedState = initialState();
             modifiedState.graph.addEdge('node1', 'node2', DEFAULT_EDGE);
             modifiedState.editorMode = EditorMode.RESOLVER;
+
+            const state = GraphReducer(modifiedState, actions.addEdge(['node2', 'node1']));
+            expect(state.graph?.getEdgeAttribute('node2', 'node1', 'edge_type')).toEqual(EdgeType.DIRECTED_EDGE);
+        });
+        it('should add -> symbol if graph is a Dag and editor mode is undefined', () => {
+            const modifiedState = initialState();
+            modifiedState.graph.addEdge('node1', 'node2', DEFAULT_EDGE);
+
+            const state = GraphReducer(modifiedState, actions.addEdge(['node2', 'node1']));
+            expect(state.graph?.getEdgeAttribute('node2', 'node1', 'edge_type')).toEqual(EdgeType.DIRECTED_EDGE);
+        });
+        it('should add -- symbol if graph is not a Dag and editor mode is undefined', () => {
+            const modifiedState = dagInitialState();
+            modifiedState.graph.addEdge('node1', 'node4', DEFAULT_EDGE);
 
             const state = GraphReducer(modifiedState, actions.addEdge(['node2', 'node1']));
             expect(state.graph?.getEdgeAttribute('node2', 'node1', 'edge_type')).toEqual(EdgeType.DIRECTED_EDGE);
