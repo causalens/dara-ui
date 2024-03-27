@@ -145,7 +145,6 @@ export const GraphReducer: Reducer<GraphState, GraphAction> = (state, action) =>
                 [EditorMode.DEFAULT, EditorMode.RESOLVER].includes(editorMode) ?
                     EdgeType.DIRECTED_EDGE
                 :   EdgeType.UNDIRECTED_EDGE;
-            
 
             const attributes: SimulationEdge = {
                 edge_type: edgeType,
