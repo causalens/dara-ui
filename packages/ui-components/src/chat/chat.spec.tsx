@@ -20,9 +20,8 @@ import { fireEvent, render } from '@testing-library/react';
 
 import { ThemeProvider, theme } from '@darajs/styled-components';
 
-import Chat, { ChatProps } from './chat';
 import { Message } from '../types';
-
+import Chat, { ChatProps } from './chat';
 
 function RenderChat(props: ChatProps): JSX.Element {
     return (
