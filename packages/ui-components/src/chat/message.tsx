@@ -174,12 +174,12 @@ function MessageComponent(props: MessageProps): JSX.Element {
                     </EditButtons>
                 </div>
             )}
-           {!editMode && (
-            <MessageBody>
-                {localMessage.message}
-                {localMessage.edited && <EditedText> (edited)</EditedText>}
-            </MessageBody>
-        )}
+            {!editMode && (
+                <MessageBody>
+                    {localMessage.message}
+                    {localMessage.edited && <EditedText> (edited)</EditedText>}
+                </MessageBody>
+            )}
         </MessageWrapper>
     );
 }
