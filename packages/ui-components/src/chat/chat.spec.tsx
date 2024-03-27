@@ -20,6 +20,7 @@ import { fireEvent, render } from '@testing-library/react';
 
 import { ThemeProvider, theme } from '@darajs/styled-components';
 
+import { Message } from '../types';
 import Chat, { ChatProps } from './chat';
 
 function RenderChat(props: ChatProps): JSX.Element {
@@ -30,7 +31,7 @@ function RenderChat(props: ChatProps): JSX.Element {
     );
 }
 
-const mockMessages = [
+const mockMessages: Message[] = [
     {
         id: '1',
         message: 'Hello',
@@ -129,6 +130,7 @@ describe('Chat', () => {
 
         // Check that onUpdate was called with the new message value
         mockMessages[0].message = 'Hello2';
+        mockMessages[0].edited = true;
         expect(onUpdate).toHaveBeenCalledWith(mockMessages);
     });
 
