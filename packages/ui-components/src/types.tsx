@@ -75,4 +75,6 @@ export interface Message {
     message: string;
     /** The timestamp of the message */
     timestamp: string;
+    /** Whether the message has been edited */
+    edited?: boolean;
 }

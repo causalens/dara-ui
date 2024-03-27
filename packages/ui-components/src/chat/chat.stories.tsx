@@ -38,22 +38,11 @@ const messages = [
         timestamp: '12:01',
     },
     {
-        id: '3',
-        message:
-            'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
-        timestamp: '12:00',
-    },
-    {
-        id: '4',
-        message:
-            'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
-        timestamp: '12:01',
-    },
-    {
         id: '5',
         message:
             'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
         timestamp: '12:00',
+        edited: true,
     },
     {
         id: '6',

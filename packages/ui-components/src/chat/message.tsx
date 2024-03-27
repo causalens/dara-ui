@@ -68,10 +68,14 @@ const MessageTop = styled.div`
 `;
 
 const MessageBody = styled.div`
-    display: flex;
     width: 100%;
     color: ${(props) => props.theme.colors.text};
     overflow-wrap: break-word;
+`;
+
+const EditedText = styled.span`
+    font-size: 0.8rem;
+    color: ${(props) => props.theme.colors.grey4};
 `;
 
 const DeleteIcon = styled(Trash)`
@@ -127,16 +131,17 @@ function MessageComponent(props: MessageProps): JSX.Element {
     }
 
     const onAccept = (): void => {
-        // if the message hasn't changed, don't do anything
+        // if the message hasn't changed, just close the edit mode
         if (editMessage === localMessage.message) {
+            setEditMode(false);
             return;
         }
         // remove any /n and trailing whitespace
-        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').trim() };
+        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').trim(), edited: true };
 
         props?.onChange(newMessage);
         setLocalMessage(newMessage);
-        // need to reset the textarea message to the message without the /n and trailing whitespace
+        // reset the textarea message to the message without the /n and trailing whitespace
         setEditMessage(newMessage.message);
         setEditMode(false);
     };
@@ -169,7 +174,12 @@ function MessageComponent(props: MessageProps): JSX.Element {
                     </EditButtons>
                 </div>
             )}
-            {!editMode && <MessageBody>{localMessage.message}</MessageBody>}
+           {!editMode && (
+            <MessageBody>
+                {localMessage.message}
+                {localMessage.edited && <EditedText> (edited)</EditedText>}
+            </MessageBody>
+        )}
         </MessageWrapper>
     );
 }
