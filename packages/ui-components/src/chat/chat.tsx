@@ -133,7 +133,6 @@ function scrollToBottom(node: HTMLElement | null): void {
  */
 function Chat(props: ChatProps): JSX.Element {
     const [reply, setReply] = React.useState('');
-    const [isDisabled, setIsDisabled] = React.useState(true);
 
     const [localMessages, setLocalMessages] = React.useState(props.value ?? []);
     if (props.value && !isEqual(props.value, localMessages)) {
@@ -143,8 +142,6 @@ function Chat(props: ChatProps): JSX.Element {
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
 
     const onChangeReply = (text: string): void => {
-        // Disable the send button if the reply is empty
-        setIsDisabled(!(text.trim().length > 0));
         // Prevents the message starting with a newline
         if (!text.startsWith('\n')) {
             setReply(text);
@@ -222,7 +219,7 @@ function Chat(props: ChatProps): JSX.Element {
                     value={reply}
                 />
                 <ReplyButtons>
-                    <Button disabled={isDisabled} onClick={onSubmitMessage}>
+                    <Button disabled={!(reply.trim().length > 0)} onClick={onSubmitMessage}>
                         Send
                     </Button>
                 </ReplyButtons>
