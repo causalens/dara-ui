@@ -18,7 +18,6 @@ import { IPointData } from 'pixi.js';
 import { Reducer } from 'react';
 
 import { EdgeType, EditorMode, GraphState, SimulationEdge, SimulationGraph, VariableType } from '../types';
-import { isDag } from './utils';
 
 export enum GraphActionType {
     ACCEPT_EDGE = 'ACCEPT_EDGE',
@@ -139,10 +138,8 @@ export const GraphReducer: Reducer<GraphState, GraphAction> = (state, action) =>
         }
 
         case GraphActionType.ADD_EDGE: {
-            const editorMode = draft.editorMode ?? (isDag(draft.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
-
             const edgeType =
-                [EditorMode.DEFAULT, EditorMode.RESOLVER].includes(editorMode) ?
+                [EditorMode.DEFAULT, EditorMode.RESOLVER].includes(state.editorMode) ?
                     EdgeType.DIRECTED_EDGE
                 :   EdgeType.UNDIRECTED_EDGE;
 
