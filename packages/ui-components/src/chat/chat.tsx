@@ -141,13 +141,20 @@ function Chat(props: ChatProps): JSX.Element {
 
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
 
+    const onChangeReply = (text: string): void => {
+        // Prevents the message starting with a newline
+        if (!text.startsWith('\n')) {
+            setReply(text);
+        }
+    };
+
     const onSubmitMessage = (): void => {
         if (reply) {
             // Create a new message
             const newMessage = {
                 id: nanoid(),
-                // remove any /n and trailing whitespace
-                message: reply.replace(/\n/g, ' ').trim(),
+                // remove any trailing whitespace
+                message: reply.trim(),
                 timestamp: getFormattedTimestamp(),
             };
             const newMessages = [...localMessages, newMessage];
@@ -204,9 +211,17 @@ function Chat(props: ChatProps): JSX.Element {
                 ))}
             </ChatBody>
             <ReplyWrapper>
-                <TextArea onChange={setReply} placeholder="Add a comment" resize="none" value={reply} />
+                <TextArea
+                    onChange={onChangeReply}
+                    onComplete={onSubmitMessage}
+                    placeholder="Add a comment"
+                    resize="none"
+                    value={reply}
+                />
                 <ReplyButtons>
-                    <Button onClick={onSubmitMessage}>Send</Button>
+                    <Button disabled={!(reply.trim().length > 0)} onClick={onSubmitMessage}>
+                        Send
+                    </Button>
                 </ReplyButtons>
             </ReplyWrapper>
         </ChatWrapper>
