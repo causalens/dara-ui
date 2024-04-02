@@ -55,6 +55,7 @@ interface AddLatentNodeAction {
 
 interface InitGraphAction {
     graph: SimulationGraph;
+    editorMode: EditorMode;
     type: GraphActionType.INIT_GRAPH;
 }
 
@@ -138,7 +139,7 @@ export const GraphReducer: Reducer<GraphState, GraphAction> = (state, action) =>
         }
 
         case GraphActionType.ADD_EDGE: {
-            const edgeType = [EditorMode.DEFAULT, EditorMode.RESOLVER].includes(draft.editorMode)
+            const edgeType = [EditorMode.DEFAULT, EditorMode.RESOLVER].includes(state.editorMode)
                 ? EdgeType.DIRECTED_EDGE
                 : EdgeType.UNDIRECTED_EDGE;
 
@@ -180,6 +181,7 @@ export const GraphReducer: Reducer<GraphState, GraphAction> = (state, action) =>
 
         case GraphActionType.INIT_GRAPH: {
             draft.graph = action.graph;
+            draft.editorMode = action.editorMode;
 
             break;
         }
