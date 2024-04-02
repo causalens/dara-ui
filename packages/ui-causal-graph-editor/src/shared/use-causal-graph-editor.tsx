@@ -108,8 +108,12 @@ export default function useCausalGraphEditor(
             !isEqual(lastParentData.current.nodes, graphData.nodes) ||
             !isEqual(lastParentData.current.edges, graphData.edges)
         ) {
+            const parsedGraph = causalGraphParser(graphData, availableInputs, state.graph);
+            const newEditorMode = editorMode ?? (isDag(parsedGraph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
+
             dispatch({
                 graph: causalGraphParser(graphData, availableInputs, state.graph),
+                editorMode: newEditorMode,
                 type: GraphActionType.INIT_GRAPH,
             });
         }

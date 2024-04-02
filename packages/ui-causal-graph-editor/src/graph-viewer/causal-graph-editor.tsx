@@ -42,7 +42,7 @@ import {
 } from '@shared/editor-overlay';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import useGraphTooltip from '@shared/use-graph-tooltip';
-import { getTooltipContent, isDag, willCreateCycle } from '@shared/utils';
+import { getTooltipContent, willCreateCycle } from '@shared/utils';
 
 import {
     CausalGraph,
@@ -172,10 +172,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         props.availableInputs
     );
 
-    const [editorMode] = useState(
-        () => props.editorMode ?? (isDag(state.graph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER)
-    );
-
     const [error, setError] = useState(null);
     const handleError = (e: NotificationPayload): void => {
         setError(e);
@@ -195,7 +191,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     } = useRenderEngine({
         constraints: props.initialConstraints,
         editable: props.editable,
-        editorMode,
+        editorMode: state.editorMode,
         errorHandler: handleError,
         graph: state.graph,
         layout,
@@ -282,7 +278,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         useEdgeConstraintEncoder(props.initialConstraints, props.onEdgeConstraintsUpdate);
 
     const selectedConstraint = useMemo(() => {
-        if (editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
+        if (state.editorMode === EditorMode.EDGE_ENCODER && selectedEdge) {
             const [source, target] = selectedEdge;
 
             // Find constraint with either matching or reversed source/target
@@ -290,7 +286,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 (c) => (c.source === source && c.target === target) || (c.source === target && c.target === source)
             );
         }
-    }, [editorMode, selectedEdge, constraints]);
+    }, [state.editorMode, selectedEdge, constraints]);
 
     // deletion
 
@@ -306,7 +302,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
 
     function onConfirmRemoveEdge(): void {
         // In encoder mode, remove related constraint
-        if (editorMode === EditorMode.EDGE_ENCODER) {
+        if (state.editorMode === EditorMode.EDGE_ENCODER) {
             onRemoveConstraint();
         }
 
@@ -358,7 +354,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
             return;
         }
 
-        if (editorMode === EditorMode.EDGE_ENCODER) {
+        if (state.editorMode === EditorMode.EDGE_ENCODER) {
             const [source, target] = edge;
             addConstraint(source, target);
         }
@@ -407,7 +403,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         api.updateEdgeType(selectedEdge, EdgeType.DIRECTED_EDGE);
 
         if (reverse) {
-            if (editorMode === EditorMode.EDGE_ENCODER) {
+            if (state.editorMode === EditorMode.EDGE_ENCODER) {
                 onReverseConstraint();
             }
 
@@ -476,7 +472,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         const sourceLabel = sourceNodeAttributes['meta.rendering_properties.label'] ?? sourceNodeAttributes.id;
         const targetLabel = targetNodeAttributes['meta.rendering_properties.label'] ?? targetNodeAttributes.id;
 
-        const tooltipArrow = editorMode === EditorMode.DEFAULT ? '➜' : '-';
+        const tooltipArrow = state.editorMode === EditorMode.DEFAULT ? '➜' : '-';
 
         const edgeTooltipContent = getTooltipContent(
             `${sourceLabel} ${tooltipArrow} ${targetLabel}`,
@@ -634,7 +630,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     if (selectedEdge) {
         contentSelected = state.graph.hasEdge(selectedEdge[0], selectedEdge[1]);
         panelTitle = 'Edge';
-    } else if (selectedNode && editorMode !== EditorMode.EDGE_ENCODER) {
+    } else if (selectedNode && state.editorMode !== EditorMode.EDGE_ENCODER) {
         contentSelected = state.graph.hasNode(selectedNode);
         panelTitle = 'Node';
     }
@@ -656,7 +652,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 disableLatentNodeAdd: props.disableLatentNodeAdd,
                 disableNodeRemoval: props.disableNodeRemoval,
                 editable: props.editable,
-                editorMode,
+                editorMode: state.editorMode,
                 onNotify: props.onNotify,
                 verboseDescriptions: props.verboseDescriptions,
             }}
@@ -667,7 +663,11 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                         <Overlay
                             bottomLeft={
                                 <Legend
-                                    listItems={getLegendData(props.defaultLegends, editorMode, props.additionalLegends)}
+                                    listItems={getLegendData(
+                                        props.defaultLegends,
+                                        state.editorMode,
+                                        props.additionalLegends
+                                    )}
                                 />
                             }
                             onDelete={onDelete}
