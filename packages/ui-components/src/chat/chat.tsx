@@ -24,7 +24,7 @@ import { Xmark } from '@darajs/ui-icons';
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
 import { InteractiveComponentProps, Message } from '../types';
-import { default as MessageComponent } from './message';
+import { default as MessageComponent, getFormattedTimestamp } from './message';
 
 const ChatWrapper = styled.div`
     overflow-y: auto;
@@ -101,21 +101,6 @@ export interface ChatProps extends InteractiveComponentProps<Message[]> {
 }
 
 /**
- * A function to get the formatted timestamp to display in the submitted message
- */
-function getFormattedTimestamp(): string {
-    const now = new Date();
-
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // +1 because months are 0-indexed
-    const year = now.getFullYear();
-
-    return `${hours}:${minutes} ${day}/${month}/${year}`;
-}
-
-/**
  * A function to scroll to the bottom of the chat so that the latest message is visible
  */
 function scrollToBottom(node: HTMLElement | null): void {
@@ -148,7 +133,7 @@ function Chat(props: ChatProps): JSX.Element {
                 id: nanoid(),
                 // remove any /n and trailing whitespace
                 message: reply.replace(/\n/g, ' ').trim(),
-                timestamp: getFormattedTimestamp(),
+                created_at: getFormattedTimestamp(),
             };
             const newMessages = [...localMessages, newMessage];
 

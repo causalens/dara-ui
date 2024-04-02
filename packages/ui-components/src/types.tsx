@@ -73,8 +73,8 @@ export interface Message {
     id: string;
     /** The message content */
     message: string;
-    /** The timestamp of the message */
-    timestamp: string;
-    /** Whether the message has been edited */
-    edited?: boolean;
+    /** The timestamp of the creation of the message */
+    created_at: string;
+    /** The timestamp of the last time the message was edited */
+    updated_at?: string;
 }

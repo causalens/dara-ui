@@ -22,6 +22,7 @@ import { PenToSquare, Trash } from '@darajs/ui-icons';
 
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
+import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Message } from '../types';
 
 const InteractiveIcons = styled.div`
@@ -118,6 +119,21 @@ export interface MessageProps extends InteractiveComponentProps<Message> {
 }
 
 /**
+ * A function to get the formatted timestamp to display in the submitted message
+ */
+export function getFormattedTimestamp(): string {
+    const now = new Date();
+
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // +1 because months are 0-indexed
+    const year = now.getFullYear();
+
+    return `${hours}:${minutes} ${day}/${month}/${year}`;
+}
+
+/**
  * A Message component that displays a message with a timestamp and allows for editing and deleting
  *
  * @param {MessageProps} props - the component props
@@ -137,7 +153,11 @@ function MessageComponent(props: MessageProps): JSX.Element {
             return;
         }
         // remove any /n and trailing whitespace
-        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').trim(), edited: true };
+        const newMessage = {
+            ...localMessage,
+            message: editMessage.replace(/\n/g, ' ').trim(),
+            updated_at: getFormattedTimestamp(),
+        };
 
         props?.onChange(newMessage);
         setLocalMessage(newMessage);
@@ -155,7 +175,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
     return (
         <MessageWrapper className={props.className} style={props.style}>
             <MessageTop>
-                {props.value.timestamp}
+                {props.value.created_at}
                 {!editMode && (
                     <InteractiveIcons>
                         <EditIcon data-testid="message-edit-button" onClick={() => setEditMode(true)} role="button" />
@@ -177,7 +197,11 @@ function MessageComponent(props: MessageProps): JSX.Element {
             {!editMode && (
                 <MessageBody>
                     {localMessage.message}
-                    {localMessage.edited && <EditedText> (edited)</EditedText>}
+                    {localMessage.updated_at && (
+                        <Tooltip content={props.value.updated_at}>
+                            <EditedText> (edited)</EditedText>
+                        </Tooltip>
+                    )}
                 </MessageBody>
             )}
         </MessageWrapper>
