@@ -6,6 +6,8 @@ title: Changelog
 
 -   Fixed an issue where if a word was too long, such as in an url, the `Chat` message would overflow instead of wrap.
 -   Fixed an issue where in `Chat` component if a newline character was added to a comment, on subsequent reloads it would show '/n' in the message.
+-   `Chat` will now send a message when `Enter` is pressed by the user.
+-   `Chat` now shows a disabled state for the `Send` button if the message to be sent is empty.
 
 ## 1.7.1
 
