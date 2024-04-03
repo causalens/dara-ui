@@ -20,6 +20,7 @@ import { fireEvent, render } from '@testing-library/react';
 
 import { ThemeProvider, theme } from '@darajs/styled-components';
 
+import { Message } from '../types';
 import Chat, { ChatProps } from './chat';
 
 function RenderChat(props: ChatProps): JSX.Element {
@@ -30,21 +31,24 @@ function RenderChat(props: ChatProps): JSX.Element {
     );
 }
 
-const mockMessages = [
+const mockMessages: Message[] = [
     {
         id: '1',
         message: 'Hello',
-        timestamp: '12:00',
+        created_at: '2024-04-03T10:34:17.167Z',
+        updated_at: '2024-04-03T10:34:17.167Z',
     },
     {
         id: '2',
         message: 'Hi',
-        timestamp: '12:01',
+        created_at: '2024-04-03T10:35:17.167Z',
+        updated_at: '2024-04-03T10:35:17.167Z',
     },
     {
         id: '3',
         message: 'Hey',
-        timestamp: '12:02',
+        created_at: '2024-04-03T10:36:17.167Z',
+        updated_at: '2024-04-03T10:36:17.167Z',
     },
 ];
 
@@ -127,9 +131,12 @@ describe('Chat', () => {
         const saveButton = getByRole('button', { name: /save/i });
         fireEvent.click(saveButton);
 
-        // Check that onUpdate was called with the new message value
-        mockMessages[0].message = 'Hello2';
-        expect(onUpdate).toHaveBeenCalledWith(mockMessages);
+        // Check that onUpdate was called with the new message
+        expect(onUpdate).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ message: 'Hello2' })]));
+        // Check that the message timestamp was updated
+        const firstCallArgument = onUpdate.mock.calls[0][0]; // Get the first argument of the first call
+        const firstMessage = firstCallArgument[0];
+        expect(firstMessage.created_at).not.toBe(firstMessage.updated_at);
     });
 
     it('delete message should trigger onUpdate', () => {

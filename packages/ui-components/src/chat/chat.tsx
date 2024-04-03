@@ -101,21 +101,6 @@ export interface ChatProps extends InteractiveComponentProps<Message[]> {
 }
 
 /**
- * A function to get the formatted timestamp to display in the submitted message
- */
-function getFormattedTimestamp(): string {
-    const now = new Date();
-
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // +1 because months are 0-indexed
-    const year = now.getFullYear();
-
-    return `${hours}:${minutes} ${day}/${month}/${year}`;
-}
-
-/**
  * A function to scroll to the bottom of the chat so that the latest message is visible
  */
 function scrollToBottom(node: HTMLElement | null): void {
@@ -151,11 +136,13 @@ function Chat(props: ChatProps): JSX.Element {
     const onSubmitMessage = (): void => {
         if (reply) {
             // Create a new message
+            const timestamp = new Date().toISOString();
             const newMessage = {
                 id: nanoid(),
-                // remove any trailing whitespace
+                // remove any /n and trailing whitespace
                 message: reply.trim(),
-                timestamp: getFormattedTimestamp(),
+                created_at: timestamp,
+                updated_at: timestamp,
             };
             const newMessages = [...localMessages, newMessage];
 

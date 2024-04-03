@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { format, parseISO } from 'date-fns';
 import { isEqual } from 'lodash';
 import * as React from 'react';
 
@@ -22,6 +23,7 @@ import { PenToSquare, Trash } from '@darajs/ui-icons';
 
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
+import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Message } from '../types';
 
 const InteractiveIcons = styled.div`
@@ -67,11 +69,15 @@ const MessageTop = styled.div`
     color: ${(props) => props.theme.colors.grey5};
 `;
 
-const MessageBody = styled.div`
-    display: flex;
+const MessageBody = styled.span`
     width: 100%;
     color: ${(props) => props.theme.colors.text};
     overflow-wrap: break-word;
+`;
+
+const EditedText = styled.span`
+    font-size: 0.8rem;
+    color: ${(props) => props.theme.colors.grey4};
 `;
 
 const DeleteIcon = styled(Trash)`
@@ -114,6 +120,13 @@ export interface MessageProps extends InteractiveComponentProps<Message> {
 }
 
 /**
+ * A function to get the formatted timestamp to display in the submitted message
+ */
+export function getFormattedTimestamp(date: string): string {
+    return format(parseISO(date), 'HH:mm dd/MM/yyyy');
+}
+
+/**
  * A Message component that displays a message with a timestamp and allows for editing and deleting
  *
  * @param {MessageProps} props - the component props
@@ -127,16 +140,21 @@ function MessageComponent(props: MessageProps): JSX.Element {
     }
 
     const onAccept = (): void => {
-        // if the message hasn't changed, don't do anything
+        // if the message hasn't changed, just close the edit mode
         if (editMessage === localMessage.message) {
+            setEditMode(false);
             return;
         }
         // remove any /n and trailing whitespace
-        const newMessage = { ...localMessage, message: editMessage.replace(/\n/g, ' ').trim() };
+        const newMessage = {
+            ...localMessage,
+            message: editMessage.replace(/\n/g, ' ').trim(),
+            updated_at: new Date().toISOString(),
+        };
 
         props?.onChange(newMessage);
         setLocalMessage(newMessage);
-        // need to reset the textarea message to the message without the /n and trailing whitespace
+        // reset the textarea message to the message without the /n and trailing whitespace
         setEditMessage(newMessage.message);
         setEditMode(false);
     };
@@ -150,7 +168,14 @@ function MessageComponent(props: MessageProps): JSX.Element {
     return (
         <MessageWrapper className={props.className} style={props.style}>
             <MessageTop>
-                {props.value.timestamp}
+                <div>
+                    {getFormattedTimestamp(props.value.created_at)}
+                    {localMessage.updated_at !== localMessage.created_at && (
+                        <Tooltip content={getFormattedTimestamp(props.value.updated_at)}>
+                            <EditedText> (edited)</EditedText>
+                        </Tooltip>
+                    )}
+                </div>
                 {!editMode && (
                     <InteractiveIcons>
                         <EditIcon data-testid="message-edit-button" onClick={() => setEditMode(true)} role="button" />
