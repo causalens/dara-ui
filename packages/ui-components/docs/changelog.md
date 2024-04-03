@@ -8,6 +8,8 @@ title: Changelog
 -   Fixed an issue where in `Chat` component if a newline character was added to a comment, on subsequent reloads it would show '/n' in the message.
 -   **Breaking** In `Chat` messages, changed `timestamp` prop to be divided into two `created_at` and `updated_at`. 
 -   Added "(edited)" indicator to the messages which have been edited in the `Chat` component.
+-   `Chat` will now send a message when `Enter` is pressed by the user.
+-   `Chat` now shows a disabled state for the `Send` button if the message to be sent is empty.
 
 ## 1.7.1
 
