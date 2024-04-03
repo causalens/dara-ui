@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { format, parseISO } from 'date-fns';
 import { isEqual } from 'lodash';
 import * as React from 'react';
 
@@ -68,7 +69,7 @@ const MessageTop = styled.div`
     color: ${(props) => props.theme.colors.grey5};
 `;
 
-const MessageBody = styled.div`
+const MessageBody = styled.span`
     width: 100%;
     color: ${(props) => props.theme.colors.text};
     overflow-wrap: break-word;
@@ -121,16 +122,8 @@ export interface MessageProps extends InteractiveComponentProps<Message> {
 /**
  * A function to get the formatted timestamp to display in the submitted message
  */
-export function getFormattedTimestamp(): string {
-    const now = new Date();
-
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // +1 because months are 0-indexed
-    const year = now.getFullYear();
-
-    return `${hours}:${minutes} ${day}/${month}/${year}`;
+export function getFormattedTimestamp(date: string): string {
+    return format(parseISO(date), 'HH:mm dd/MM/yyyy');
 }
 
 /**
@@ -156,7 +149,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
         const newMessage = {
             ...localMessage,
             message: editMessage.replace(/\n/g, ' ').trim(),
-            updated_at: getFormattedTimestamp(),
+            updated_at: new Date().toISOString(),
         };
 
         props?.onChange(newMessage);
@@ -175,7 +168,14 @@ function MessageComponent(props: MessageProps): JSX.Element {
     return (
         <MessageWrapper className={props.className} style={props.style}>
             <MessageTop>
-                {props.value.created_at}
+                <div>
+                    {getFormattedTimestamp(props.value.created_at)}
+                    {localMessage.updated_at !== localMessage.created_at && (
+                        <Tooltip content={getFormattedTimestamp(props.value.updated_at)}>
+                            <EditedText> (edited)</EditedText>
+                        </Tooltip>
+                    )}
+                </div>
                 {!editMode && (
                     <InteractiveIcons>
                         <EditIcon data-testid="message-edit-button" onClick={() => setEditMode(true)} role="button" />
@@ -194,16 +194,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
                     </EditButtons>
                 </div>
             )}
-            {!editMode && (
-                <MessageBody>
-                    {localMessage.message}
-                    {localMessage.updated_at && (
-                        <Tooltip content={props.value.updated_at}>
-                            <EditedText> (edited)</EditedText>
-                        </Tooltip>
-                    )}
-                </MessageBody>
-            )}
+            {!editMode && <MessageBody>{localMessage.message}</MessageBody>}
         </MessageWrapper>
     );
 }

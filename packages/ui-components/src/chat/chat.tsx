@@ -24,7 +24,7 @@ import { Xmark } from '@darajs/ui-icons';
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
 import { InteractiveComponentProps, Message } from '../types';
-import { default as MessageComponent, getFormattedTimestamp } from './message';
+import { default as MessageComponent } from './message';
 
 const ChatWrapper = styled.div`
     overflow-y: auto;
@@ -129,11 +129,13 @@ function Chat(props: ChatProps): JSX.Element {
     const onSubmitMessage = (): void => {
         if (reply) {
             // Create a new message
+            const timestamp = new Date().toISOString();
             const newMessage = {
                 id: nanoid(),
                 // remove any /n and trailing whitespace
                 message: reply.replace(/\n/g, ' ').trim(),
-                created_at: getFormattedTimestamp(),
+                created_at: timestamp,
+                updated_at: timestamp,
             };
             const newMessages = [...localMessages, newMessage];
 

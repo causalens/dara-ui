@@ -6,7 +6,8 @@ title: Changelog
 
 -   Fixed an issue where if a word was too long, such as in an url, the `Chat` message would overflow instead of wrap.
 -   Fixed an issue where in `Chat` component if a newline character was added to a comment, on subsequent reloads it would show '/n' in the message.
--   Added "(edited)" indicator to the end of any messages which have been edited in the `Chat` component.
+-   **Breaking** In `Chat` messages, changed `timestamp` prop to be divided into two `created_at` and `updated_at`. 
+-   Added "(edited)" indicator to the messages which have been edited in the `Chat` component.
 
 ## 1.7.1
 

@@ -76,5 +76,5 @@ export interface Message {
     /** The timestamp of the creation of the message */
     created_at: string;
     /** The timestamp of the last time the message was edited */
-    updated_at?: string;
+    updated_at: string;
 }

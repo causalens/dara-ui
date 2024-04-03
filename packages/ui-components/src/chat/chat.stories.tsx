@@ -26,30 +26,24 @@ export default {
 
 const messages = [
     {
-        id: '1',
+        id: 'yYZ1_TTZbL9is7RhG_C0l',
         message:
             'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
-        created_at: '14:31 02/04/2024',
+        created_at: '2024-04-03T10:34:05.502Z',
+        updated_at: '2024-04-03T10:34:05.502Z',
     },
     {
-        id: '2',
+        id: 'oGbwtu9PHMVNYbFfxN7Br',
         message:
             'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
-        created_at: '15:31 02/04/2024',
+        created_at: '2024-04-03T10:34:17.167Z',
+        updated_at: '2024-04-03T10:34:17.167Z',
     },
     {
-        id: '5',
-        message:
-            'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
-        timestamp: '12:00',
-        created_at: '15:35 02/04/2024',
-    },
-    {
-        id: '6',
-        message:
-            'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
-        created_at: '16:32 02/04/2024',
-        updated_at: '16:35 02/04/2024',
+        id: 'ocRSEZU9DeILt8MvyKu0b',
+        message: 'This is another test message, which has been edited!',
+        created_at: '2024-04-03T10:34:26.944Z',
+        updated_at: '2024-04-03T10:34:45.061Z',
     },
 ];
 
