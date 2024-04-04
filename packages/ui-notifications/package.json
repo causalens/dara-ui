@@ -52,7 +52,7 @@
     "lodash": "4.17.21",
     "polished": "^4.1.1",
     "react": "^18.0",
-    "rxjs": "6.5.5"
+    "rxjs": "^7.0.0"
   },
   "files": [
     "dist"
