@@ -2,10 +2,13 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.7.4
+
+-   Fixed an issue where if `EditorMode` was not defined edges were always added as undirected.
+
+## 1.7.3
 
 -   Fixed an issue where graph rendering would enter an infinite loop and cause crashes in some circumstances.
--   Fixed an issue where if `EditorMode` was not defined edges were always added as undirected.
 
 ## 1.7.0
 
