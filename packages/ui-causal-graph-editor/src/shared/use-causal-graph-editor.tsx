@@ -62,8 +62,8 @@ export default function useCausalGraphEditor(
 
             return {
                 ...initState,
-                graph: parsedGraph,
                 editorMode: newEditorMode,
+                graph: parsedGraph,
             };
         }
     );
@@ -113,8 +113,8 @@ export default function useCausalGraphEditor(
             const newEditorMode = editorMode ?? (isDag(parsedGraph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
 
             dispatch({
-                graph: causalGraphParser(graphData, availableInputs, state.graph),
                 editorMode: newEditorMode,
+                graph: causalGraphParser(graphData, availableInputs, state.graph),
                 type: GraphActionType.INIT_GRAPH,
             });
         }

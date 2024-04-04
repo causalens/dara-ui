@@ -54,8 +54,8 @@ interface AddLatentNodeAction {
 }
 
 interface InitGraphAction {
-    graph: SimulationGraph;
     editorMode: EditorMode;
+    graph: SimulationGraph;
     type: GraphActionType.INIT_GRAPH;
 }
 
