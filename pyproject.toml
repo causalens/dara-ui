@@ -2,7 +2,7 @@
 requires = ["poetry"]
 [tool.poetry]
 name = "borg-meta-package"
-version = "1.7.4"
+version = "1.8.0"
 description = "Borg Meta Package"
 authors = ["borg"]
 
