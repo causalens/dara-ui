@@ -67,7 +67,9 @@ const LabelStaticDisplay = styled.div<{ $viewOnly: boolean }>`
     border-radius: 4px;
 
     box-align: center; /* stylelint-disable-line property-no-unknown */
+
     box-orient: vertical; /* stylelint-disable-line property-no-unknown */
+
     box-pack: center; /* stylelint-disable-line property-no-unknown */
 
     -webkit-line-clamp: 3;
