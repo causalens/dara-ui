@@ -4,6 +4,9 @@
 var ignoredModules = [
     'nanoid',
     'react-markdown',
+    'devlop',
+    'hast-util-to-jsx-runtime',
+    'comma-separated-tokens'
 ];
 
 module.exports = {
