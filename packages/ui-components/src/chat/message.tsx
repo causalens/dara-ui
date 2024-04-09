@@ -17,8 +17,6 @@
 import { format, parseISO } from 'date-fns';
 import { isEqual } from 'lodash';
 import * as React from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 import styled from '@darajs/styled-components';
 import { PenToSquare, Trash } from '@darajs/ui-icons';
@@ -26,6 +24,7 @@ import { PenToSquare, Trash } from '@darajs/ui-icons';
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
 import Tooltip from '../tooltip/tooltip';
+import Markdown from '../markdown/markdown';
 import { InteractiveComponentProps, Message } from '../types';
 
 const InteractiveIcons = styled.div`
@@ -205,7 +204,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
             )}
             {!editMode && (
                 <MessageBody>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{processText(localMessage.message)}</ReactMarkdown>
+                    <Markdown markdown={processText(localMessage.message)} />
                 </MessageBody>
             )}
         </MessageWrapper>

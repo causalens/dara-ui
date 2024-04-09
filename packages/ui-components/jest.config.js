@@ -1,6 +1,11 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
+var ignoredModules = [
+    'nanoid',
+    'react-markdown',
+];
+
 module.exports = {
     // All imported modules in your tests should be mocked automatically
     // automock: false,
@@ -170,7 +175,7 @@ module.exports = {
     },
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-    transformIgnorePatterns: ['/node_modules/(?!(nanoid))'],
+    transformIgnorePatterns: [`node_modules/(?!(.pnpm/)?(${ignoredModules.join('|')})).*`],
 
     // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
     // unmockedModulePathPatterns: undefined,

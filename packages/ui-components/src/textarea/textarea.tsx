@@ -130,7 +130,6 @@ function TextArea({
             return;
         }
         if (e.key === Key.ENTER && onComplete) {
-            e.preventDefault(); // stops the enter being entered as a character to the textarea component
             onComplete();
         }
     };
