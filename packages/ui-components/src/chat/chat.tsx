@@ -23,7 +23,7 @@ import { Xmark } from '@darajs/ui-icons';
 
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
-import { InteractiveComponentProps, Message } from '../types';
+import { InteractiveComponentProps, Message, UserData } from '../types';
 import { default as MessageComponent } from './message';
 
 const ChatWrapper = styled.div`
@@ -98,6 +98,8 @@ export interface ChatProps extends InteractiveComponentProps<Message[]> {
     onClose?: () => void | Promise<void>;
     /** Event triggered when the chat is changed */
     onUpdate?: (value: Message[]) => void | Promise<void>;
+    /** The user who is currently active in the chat */
+    active_user: UserData;
 }
 
 /**
@@ -109,6 +111,20 @@ function scrollToBottom(node: HTMLElement | null): void {
             node.scrollTop = node.scrollHeight;
         }
     }, 100);
+}
+
+/**
+ * A function to check if the user wrote the message
+ *
+ * @param {Message} message - the message to check
+ * @param {UserData} user - the user to check against
+ * @returns {boolean} - true if the user wrote the message
+ */
+function didUserWriteMessage(message: Message, user: UserData): boolean {
+    if (user.user_id) {
+        return message.user.user_id === user.user_id;
+    }
+    return message.user.user_name === user.user_name;
 }
 
 /**
@@ -143,6 +159,7 @@ function Chat(props: ChatProps): JSX.Element {
                 message: reply.trim(),
                 created_at: timestamp,
                 updated_at: timestamp,
+                user: props.active_user,
             };
             const newMessages = [...localMessages, newMessage];
 
@@ -194,6 +211,7 @@ function Chat(props: ChatProps): JSX.Element {
                         onChange={onEditMessage}
                         onDelete={onDeleteMessage}
                         value={message}
+                        isEditable={didUserWriteMessage(message, props.active_user)}
                     />
                 ))}
             </ChatBody>

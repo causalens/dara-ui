@@ -18,13 +18,13 @@ import { format, parseISO } from 'date-fns';
 import { isEqual } from 'lodash';
 import * as React from 'react';
 
-import styled from '@darajs/styled-components';
+import styled, { useTheme } from '@darajs/styled-components';
 import { PenToSquare, Trash } from '@darajs/ui-icons';
 
 import Button from '../button/button';
 import TextArea from '../textarea/textarea';
 import Tooltip from '../tooltip/tooltip';
-import { InteractiveComponentProps, Message } from '../types';
+import { InteractiveComponentProps, Message, UserData } from '../types';
 
 const InteractiveIcons = styled.div`
     position: absolute;
@@ -63,9 +63,12 @@ const MessageTop = styled.div`
     justify-content: space-between;
 
     width: 100%;
-    height: 1.625rem;
 
-    font-size: 0.8rem;
+    font-size: 0.875rem;
+`;
+
+const MessageTimestamp = styled.span`
+    font-size: 0.75rem;
     color: ${(props) => props.theme.colors.grey5};
 `;
 
@@ -78,6 +81,7 @@ const MessageBody = styled.span`
 const EditedText = styled.span`
     font-size: 0.8rem;
     color: ${(props) => props.theme.colors.grey4};
+    align-self: end;
 `;
 
 const DeleteIcon = styled(Trash)`
@@ -112,11 +116,31 @@ const EditButtons = styled.div`
     justify-content: flex-end;
 `;
 
+const UserInfoWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+`;
+
+const AvatarIcon = styled.div`
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    font-weight: 700;
+    color: white;
+    justify-content: center;
+    align-items: center;
+
+`;
+
 export interface MessageProps extends InteractiveComponentProps<Message> {
     /** An optional onChange handler for listening to changes in the input */
     onChange?: (value: Message, e?: React.SyntheticEvent<HTMLInputElement>) => void | Promise<void>;
     /** An optional event listener for complete events (enter presses) */
     onDelete?: (id: string) => void | Promise<void>;
+    /** An optional flag to determine if the message is editable */
+    isEditable?: boolean;
 }
 
 /**
@@ -126,18 +150,54 @@ export function getFormattedTimestamp(date: string): string {
     return format(parseISO(date), 'HH:mm dd/MM/yyyy');
 }
 
+function selectColor(name: string, colors: string[]): string {
+    // Convert the name to lowercase for consistency
+    name = name.toLowerCase();
+
+    // Calculate the sum of ASCII values of the characters in the name
+    let asciiSum = 0;
+    for (let char of name) {
+        asciiSum += char.charCodeAt(0);
+    }
+
+    // Use the remainder to select a color
+    const colorIndex = asciiSum % colors.length;
+    return colors[colorIndex];
+}
+
+function getInitials(name: string): string {
+    // Split the name into parts (assuming parts are separated by spaces)
+    const parts = name.trim().split(/\s+/);
+
+    // Get the first character of the first part
+    let initials = parts[0][0];
+
+    // If there's a second part, add its first character
+    if (parts.length > 1) {
+        initials += parts[1][0];
+    }
+
+    // Convert initials to uppercase
+    return initials.toUpperCase();
+}             // J
+
+
 /**
  * A Message component that displays a message with a timestamp and allows for editing and deleting
  *
  * @param {MessageProps} props - the component props
  */
 function MessageComponent(props: MessageProps): JSX.Element {
+    const theme = useTheme();
     const [editMode, setEditMode] = React.useState(false);
     const [editMessage, setEditMessage] = React.useState(props.value.message);
     const [localMessage, setLocalMessage] = React.useState(props.value);
     if (props.value && !isEqual(props.value, localMessage)) {
         setLocalMessage(props.value);
     }
+
+    // List of colors
+    const colors = [theme.colors.secondary, theme.colors.violet, theme.colors.turquoise, theme.colors.purple, theme.colors.teal, theme.colors.orange, theme.colors.plum];
 
     const onAccept = (): void => {
         // if the message hasn't changed, just close the edit mode
@@ -168,15 +228,19 @@ function MessageComponent(props: MessageProps): JSX.Element {
     return (
         <MessageWrapper className={props.className} style={props.style}>
             <MessageTop>
-                <div>
-                    {getFormattedTimestamp(props.value.created_at)}
+                <UserInfoWrapper>
+                    <AvatarIcon style={{ backgroundColor: selectColor(localMessage.user.user_name, colors) }}>{getInitials(localMessage.user.user_name)}</AvatarIcon>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {localMessage.user.user_name}
+                        <MessageTimestamp>{getFormattedTimestamp(props.value.created_at)}</MessageTimestamp>
+                    </div>
                     {localMessage.updated_at !== localMessage.created_at && (
                         <Tooltip content={getFormattedTimestamp(props.value.updated_at)}>
                             <EditedText> (edited)</EditedText>
                         </Tooltip>
                     )}
-                </div>
-                {!editMode && (
+                </UserInfoWrapper>
+                {!editMode && props.isEditable && (
                     <InteractiveIcons>
                         <EditIcon data-testid="message-edit-button" onClick={() => setEditMode(true)} role="button" />
                         <DeleteIcon data-testid="message-delete-button" onClick={onDelete} role="button" />

@@ -77,4 +77,12 @@ export interface Message {
     created_at: string;
     /** The timestamp of the last time the message was edited */
     updated_at: string;
+    /** User data of the person who wrote the message*/
+    user: UserData;
+}
+
+export interface UserData {
+    user_id?: string;
+    user_name: string;
+    user_email?: string;
 }

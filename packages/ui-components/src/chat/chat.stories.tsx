@@ -18,11 +18,22 @@ import { Meta } from '@storybook/react';
 import * as React from 'react';
 
 import { default as ChatComponent } from './chat';
+import { UserData } from '../types';
 
 export default {
     component: ChatComponent,
     title: 'UI Components/Chat',
 } as Meta;
+
+const testUser: UserData = {
+    user_name: 'Test User',
+    user_id: 'test_user_id',
+}
+
+const testUser2: UserData = {
+    user_name: 'Harry Potter',
+    user_id: 'test_user_id2',
+}
 
 const messages = [
     {
@@ -31,6 +42,7 @@ const messages = [
             'For uploading templates, we would need to provide a user the interface to select associated folders and files along with the dbook they wish to save to the registry.',
         created_at: '2024-04-03T10:34:05.502Z',
         updated_at: '2024-04-03T10:34:05.502Z',
+        user: testUser,
     },
     {
         id: 'oGbwtu9PHMVNYbFfxN7Br',
@@ -38,21 +50,25 @@ const messages = [
             'Do we want to consider some of the management of metacell / template registries as a UI/UX flow occurring outside of Studio itself? i.e. it is a platform level user journey?',
         created_at: '2024-04-03T10:34:17.167Z',
         updated_at: '2024-04-03T10:34:17.167Z',
+        user: testUser,
     },
     {
         id: 'ocRSEZU9DeILt8MvyKu0b',
         message: 'This is another test message, which has been edited!',
         created_at: '2024-04-03T10:34:26.944Z',
         updated_at: '2024-04-03T10:34:45.061Z',
+        user: testUser2,
     },
 ];
+
+
 
 export const Chat = (): JSX.Element => {
     const [value, setValue] = React.useState(messages);
 
     return (
         <div style={{ backgroundColor: 'black', display: 'flex' }}>
-            <ChatComponent onUpdate={setValue} value={value} />
+            <ChatComponent active_user={testUser} onUpdate={setValue} value={value} />
         </div>
     );
 };
