@@ -8,6 +8,10 @@ interface MarkdownProps extends Options {
      * The markdown string to render
      */
     markdown: string;
+    /** Pass through of className property */
+    className?: string;
+    /** Native react style property, can be used to fine tune the element appearance */
+    style?: React.CSSProperties;
 }
 
 const CustomMarkdownWrapper = styled.div`
@@ -44,16 +48,6 @@ const CustomMarkdownWrapper = styled.div`
     math {
         padding: 0.5rem;
         font-size: 1.5rem;
-    }
-
-    /* stylelint-disable-next-line */
-    highlight {
-        background-color: ${(props) => props.theme.colors.blue4};
-
-        &.highlight-focused {
-            color: ${(props) => props.theme.colors.background};
-            background-color: ${(props) => props.theme.colors.primary};
-        }
     }
 
     a {
@@ -278,10 +272,10 @@ const CustomMarkdownWrapper = styled.div`
  * A component for rendering markdown
  */
 function Markdown(props: MarkdownProps): JSX.Element {
-    const { markdown, ...reactMarkdownProps } = props;
+    const { markdown, className, style, ...reactMarkdownProps } = props;
 
     return (
-        <CustomMarkdownWrapper>
+        <CustomMarkdownWrapper className={className} style={style}>
             <ReactMarkdown {...reactMarkdownProps} remarkPlugins={reactMarkdownProps.remarkPlugins ?? [remarkGfm]}>
                 {markdown}
             </ReactMarkdown>
