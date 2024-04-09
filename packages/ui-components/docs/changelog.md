@@ -2,17 +2,20 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.8.0
 
--   Fixed an issue where if a word was too long, such as in an url, the `Chat` message would overflow instead of wrap.
--   Fixed an issue where in `Chat` component if a newline character was added to a comment, on subsequent reloads it would show '/n' in the message.
--   **Breaking** In `Chat` messages, changed `timestamp` prop to be divided into two `created_at` and `updated_at`. 
+-   **Breaking** In `Chat` messages, changed `timestamp` prop to be divided into two `created_at` and `updated_at`.
 -   Added "(edited)" indicator to the messages which have been edited in the `Chat` component.
 -   `Chat` will now send a message when `Enter` is pressed by the user.
 -   `Chat` now shows a disabled state for the `Send` button if the message to be sent is empty.
 -   `Chat` component now displays its messages content as `Markdown`.
 -   `Chat` component now displays next line breaks.
 -   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter. 
+
+## 1.7.2
+
+-   Fixed an issue where if a word was too long, such as in an url, the `Chat` message would overflow instead of wrap.
+-   Fixed an issue where in `Chat` component if a newline character was added to a comment, on subsequent reloads it would show '/n' in the message.
 
 ## 1.7.1
 
