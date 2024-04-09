@@ -10,6 +10,9 @@ title: Changelog
 -   Added "(edited)" indicator to the messages which have been edited in the `Chat` component.
 -   `Chat` will now send a message when `Enter` is pressed by the user.
 -   `Chat` now shows a disabled state for the `Send` button if the message to be sent is empty.
+-   `Chat` component now displays its messages content as `Markdown`.
+-   `Chat` component now displays next line breaks.
+-   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter. 
 
 ## 1.7.1
 
