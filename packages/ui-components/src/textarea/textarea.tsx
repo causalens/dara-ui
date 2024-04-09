@@ -126,6 +126,9 @@ function TextArea({
         if (keydownFilter && !keydownFilter(e)) {
             e.preventDefault();
         }
+        if (e.key === Key.ENTER && e.shiftKey && onComplete) {
+            return;
+        }
         if (e.key === Key.ENTER && onComplete) {
             onComplete();
         }

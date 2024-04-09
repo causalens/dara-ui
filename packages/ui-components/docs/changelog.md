@@ -2,6 +2,13 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   `Chat` component now displays its messages content as `Markdown`.
+-   `Chat` component now displays next line breaks.
+-   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter. 
+-   Added a new `Markdown` component.
+
 ## 1.8.0
 
 -   **Breaking** In `Chat` messages, changed `timestamp` prop to be divided into two `created_at` and `updated_at`.
