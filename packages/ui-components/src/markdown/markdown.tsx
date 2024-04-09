@@ -274,7 +274,6 @@ const CustomMarkdownWrapper = styled.div`
     }
 `;
 
-
 /**
  * A component for rendering markdown
  */

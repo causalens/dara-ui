@@ -22,9 +22,9 @@ import styled from '@darajs/styled-components';
 import { PenToSquare, Trash } from '@darajs/ui-icons';
 
 import Button from '../button/button';
+import Markdown from '../markdown/markdown';
 import TextArea from '../textarea/textarea';
 import Tooltip from '../tooltip/tooltip';
-import Markdown from '../markdown/markdown';
 import { InteractiveComponentProps, Message } from '../types';
 
 const InteractiveIcons = styled.div`
