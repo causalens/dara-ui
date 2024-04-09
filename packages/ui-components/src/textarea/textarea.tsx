@@ -115,11 +115,8 @@ function TextArea({
     value,
     resize,
 }: TextAreaProps): JSX.Element {
-    const [textAreaValue, setTextAreaValue] = React.useState<string>(value);
-
     const onChangeText = (e: React.SyntheticEvent<HTMLTextAreaElement>): void => {
         const target = e.target as HTMLInputElement;
-        setTextAreaValue(target.value);
         if (onChange) {
             onChange(target.value, e);
         }
@@ -134,7 +131,6 @@ function TextArea({
         }
         if (e.key === Key.ENTER && onComplete) {
             e.preventDefault(); // stops the enter being entered as a character to the textarea component
-            setTextAreaValue(''); // clear the text area on complete
             onComplete();
         }
     };
@@ -152,7 +148,7 @@ function TextArea({
                 onKeyDown={onKeyDown}
                 placeholder={placeholder}
                 style={{ resize }}
-                value={textAreaValue}
+                value={value}
             />
             {errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
         </div>
