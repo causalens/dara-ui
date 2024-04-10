@@ -23,6 +23,7 @@ export {
     InteractiveComponentProps,
     CarouselItem,
     Message,
+    UserData,
 } from './types';
 
 export { default as Accordion } from './accordion/accordion';

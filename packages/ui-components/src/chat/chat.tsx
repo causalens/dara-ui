@@ -121,10 +121,10 @@ function scrollToBottom(node: HTMLElement | null): void {
  * @returns {boolean} - true if the user wrote the message
  */
 function didUserWriteMessage(message: Message, user: UserData): boolean {
-    if (user.user_id) {
-        return message.user.user_id === user.user_id;
+    if (user?.id) {
+        return message.user?.id === user.id;
     }
-    return message.user.user_name === user.user_name;
+    return message.user.name === user.name;
 }
 
 /**

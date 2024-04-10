@@ -31,30 +31,47 @@ function RenderChat(props: ChatProps): JSX.Element {
     );
 }
 
+const mockUser1 = {
+    id: 'user1',
+    name: 'User 1',
+    email: 'user@email.com',
+};
+
+const mockUser2 = {
+    name: 'User 2',
+};
+
+const mockUser3 = {
+    name: 'User 3',
+};
+
 const mockMessages: Message[] = [
     {
         id: '1',
         message: 'Hello',
         created_at: '2024-04-03T10:34:17.167Z',
         updated_at: '2024-04-03T10:34:17.167Z',
+        user: mockUser1,
     },
     {
         id: '2',
         message: 'Hi',
         created_at: '2024-04-03T10:35:17.167Z',
         updated_at: '2024-04-03T10:35:17.167Z',
+        user: mockUser2,
     },
     {
         id: '3',
         message: 'Hey',
         created_at: '2024-04-03T10:36:17.167Z',
         updated_at: '2024-04-03T10:36:17.167Z',
+        user: mockUser1,
     },
 ];
 
 describe('Chat', () => {
     it('should be able to add a message', () => {
-        const { getByRole, getByText } = render(<RenderChat />);
+        const { getByRole, getByText } = render(<RenderChat active_user={mockUser1} />);
         const textArea = getByRole('textbox');
         // Write a message in textare
         fireEvent.change(textArea, { target: { value: 'Hello' } });
@@ -63,14 +80,32 @@ describe('Chat', () => {
         // Click the send button
         const button = getByRole('button', { name: /send/i });
         fireEvent.click(button);
+        expect(textArea).toHaveValue('');
 
-        // Check that the message is added
+        // Check that the message is added with expected user and content
         expect(getByText('Hello')).toBeInTheDocument();
+        expect(getByText('User 1')).toBeInTheDocument();
+    });
+
+    it('should be able to add a message with enter', () => {
+        const { getByRole, getByText } = render(<RenderChat active_user={mockUser1} />);
+        const textArea = getByRole('textbox');
+        // Write a message in textare
+        fireEvent.change(textArea, { target: { value: 'Hello' } });
+        expect(textArea).toHaveValue('Hello');
+
+        // Press enter
+        fireEvent.keyDown(textArea, { key: 'Enter', code: 'Enter' });
+        expect(textArea).toHaveValue('');
+
+        // Check that the message is added with expected user and content
+        expect(getByText('Hello')).toBeInTheDocument();
+        expect(getByText('User 1')).toBeInTheDocument();
     });
 
     it('onUpdate should be called when submiting a message', () => {
         const onUpdate = jest.fn();
-        const { getByRole } = render(<RenderChat onUpdate={onUpdate} value={mockMessages} />);
+        const { getByRole } = render(<RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />);
 
         // Write a new message
         const textArea = getByRole('textbox');
@@ -90,7 +125,7 @@ describe('Chat', () => {
     it('cancel edited message should not trigger onUpdate', () => {
         const onUpdate = jest.fn();
         const { getByRole, getAllByTestId, getAllByRole, getByDisplayValue } = render(
-            <RenderChat onUpdate={onUpdate} value={mockMessages} />
+            <RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Check that there is only one textarea which is to add new messages
@@ -114,7 +149,7 @@ describe('Chat', () => {
     it('save edited message should trigger onUpdate', () => {
         const onUpdate = jest.fn();
         const { getByRole, getAllByTestId, getAllByRole, getByDisplayValue } = render(
-            <RenderChat onUpdate={onUpdate} value={mockMessages} />
+            <RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Check no messages are currently in edit mode
@@ -141,12 +176,31 @@ describe('Chat', () => {
 
     it('delete message should trigger onUpdate', () => {
         const onUpdate = jest.fn();
-        const { getAllByTestId } = render(<RenderChat onUpdate={onUpdate} value={mockMessages} />);
+        const { getAllByTestId } = render(
+            <RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />
+        );
 
         // Delete the first message
         const deleteButton = getAllByTestId('message-delete-button');
         fireEvent.click(deleteButton[0]);
 
         expect(onUpdate).toHaveBeenCalledWith(mockMessages.slice(1));
+    });
+
+    it('user should not be able to edit/delete a message that does not belong to them', () => {
+        const { getAllByTestId, queryByTestId, rerender } = render(
+            <RenderChat active_user={mockUser3} value={mockMessages} />
+        );
+
+        // Check if user can edit any messages. Since user3 has not sent any, this should be none
+        expect(queryByTestId('message-delete-button')).not.toBeInTheDocument();
+        expect(queryByTestId('message-edit-button')).not.toBeInTheDocument();
+
+        // Rerender with a different active user that has already sent a message
+        rerender(<RenderChat active_user={mockUser2} value={mockMessages} />);
+
+        // Check that they can now see the edit and delete buttons for the message they sent
+        expect(getAllByTestId('message-delete-button')).toHaveLength(1);
+        expect(getAllByTestId('message-edit-button')).toHaveLength(1);
     });
 });

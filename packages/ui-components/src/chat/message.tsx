@@ -25,7 +25,7 @@ import Button from '../button/button';
 import Markdown from '../markdown/markdown';
 import TextArea from '../textarea/textarea';
 import Tooltip from '../tooltip/tooltip';
-import { InteractiveComponentProps, Message, UserData } from '../types';
+import { InteractiveComponentProps, Message } from '../types';
 
 const InteractiveIcons = styled.div`
     position: absolute;
@@ -62,9 +62,7 @@ const MessageWrapper = styled.div`
 const MessageTop = styled.div`
     display: flex;
     justify-content: space-between;
-
     width: 100%;
-
     font-size: 0.875rem;
 `;
 
@@ -80,9 +78,9 @@ const MessageBody = styled.span`
 `;
 
 const EditedText = styled.span`
+    align-self: end;
     font-size: 0.8rem;
     color: ${(props) => props.theme.colors.grey4};
-    align-self: end;
 `;
 
 const DeleteIcon = styled(Trash)`
@@ -119,20 +117,22 @@ const EditButtons = styled.div`
 
 const UserInfoWrapper = styled.div`
     display: flex;
-    align-items: center;
     gap: 0.5rem;
+    align-items: center;
 `;
 
 const AvatarIcon = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     width: 2rem;
     height: 2rem;
-    border-radius: 50%;
-    display: flex;
+
     font-weight: 700;
     color: white;
-    justify-content: center;
-    align-items: center;
 
+    border-radius: 50%;
 `;
 
 export interface MessageProps extends InteractiveComponentProps<Message> {
@@ -151,13 +151,16 @@ export function getFormattedTimestamp(date: string): string {
     return format(parseISO(date), 'HH:mm dd/MM/yyyy');
 }
 
+/**
+ * A function to assign a color to user token depending on their name
+ */
 function selectColor(name: string, colors: string[]): string {
     // Convert the name to lowercase for consistency
-    name = name.toLowerCase();
+    const lowerCaseName = name.toLowerCase();
 
     // Calculate the sum of ASCII values of the characters in the name
     let asciiSum = 0;
-    for (let char of name) {
+    for (const char of lowerCaseName) {
         asciiSum += char.charCodeAt(0);
     }
 
@@ -166,22 +169,20 @@ function selectColor(name: string, colors: string[]): string {
     return colors[colorIndex];
 }
 
+/**
+ * A function to get the user's initials
+ */
 function getInitials(name: string): string {
-    // Split the name into parts (assuming parts are separated by spaces)
     const parts = name.trim().split(/\s+/);
-
-    // Get the first character of the first part
     let initials = parts[0][0];
 
-    // If there's a second part, add its first character
+    // If there's a second part, add its first character, so we only get two letter initials
     if (parts.length > 1) {
         initials += parts[1][0];
     }
 
-    // Convert initials to uppercase
     return initials.toUpperCase();
-}             // J
-
+}
 
 /**
  * A function to porcess the text for the markdown render
@@ -205,7 +206,15 @@ function MessageComponent(props: MessageProps): JSX.Element {
     }
 
     // List of colors
-    const colors = [theme.colors.secondary, theme.colors.violet, theme.colors.turquoise, theme.colors.purple, theme.colors.teal, theme.colors.orange, theme.colors.plum];
+    const colors = [
+        theme.colors.secondary,
+        theme.colors.violet,
+        theme.colors.turquoise,
+        theme.colors.purple,
+        theme.colors.teal,
+        theme.colors.orange,
+        theme.colors.plum,
+    ];
 
     const onAccept = (): void => {
         // if the message hasn't changed, just close the edit mode
@@ -237,9 +246,11 @@ function MessageComponent(props: MessageProps): JSX.Element {
         <MessageWrapper className={props.className} style={props.style}>
             <MessageTop>
                 <UserInfoWrapper>
-                    <AvatarIcon style={{ backgroundColor: selectColor(localMessage.user.user_name, colors) }}>{getInitials(localMessage.user.user_name)}</AvatarIcon>
+                    <AvatarIcon style={{ backgroundColor: selectColor(localMessage.user.name, colors) }}>
+                        {getInitials(localMessage.user.name)}
+                    </AvatarIcon>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {localMessage.user.user_name}
+                        {localMessage.user.name}
                         <MessageTimestamp>{getFormattedTimestamp(props.value.created_at)}</MessageTimestamp>
                     </div>
                     {localMessage.updated_at !== localMessage.created_at && (
