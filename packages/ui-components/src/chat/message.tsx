@@ -22,6 +22,7 @@ import styled, { useTheme } from '@darajs/styled-components';
 import { PenToSquare, Trash } from '@darajs/ui-icons';
 
 import Button from '../button/button';
+import Markdown from '../markdown/markdown';
 import TextArea from '../textarea/textarea';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Message, UserData } from '../types';
@@ -183,6 +184,13 @@ function getInitials(name: string): string {
 
 
 /**
+ * A function to porcess the text for the markdown render
+ */
+export function processText(text: string): string {
+    return text.replace(/\n/g, '\n\n');
+}
+
+/**
  * A Message component that displays a message with a timestamp and allows for editing and deleting
  *
  * @param {MessageProps} props - the component props
@@ -208,7 +216,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
         // remove any /n and trailing whitespace
         const newMessage = {
             ...localMessage,
-            message: editMessage.replace(/\n/g, ' ').trim(),
+            message: editMessage.trim(),
             updated_at: new Date().toISOString(),
         };
 
@@ -258,7 +266,11 @@ function MessageComponent(props: MessageProps): JSX.Element {
                     </EditButtons>
                 </div>
             )}
-            {!editMode && <MessageBody>{localMessage.message}</MessageBody>}
+            {!editMode && (
+                <MessageBody>
+                    <Markdown markdown={processText(localMessage.message)} />
+                </MessageBody>
+            )}
         </MessageWrapper>
     );
 }

@@ -1,6 +1,48 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
+var ignoredModules = [
+    'nanoid',
+    'react-markdown',
+    'devlop',
+    'hast-util-to-jsx-runtime',
+    'comma-separated-tokens',
+    'estree-util-is-identifier-name',
+    'hast-util-whitespace',
+    'property-information',
+    'unist-util-position',
+    'space-separated-tokens',
+    'vfile-message',
+    'unist-util-stringify-position',
+    'html-url-attributes',
+    'remark-parse',
+    'mdast-util-from-markdown',
+    'mdast-util-to-string',
+    'mdast-util-to-hast',
+    'micromark',
+    'decode-named-character-reference',
+    'remark-rehype',
+    'trim-lines',
+    'unist-util-visit',
+    'unist-util-is',
+    'unified',
+    'bail',
+    'is-plain-obj',
+    'trough',
+    'vfile',
+    'remark-gf',
+    'mdast-util-gf',
+    'ccount',
+    'mdast-util-find-and-replace',
+    'escape-string-regexp',
+    'markdown-table',
+    'mdast-util-to-markdown',
+    'zwitch',
+    'longest-streak',
+    'jest-runtime',
+    'mdast-util-phrasing',
+];
+
 module.exports = {
     // All imported modules in your tests should be mocked automatically
     // automock: false,
@@ -170,7 +212,7 @@ module.exports = {
     },
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-    transformIgnorePatterns: ['/node_modules/(?!(nanoid))'],
+    transformIgnorePatterns: [`node_modules/(?!(.pnpm/)?(${ignoredModules.join('|')})).*`],
 
     // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
     // unmockedModulePathPatterns: undefined,
