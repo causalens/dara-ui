@@ -205,8 +205,8 @@ function MessageComponent(props: MessageProps): JSX.Element {
         setLocalMessage(props.value);
     }
 
-    // List of colors
-    const colors = [
+    // List of colors for user token to pick from
+    const tokenColors = [
         theme.colors.secondary,
         theme.colors.violet,
         theme.colors.turquoise,
@@ -246,7 +246,7 @@ function MessageComponent(props: MessageProps): JSX.Element {
         <MessageWrapper className={props.className} style={props.style}>
             <MessageTop>
                 <UserInfoWrapper>
-                    <AvatarIcon style={{ backgroundColor: selectColor(localMessage.user.name, colors) }}>
+                    <AvatarIcon style={{ backgroundColor: selectColor(localMessage.user.name, tokenColors) }}>
                         {getInitials(localMessage.user.name)}
                     </AvatarIcon>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
