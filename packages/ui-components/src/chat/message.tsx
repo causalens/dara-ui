@@ -178,7 +178,7 @@ function getInitials(name: string): string {
 
     // If there's a second part, add its first character, so we only get two letter initials
     if (parts.length > 1) {
-        initials += parts[1][0];
+        initials += parts[parts.length - 1][0];
     }
 
     return initials.toUpperCase();

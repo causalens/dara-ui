@@ -71,7 +71,7 @@ const mockMessages: Message[] = [
 
 describe('Chat', () => {
     it('should be able to add a message', () => {
-        const { getByRole, getByText } = render(<RenderChat active_user={mockUser1} />);
+        const { getByRole, getByText } = render(<RenderChat activeUser={mockUser1} />);
         const textArea = getByRole('textbox');
         // Write a message in textare
         fireEvent.change(textArea, { target: { value: 'Hello' } });
@@ -88,7 +88,7 @@ describe('Chat', () => {
     });
 
     it('should be able to add a message with enter', () => {
-        const { getByRole, getByText } = render(<RenderChat active_user={mockUser1} />);
+        const { getByRole, getByText } = render(<RenderChat activeUser={mockUser1} />);
         const textArea = getByRole('textbox');
         // Write a message in textare
         fireEvent.change(textArea, { target: { value: 'Hello' } });
@@ -105,7 +105,7 @@ describe('Chat', () => {
 
     it('onUpdate should be called when submiting a message', () => {
         const onUpdate = jest.fn();
-        const { getByRole } = render(<RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />);
+        const { getByRole } = render(<RenderChat activeUser={mockUser1} onUpdate={onUpdate} value={mockMessages} />);
 
         // Write a new message
         const textArea = getByRole('textbox');
@@ -125,7 +125,7 @@ describe('Chat', () => {
     it('cancel edited message should not trigger onUpdate', () => {
         const onUpdate = jest.fn();
         const { getByRole, getAllByTestId, getAllByRole, getByDisplayValue } = render(
-            <RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />
+            <RenderChat activeUser={mockUser1} onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Check that there is only one textarea which is to add new messages
@@ -149,7 +149,7 @@ describe('Chat', () => {
     it('save edited message should trigger onUpdate', () => {
         const onUpdate = jest.fn();
         const { getByRole, getAllByTestId, getAllByRole, getByDisplayValue } = render(
-            <RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />
+            <RenderChat activeUser={mockUser1} onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Check no messages are currently in edit mode
@@ -177,7 +177,7 @@ describe('Chat', () => {
     it('delete message should trigger onUpdate', () => {
         const onUpdate = jest.fn();
         const { getAllByTestId } = render(
-            <RenderChat active_user={mockUser1} onUpdate={onUpdate} value={mockMessages} />
+            <RenderChat activeUser={mockUser1} onUpdate={onUpdate} value={mockMessages} />
         );
 
         // Delete the first message
@@ -189,7 +189,7 @@ describe('Chat', () => {
 
     it('user should not be able to edit/delete a message that does not belong to them', () => {
         const { getAllByTestId, queryByTestId, rerender } = render(
-            <RenderChat active_user={mockUser3} value={mockMessages} />
+            <RenderChat activeUser={mockUser3} value={mockMessages} />
         );
 
         // Check if user can edit any messages. Since user3 has not sent any, this should be none
@@ -197,7 +197,7 @@ describe('Chat', () => {
         expect(queryByTestId('message-edit-button')).not.toBeInTheDocument();
 
         // Rerender with a different active user that has already sent a message
-        rerender(<RenderChat active_user={mockUser2} value={mockMessages} />);
+        rerender(<RenderChat activeUser={mockUser2} value={mockMessages} />);
 
         // Check that they can now see the edit and delete buttons for the message they sent
         expect(getAllByTestId('message-delete-button')).toHaveLength(1);

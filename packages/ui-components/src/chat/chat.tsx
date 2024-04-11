@@ -99,7 +99,7 @@ export interface ChatProps extends InteractiveComponentProps<Message[]> {
     /** Event triggered when the chat is changed */
     onUpdate?: (value: Message[]) => void | Promise<void>;
     /** The user who is currently active in the chat */
-    active_user: UserData;
+    activeUser: UserData;
 }
 
 /**
@@ -116,9 +116,8 @@ function scrollToBottom(node: HTMLElement | null): void {
 /**
  * A function to check if the user wrote the message
  *
- * @param {Message} message - the message to check
- * @param {UserData} user - the user to check against
- * @returns {boolean} - true if the user wrote the message
+ * @param message - the message to check
+ * @param user - the user to check against
  */
 function didUserWriteMessage(message: Message, user: UserData): boolean {
     if (user?.id) {
@@ -159,7 +158,7 @@ function Chat(props: ChatProps): JSX.Element {
                 message: reply.trim(),
                 created_at: timestamp,
                 updated_at: timestamp,
-                user: props.active_user,
+                user: props.activeUser,
             };
             const newMessages = [...localMessages, newMessage];
 
@@ -211,7 +210,7 @@ function Chat(props: ChatProps): JSX.Element {
                         onChange={onEditMessage}
                         onDelete={onDeleteMessage}
                         value={message}
-                        isEditable={didUserWriteMessage(message, props.active_user)}
+                        isEditable={didUserWriteMessage(message, props.activeUser)}
                     />
                 ))}
             </ChatBody>

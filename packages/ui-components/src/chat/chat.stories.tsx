@@ -85,7 +85,7 @@ export const Chat = (): JSX.Element => {
 
     return (
         <div style={{ backgroundColor: 'black', display: 'flex' }}>
-            <ChatComponent active_user={Harry} onUpdate={setValue} value={value} />
+            <ChatComponent activeUser={Harry} onUpdate={setValue} value={value} />
         </div>
     );
 };
