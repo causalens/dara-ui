@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.0
 
 -   `Chat` component now displays its messages content as `Markdown`.
 -   `Chat` component now displays next line breaks.
