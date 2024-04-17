@@ -338,7 +338,18 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     const { refs, floatingStyles, context, update } = useFloating({
         open: isOpen,
         onOpenChange: setIsOpen,
-        middleware: [offset(10), flip(), shift()],
+        middleware: [
+            // offset(10),
+            flip(),
+            shift(),
+            size({
+                apply({ rects, elements }) {
+                    Object.assign(elements.floating.style, {
+                        width: `${rects.reference.width}px`,
+                    });
+                },
+            }),
+        ],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
