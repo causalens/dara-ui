@@ -31,7 +31,7 @@ import {
     useTypeahead,
 } from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { usePopper } from 'react-popper';
 
@@ -239,6 +239,30 @@ const ChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling: 'gho
     background-color: transparent !important;
 `;
 
+// Custom middleware to update position only when the floating element is visible
+const updateWhenVisible = {
+    name: 'updateWhenVisible',
+    fn: ({ x, y, placement, middlewareData, update }) => {
+        const { referenceElement, floatingElement } = middlewareData;
+
+        if (referenceElement && floatingElement) {
+            const referenceRect = referenceElement.getBoundingClientRect();
+            const floatingRect = floatingElement.getBoundingClientRect();
+
+            const isVisible =
+                floatingRect.top >= 0 &&
+                floatingRect.left >= 0 &&
+                floatingRect.bottom <= window.innerHeight &&
+                floatingRect.right <= window.innerWidth;
+
+            if (isVisible) {
+                update();
+            }
+        }
+
+        return { x, y, placement };
+    },
+};
 export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>> {
     /** Whether to open the select dropdown on load or not, defaults to false */
     initialIsOpen?: boolean;
@@ -270,6 +294,7 @@ export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>>
 function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectProps): JSX.Element {
     const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState('');
+
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
         useMultipleSelection({
             initialSelectedItems: props.initialValue ?? [],
@@ -299,17 +324,11 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
             );
 
-    const {
-        isOpen: comboboxIsOpen,
-        getMenuProps,
-        getInputProps,
-        highlightedIndex,
-        getItemProps,
-        getToggleButtonProps,
-    } = useCombobox<Item>({
+    const { getMenuProps, getInputProps, highlightedIndex, getItemProps, getToggleButtonProps } = useCombobox<Item>({
         defaultHighlightedIndex: -1,
         initialIsOpen: props.initialIsOpen,
         inputValue,
+        isOpen,
         itemToString: (item) => item?.label || '',
         items: filteredItems,
         onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
@@ -337,10 +356,10 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     });
 
     const { refs, floatingStyles, context, update } = useFloating({
-        open: comboboxIsOpen,
+        open: isOpen,
         onOpenChange: setIsOpen,
         middleware: [offset(10), flip(), shift()],
-        // whileElementsMounted: autoUpdate,
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
     const click = useClick(context);
@@ -351,16 +370,27 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     // After the dropdown is opened, trigger an update of its position, so it positions correctly.
     useEffect(() => {
-        if (comboboxIsOpen && update) {
+        if (isOpen && update) {
             update();
         }
-    }, [comboboxIsOpen, update]);
+    }, [isOpen, update]);
+
+    const menuProps = getMenuProps();
+    const menuRef = menuProps.ref;
+    const setFloatingRef = refs.setFloating;
+
+    const mergedRefs = useMemo(() => {
+        return (node: HTMLElement | null) => {
+            setFloatingRef(node);
+            menuRef(node);
+        };
+    }, [setFloatingRef, menuRef]);
 
     return (
         <Wrapper
             className={props.className}
             isDisabled={props.disabled}
-            isOpen={comboboxIsOpen}
+            isOpen={isOpen}
             maxRows={maxRows}
             maxWidth={maxWidth}
             style={props.style}
@@ -368,7 +398,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
                 <InputWrapper
                     isDisabled={props.disabled}
-                    isOpen={comboboxIsOpen}
+                    isOpen={isOpen}
                     ref={refs.setReference}
                     {...getReferenceProps()}
                 >
@@ -390,7 +420,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             </Tag>
                         ))}
                         <Input
-                            {...getInputProps(getDropdownProps({ preventKeyAction: comboboxIsOpen }))}
+                            {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
                             disabled={props.disabled}
                             placeholder={props.placeholder}
                             size={props.size}
@@ -398,7 +428,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                         />
                     </TagWrapper>
                     <ChevronButton {...getToggleButtonProps()}>
-                        <Chevron disabled={props.disabled} isOpen={comboboxIsOpen} />
+                        <Chevron disabled={props.disabled} isOpen={isOpen} />
                     </ChevronButton>
                 </InputWrapper>
             </Tooltip>
@@ -406,9 +436,8 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 <FloatingFocusManager context={context} modal={false}>
                     <DropdownList
                         {...getFloatingProps()}
-                        {...getMenuProps()}
-                        isOpen={comboboxIsOpen}
-                        ref={refs.setFloating}
+                        ref={mergedRefs}
+                        isOpen={isOpen}
                         style={{
                             ...floatingStyles,
                             width: parseFloat(floatingStyles?.width as string),
