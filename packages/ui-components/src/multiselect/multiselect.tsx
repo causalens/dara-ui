@@ -239,30 +239,6 @@ const ChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling: 'gho
     background-color: transparent !important;
 `;
 
-// Custom middleware to update position only when the floating element is visible
-const updateWhenVisible = {
-    name: 'updateWhenVisible',
-    fn: ({ x, y, placement, middlewareData, update }) => {
-        const { referenceElement, floatingElement } = middlewareData;
-
-        if (referenceElement && floatingElement) {
-            const referenceRect = referenceElement.getBoundingClientRect();
-            const floatingRect = floatingElement.getBoundingClientRect();
-
-            const isVisible =
-                floatingRect.top >= 0 &&
-                floatingRect.left >= 0 &&
-                floatingRect.bottom <= window.innerHeight &&
-                floatingRect.right <= window.innerWidth;
-
-            if (isVisible) {
-                update();
-            }
-        }
-
-        return { x, y, placement };
-    },
-};
 export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>> {
     /** Whether to open the select dropdown on load or not, defaults to false */
     initialIsOpen?: boolean;
@@ -307,6 +283,17 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             ...('selectedItems' in props && { selectedItems: props.selectedItems }),
         });
 
+    const filteredItems = useMemo(
+        () =>
+            props.onTermChange ?
+                props.items
+            :   props.items.filter(
+                    (item) =>
+                        !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
+                ),
+        [props.onTermChange, props.items, selectedItems, inputValue]
+    );
+
     const onTermChange = useCallback(
         (term: string) => {
             setInputValue(term);
@@ -316,13 +303,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         },
         [props.onTermChange]
     );
-
-    const filteredItems =
-        props.onTermChange ?
-            props.items
-        :   props.items.filter(
-                (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
-            );
 
     const { getMenuProps, getInputProps, highlightedIndex, getItemProps, getToggleButtonProps } = useCombobox<Item>({
         defaultHighlightedIndex: -1,
@@ -379,12 +359,13 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     const menuRef = menuProps.ref;
     const setFloatingRef = refs.setFloating;
 
-    const mergedRefs = useMemo(() => {
-        return (node: HTMLElement | null) => {
+    const mergedRefs = useCallback(
+        (node: HTMLElement | null) => {
             setFloatingRef(node);
             menuRef(node);
-        };
-    }, [setFloatingRef, menuRef]);
+        },
+        [setFloatingRef, menuRef]
+    );
 
     return (
         <Wrapper
