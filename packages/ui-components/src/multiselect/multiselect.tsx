@@ -14,6 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+    FloatingFocusManager,
+    FloatingPortal,
+    autoUpdate,
+    flip,
+    offset,
+    shift,
+    size,
+    useClick,
+    useDismiss,
+    useFloating,
+    useInteractions,
+    useListNavigation,
+    useRole,
+    useTypeahead,
+} from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -252,15 +268,8 @@ export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>>
  * @param {MultiSelectProps} props - the component props
  */
 function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectProps): JSX.Element {
-    const referenceElement = useRef<HTMLDivElement>(null);
-    const popperElement = useRef<HTMLElement>(null);
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: [sameWidthModifier],
-        placement: 'bottom-start',
-    });
-
+    const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState('');
-
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
         useMultipleSelection({
             initialSelectedItems: props.initialValue ?? [],
@@ -270,7 +279,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 }
                 update();
             },
-            // Only set the selectedItems key if it has been explicitly set in props
             ...('selectedItems' in props && { selectedItems: props.selectedItems }),
         });
 
@@ -281,11 +289,9 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 props.onTermChange(term);
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [props.onTermChange]
     );
 
-    // If there is a term change function passed in then don't filter locally
     const filteredItems =
         props.onTermChange ?
             props.items
@@ -293,67 +299,79 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
             );
 
-    const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps, openMenu, getToggleButtonProps } =
-        useCombobox<Item>({
-            defaultHighlightedIndex: -1,
-            initialIsOpen: props.initialIsOpen,
-            inputValue,
-            itemToString: (item) => item?.label || '',
-            items: filteredItems,
-            onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
-                if (type === stateChangeTypes.InputChange) {
-                    onTermChange(internalInputVal);
+    const {
+        isOpen: comboboxIsOpen,
+        getMenuProps,
+        getInputProps,
+        highlightedIndex,
+        getItemProps,
+        getToggleButtonProps,
+    } = useCombobox<Item>({
+        defaultHighlightedIndex: -1,
+        initialIsOpen: props.initialIsOpen,
+        inputValue,
+        itemToString: (item) => item?.label || '',
+        items: filteredItems,
+        onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
+            if (type === stateChangeTypes.InputChange) {
+                onTermChange(internalInputVal);
+            }
+            if (
+                [stateChangeTypes.InputKeyDownEnter, stateChangeTypes.ItemClick, stateChangeTypes.InputBlur].includes(
+                    type
+                )
+            ) {
+                if (selectedItem) {
+                    onTermChange('');
+                    addSelectedItem(selectedItem);
                 }
-                if (
-                    [
-                        stateChangeTypes.InputKeyDownEnter,
-                        stateChangeTypes.ItemClick,
-                        stateChangeTypes.InputBlur,
-                    ].includes(type)
-                ) {
-                    if (selectedItem) {
-                        onTermChange('');
-                        addSelectedItem(selectedItem);
-                    }
-                }
-            },
-            selectedItem: null,
-            stateReducer: (state, { changes, type }) => {
-                if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
-                    return { ...changes, isOpen: true };
-                }
-                return changes;
-            },
-        });
+            }
+        },
+        selectedItem: null,
+        stateReducer: (state, { changes, type }) => {
+            if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
+                return { ...changes, isOpen: true };
+            }
+            return changes;
+        },
+    });
 
-    // After the dropdown is opened, trigger an update of it's position, so it positions correctly.
+    const { refs, floatingStyles, context, update } = useFloating({
+        open: comboboxIsOpen,
+        onOpenChange: setIsOpen,
+        middleware: [offset(10), flip(), shift()],
+        // whileElementsMounted: autoUpdate,
+    });
+
+    const click = useClick(context);
+    const dismiss = useDismiss(context);
+    const role = useRole(context);
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
+    // After the dropdown is opened, trigger an update of its position, so it positions correctly.
     useEffect(() => {
-        if (isOpen && update) {
+        if (comboboxIsOpen && update) {
             update();
         }
-    }, [isOpen, update]);
-
-    // Both downshift and popper want a ref to the reference element and popper element, the following blocks combine
-    // these refs into a single function that can be applied to the elements
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
-    delete menuProps.ref;
-    const setMenuReference = (value: any): void => {
-        setMenuRef(value);
-        popperElement.current = value;
-    };
+    }, [comboboxIsOpen, update]);
 
     return (
         <Wrapper
             className={props.className}
             isDisabled={props.disabled}
-            isOpen={isOpen}
+            isOpen={comboboxIsOpen}
             maxRows={maxRows}
             maxWidth={maxWidth}
             style={props.style}
         >
             <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
-                <InputWrapper isDisabled={props.disabled} isOpen={isOpen} ref={referenceElement}>
+                <InputWrapper
+                    isDisabled={props.disabled}
+                    isOpen={comboboxIsOpen}
+                    ref={refs.setReference}
+                    {...getReferenceProps()}
+                >
                     <TagWrapper maxRows={maxRows}>
                         {selectedItems.map((selectedItem, index) => (
                             <Tag
@@ -365,7 +383,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                                 <Cross
                                     asButton
                                     onClick={(e) => {
-                                        // See https://github.com/downshift-js/downshift/issues/1188
                                         e.stopPropagation();
                                         return removeSelectedItem(selectedItem);
                                     }}
@@ -373,50 +390,49 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             </Tag>
                         ))}
                         <Input
-                            {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+                            {...getInputProps(getDropdownProps({ preventKeyAction: comboboxIsOpen }))}
                             disabled={props.disabled}
-                            onFocus={openMenu}
                             placeholder={props.placeholder}
                             size={props.size}
                             style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
                     <ChevronButton {...getToggleButtonProps()}>
-                        <Chevron disabled={props.disabled} isOpen={isOpen} />
+                        <Chevron disabled={props.disabled} isOpen={comboboxIsOpen} />
                     </ChevronButton>
                 </InputWrapper>
             </Tooltip>
             {ReactDOM.createPortal(
-                <DropdownList
-                    {...menuProps}
-                    {...attributes.popper}
-                    isOpen={isOpen}
-                    ref={setMenuReference}
-                    style={{
-                        ...styles.popper,
-
-                        width: parseFloat((styles.popper as any)?.width),
-                        zIndex: 9999,
-                    }}
-                >
-                    {filteredItems.length > 0 &&
-                        filteredItems.map((item, index) => (
-                            <ListItem
-                                {...getItemProps({ index, item })}
-                                hovered={index === highlightedIndex}
-                                key={`item-${index}`}
-                                size={props.size}
-                                title={item.label}
-                            >
-                                {item.label}
-                            </ListItem>
-                        ))}
-                    {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
-                </DropdownList>,
+                <FloatingFocusManager context={context} modal={false}>
+                    <DropdownList
+                        {...getFloatingProps()}
+                        {...getMenuProps()}
+                        isOpen={comboboxIsOpen}
+                        ref={refs.setFloating}
+                        style={{
+                            ...floatingStyles,
+                            width: parseFloat(floatingStyles?.width as string),
+                            zIndex: 9999,
+                        }}
+                    >
+                        {filteredItems.length > 0 &&
+                            filteredItems.map((item, index) => (
+                                <ListItem
+                                    {...getItemProps({ index, item })}
+                                    hovered={index === highlightedIndex}
+                                    key={`item-${index}`}
+                                    size={props.size}
+                                    title={item.label}
+                                >
+                                    {item.label}
+                                </ListItem>
+                            ))}
+                        {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
+                    </DropdownList>
+                </FloatingFocusManager>,
                 document.body
             )}
         </Wrapper>
     );
 }
-
 export default MultiSelect;
