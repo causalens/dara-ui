@@ -2,6 +2,11 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where `MultiSelect` component would rerender when scrolling.
+-   Migrated `MultiSelect` to use Floating UI instead of Popper.
+
 ## 1.9.0
 
 -   `Chat` component now displays its messages content as `Markdown`.
