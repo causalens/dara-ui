@@ -17,21 +17,16 @@
 import {
     type ElementRects,
     type Elements,
-    FloatingFocusManager,
     autoUpdate,
     flip,
     shift,
     size,
-    useClick,
-    useDismiss,
     useFloating,
-    useFocus,
     useInteractions,
     useRole,
 } from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
-import _ from 'lodash';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
