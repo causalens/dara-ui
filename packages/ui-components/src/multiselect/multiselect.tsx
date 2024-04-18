@@ -368,13 +368,13 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    // const click = useClick(context);
-    // const dismiss = useDismiss(context);
+    const click = useClick(context);
+    const dismiss = useDismiss(context);
     const role = useRole(context);
 
-    // const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+    const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
-    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
+    // const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     // After the dropdown is opened, trigger an update of its position, so it positions correctly.
     useEffect(() => {
@@ -418,7 +418,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                     ref={refs.setReference}
                     // ref={menuProps.ref}
                     {...getReferenceProps()}
-                    onClick={() => inputProps.ref?.current?.focus()}
+                    // onClick={() => inputProps.ref?.current?.focus()}
                 >
                     <TagWrapper maxRows={maxRows}>
                         {selectedItems.map((selectedItem, index) => (
