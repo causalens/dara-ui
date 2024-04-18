@@ -363,8 +363,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         [setFloatingRef, setMenuRef]
     );
 
-    const inputProps = getInputProps(getDropdownProps({ preventKeyAction: isOpen }));
-
     return (
         <Wrapper
             className={props.className}
@@ -400,7 +398,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             </Tag>
                         ))}
                         <Input
-                            {...inputProps}
+                            {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
                             disabled={props.disabled}
                             placeholder={props.placeholder}
                             size={props.size}
