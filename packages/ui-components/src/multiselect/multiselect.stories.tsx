@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import { Meta } from '@storybook/react';
-import React from 'react';
 
 import { default as MultiSelectComponent, MultiSelectProps } from './multiselect';
 
@@ -65,148 +64,9 @@ const sampleItems = [
         label: 'label 10',
         value: 'value 10',
     },
-    {
-        label: 'label 11',
-        value: 'value 11',
-    },
-
-    {
-        label: 'label 12',
-        value: 'value 12',
-    },
-    {
-        label: 'label 13',
-        value: 'value 13',
-    },
-    {
-        label: 'label 14',
-        value: 'value 14',
-    },
-    {
-        label: 'label 15',
-        value: 'value 15',
-    },
-    {
-        label: 'label 16',
-        value: 'value 16',
-    },
-    {
-        label: 'label 17',
-        value: 'value 17',
-    },
-    {
-        label: 'label 18',
-        value: 'value 18',
-    },
-    {
-        label: 'label 19',
-        value: 'value 19',
-    },
-    {
-        label: 'label 20',
-        value: 'value 20',
-    },
-    {
-        label: 'label 21',
-        value: 'value 21',
-    },
-    {
-        label: 'label 22',
-        value: 'value 22',
-    },
-    {
-        label: 'label 23',
-        value: 'value 23',
-    },
-    {
-        label: 'label 24',
-        value: 'value 24',
-    },
-    {
-        label: 'label 25',
-        value: 'value 25',
-    },
-    {
-        label: 'label 26',
-        value: 'value 26',
-    },
-    {
-        label: 'label 27',
-        value: 'value 27',
-    },
-    {
-        label: 'label 28',
-        value: 'value 28',
-    },
-    {
-        label: 'label 29',
-        value: 'value 29',
-    },
-    {
-        label: 'label 30',
-        value: 'value 30',
-    },
-    {
-        label: 'label 31',
-        value: 'value 31',
-    },
-    {
-        label: 'label 32',
-        value: 'value 32',
-    },
-    {
-        label: 'label 33',
-        value: 'value 33',
-    },
-    {
-        label: 'label 34',
-        value: 'value 34',
-    },
-    {
-        label: 'label 35',
-        value: 'value 35',
-    },
-    {
-        label: 'label 36',
-        value: 'value 36',
-    },
-    {
-        badge: null,
-        image: null,
-        label: 'U99842',
-        value: 'U99842',
-    },
-    {
-        badge: null,
-        image: null,
-        label: 'UF7986',
-        value: 'UF7986',
-    },
-    {
-        badge: null,
-        image: null,
-        label: 'UM4094',
-        value: 'UM4094',
-    },
-    {
-        badge: null,
-        image: null,
-        label: 'UT7856',
-        value: 'UT7856',
-    },
 ];
 
-export const MultiSelect = (args: MultiSelectProps): JSX.Element => {
-    const [selected, setSelected] = React.useState<string[]>([]);
-    return (
-        <div style={{ height: '1500px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <button onClick={() => setTimeout(() => setSelected([]), 2000)} type="button">
-                Button
-            </button>
-            <MultiSelectComponent {...args} selectedItems={selected} onSelect={setSelected} />
-        </div>
-    );
-};
+export const MultiSelect = (args: MultiSelectProps): JSX.Element => <MultiSelectComponent {...args} />;
 
 MultiSelect.args = {
     items: sampleItems,
