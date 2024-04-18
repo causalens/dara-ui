@@ -196,11 +196,17 @@ const sampleItems = [
     },
 ];
 
-export const MultiSelect = (args: MultiSelectProps): JSX.Element => (
-    <div style={{ height: '1500px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <MultiSelectComponent {...args} />
-    </div>
-);
+export const MultiSelect = (args: MultiSelectProps): JSX.Element => {
+    const [selected, setSelected] = React.useState<string[]>([]);
+    return (
+        <div style={{ height: '1500px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <button onClick={() => setTimeout(() => setSelected([]), 2000)} type="button">
+                Button
+            </button>
+            <MultiSelectComponent {...args} selectedItems={selected} onSelect={setSelected} />
+        </div>
+    );
+};
 
 MultiSelect.args = {
     items: sampleItems,

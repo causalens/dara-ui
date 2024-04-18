@@ -276,7 +276,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 if (props.onSelect) {
                     props.onSelect(changes.selectedItems);
                 }
-                // update();
             },
             // Only set the selectedItems key if it has been explicitly set in props
             ...('selectedItems' in props && { selectedItems: props.selectedItems }),
@@ -338,7 +337,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             },
         });
 
-    const { refs, floatingStyles, context, update } = useFloating<HTMLElement>({
+    const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
         middleware: [
             flip(),
@@ -354,18 +353,8 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const click = useClick(context);
-    const dismiss = useDismiss(context);
     const role = useRole(context);
-    const focus = useFocus(context);
-
-    const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
-    // After the dropdown is opened, trigger an update of its position, so it positions correctly.
-    useEffect(() => {
-        if (isOpen && update) {
-            update();
-        }
-    }, [isOpen, update]);
+    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
