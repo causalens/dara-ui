@@ -25,6 +25,7 @@ import {
     useClick,
     useDismiss,
     useFloating,
+    useFocus,
     useInteractions,
     useRole,
 } from '@floating-ui/react';
@@ -371,6 +372,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     const click = useClick(context);
     const dismiss = useDismiss(context);
     const role = useRole(context);
+    const focus = useFocus(context);
 
     const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
@@ -397,10 +399,10 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     const inputProps = getInputProps(getDropdownProps({ preventKeyAction: isOpen }));
 
-    console.log('menu', menuProps);
-    console.log('floating', getFloatingProps());
-    console.log('reference', getReferenceProps());
-    console.log('input', inputProps);
+    // console.log('menu', menuProps);
+    // console.log('floating', getFloatingProps());
+    // console.log('reference', getReferenceProps());
+    // console.log('input', inputProps);
 
     return (
         <Wrapper
@@ -441,7 +443,16 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                         <Input
                             {...inputProps}
                             disabled={props.disabled}
-                            onFocus={openMenu}
+                            // onClick={(e) => {
+                                // setTimeout(() => inputProps.ref?.current?.focus(), 10);
+                                // e.stopPropagation();
+                                // inputProps?.onClick?.(e);
+                            // }}
+                            // onFocus={(e) => {
+                                // console.log('focus', e);
+                                // inputProps?.onFocus?.(e);
+                            // }}
+                            // onFocus={openMenu}
                             // onFocus={() => setIsOpen(true)}
                             // onFocus={() => setIsOpen(true)}
                             placeholder={props.placeholder}
@@ -455,37 +466,37 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 </InputWrapper>
             </Tooltip>
             {ReactDOM.createPortal(
-                <FloatingFocusManager context={context} modal={false}>
-                    <DropdownList
-                        {..._.omit(menuProps, 'ref')}
-                        {...getFloatingProps()}
-                        // ref={setFloatingRef}
-                        ref={mergedRefs}
-                        // ref={setMenuReference}
-                        // ref={menuProps.ref}
-                        role="listbox"
-                        isOpen={isOpen}
-                        style={{
-                            ...floatingStyles,
-                            width: parseFloat(floatingStyles?.width as string),
-                            zIndex: 9999,
-                        }}
-                    >
-                        {filteredItems.length > 0 &&
-                            filteredItems.map((item, index) => (
-                                <ListItem
-                                    {...getItemProps({ index, item })}
-                                    hovered={index === highlightedIndex}
-                                    key={`item-${index}`}
-                                    size={props.size}
-                                    title={item.label}
-                                >
-                                    {item.label}
-                                </ListItem>
-                            ))}
-                        {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
-                    </DropdownList>
-                </FloatingFocusManager>,
+                // <FloatingFocusManager context={context} modal={false}>
+                <DropdownList
+                    {...menuProps}
+                    {...getFloatingProps()}
+                    // ref={setFloatingRef}
+                    ref={mergedRefs}
+                    // ref={setMenuReference}
+                    // ref={menuProps.ref}
+                    role="listbox"
+                    isOpen={isOpen}
+                    style={{
+                        ...floatingStyles,
+                        width: parseFloat(floatingStyles?.width as string),
+                        zIndex: 9999,
+                    }}
+                >
+                    {filteredItems.length > 0 &&
+                        filteredItems.map((item, index) => (
+                            <ListItem
+                                {...getItemProps({ index, item })}
+                                hovered={index === highlightedIndex}
+                                key={`item-${index}`}
+                                size={props.size}
+                                title={item.label}
+                            >
+                                {item.label}
+                            </ListItem>
+                        ))}
+                    {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
+                </DropdownList>,
+                // </FloatingFocusManager>,
                 document.body
             )}
         </Wrapper>
