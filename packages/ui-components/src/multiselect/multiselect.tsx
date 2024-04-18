@@ -267,7 +267,6 @@ export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>>
  * @param {MultiSelectProps} props - the component props
  */
 function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectProps): JSX.Element {
-    // const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
@@ -306,55 +305,41 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         [props.onTermChange, props.items, selectedItems, inputValue]
     );
 
-    const {
-        closeMenu,
-        isOpen,
-        getMenuProps,
-        getInputProps,
-        highlightedIndex,
-        getItemProps,
-        openMenu,
-        getToggleButtonProps,
-    } = useCombobox<Item>({
-        defaultHighlightedIndex: -1,
-        initialIsOpen: props.initialIsOpen,
-        inputValue,
-        // isOpen,
-        itemToString: (item) => item?.label || '',
-        items: filteredItems,
-        onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
-            if (type === stateChangeTypes.InputChange) {
-                onTermChange(internalInputVal);
-            }
-            if (
-                [stateChangeTypes.InputKeyDownEnter, stateChangeTypes.ItemClick, stateChangeTypes.InputBlur].includes(
-                    type
-                )
-            ) {
-                if (selectedItem) {
-                    onTermChange('');
-                    addSelectedItem(selectedItem);
+    const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps, getToggleButtonProps } =
+        useCombobox<Item>({
+            defaultHighlightedIndex: -1,
+            initialIsOpen: props.initialIsOpen,
+            inputValue,
+            itemToString: (item) => item?.label || '',
+            items: filteredItems,
+            onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
+                if (type === stateChangeTypes.InputChange) {
+                    onTermChange(internalInputVal);
                 }
-            }
-        },
-        selectedItem: null,
-        stateReducer: (state, { changes, type }) => {
-            if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
-                return { ...changes, isOpen: true };
-            }
-            return changes;
-        },
-    });
+                if (
+                    [
+                        stateChangeTypes.InputKeyDownEnter,
+                        stateChangeTypes.ItemClick,
+                        stateChangeTypes.InputBlur,
+                    ].includes(type)
+                ) {
+                    if (selectedItem) {
+                        onTermChange('');
+                        addSelectedItem(selectedItem);
+                    }
+                }
+            },
+            selectedItem: null,
+            stateReducer: (state, { changes, type }) => {
+                if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
+                    return { ...changes, isOpen: true };
+                }
+                return changes;
+            },
+        });
 
     const { refs, floatingStyles, context, update } = useFloating<HTMLElement>({
         open: isOpen,
-        // onOpenChange: (open) => {
-        //     if (!open) {
-        //         closeMenu();
-        //     } else {
-        //         openMenu();
-        //     }
-        // },
         middleware: [
             flip(),
             shift(),
@@ -375,9 +360,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     const focus = useFocus(context);
 
     const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
-
-    // const { getReferenceProps, getFloatingProps } = useInteractions([role]);
-
     // After the dropdown is opened, trigger an update of its position, so it positions correctly.
     useEffect(() => {
         if (isOpen && update) {
@@ -399,11 +381,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     const inputProps = getInputProps(getDropdownProps({ preventKeyAction: isOpen }));
 
-    // console.log('menu', menuProps);
-    // console.log('floating', getFloatingProps());
-    // console.log('reference', getReferenceProps());
-    // console.log('input', inputProps);
-
     return (
         <Wrapper
             className={props.className}
@@ -418,9 +395,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                     isDisabled={props.disabled}
                     isOpen={isOpen}
                     ref={refs.setReference}
-                    // ref={menuProps.ref}
                     {...getReferenceProps()}
-                    // onClick={() => inputProps.ref?.current?.focus()}
                 >
                     <TagWrapper maxRows={maxRows}>
                         {selectedItems.map((selectedItem, index) => (
@@ -443,18 +418,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                         <Input
                             {...inputProps}
                             disabled={props.disabled}
-                            // onClick={(e) => {
-                                // setTimeout(() => inputProps.ref?.current?.focus(), 10);
-                                // e.stopPropagation();
-                                // inputProps?.onClick?.(e);
-                            // }}
-                            // onFocus={(e) => {
-                                // console.log('focus', e);
-                                // inputProps?.onFocus?.(e);
-                            // }}
-                            // onFocus={openMenu}
-                            // onFocus={() => setIsOpen(true)}
-                            // onFocus={() => setIsOpen(true)}
                             placeholder={props.placeholder}
                             size={props.size}
                             style={{ flex: '1 1 5ch' }}
@@ -466,19 +429,15 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 </InputWrapper>
             </Tooltip>
             {ReactDOM.createPortal(
-                // <FloatingFocusManager context={context} modal={false}>
                 <DropdownList
                     {...menuProps}
                     {...getFloatingProps()}
-                    // ref={setFloatingRef}
                     ref={mergedRefs}
-                    // ref={setMenuReference}
-                    // ref={menuProps.ref}
                     role="listbox"
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
-                        width: parseFloat(floatingStyles?.width as string),
+                        ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) }),
                         zIndex: 9999,
                     }}
                 >
@@ -496,7 +455,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                         ))}
                     {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
                 </DropdownList>,
-                // </FloatingFocusManager>,
                 document.body
             )}
         </Wrapper>
