@@ -70,6 +70,7 @@
     "@darajs/styled-components": "^1.9.0",
     "@darajs/ui-icons": "^1.9.0",
     "@darajs/ui-utils": "^1.9.0",
+    "@floating-ui/react": "^0.26.12",
     "@fortawesome/free-regular-svg-icons": "~6.4.0",
     "@fortawesome/free-solid-svg-icons": "~6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
