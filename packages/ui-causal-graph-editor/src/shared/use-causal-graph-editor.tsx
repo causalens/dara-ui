@@ -21,6 +21,7 @@ import { CausalGraph, EditorMode, GraphState } from '../types';
 import { GraphActionCreators, GraphActionType, GraphReducer } from './causal-graph-store';
 import { GraphLayout, PlanarLayout } from './graph-layout';
 import { causalGraphParser } from './parsers';
+import { isDag } from './utils';
 
 export interface UseCausalGraphEditorApi {
     api: GraphApi;
@@ -53,13 +54,16 @@ export default function useCausalGraphEditor(
     const [state, dispatch] = useReducer(
         GraphReducer,
         {
-            editorMode,
             newNodesRequirePosition,
         },
         (initState: GraphState) => {
+            const parsedGraph = causalGraphParser(graphData, availableInputs);
+            const newEditorMode = editorMode ?? (isDag(parsedGraph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
+
             return {
                 ...initState,
-                graph: causalGraphParser(graphData, availableInputs),
+                editorMode: newEditorMode,
+                graph: parsedGraph,
             };
         }
     );
@@ -105,7 +109,11 @@ export default function useCausalGraphEditor(
             !isEqual(lastParentData.current.nodes, graphData.nodes) ||
             !isEqual(lastParentData.current.edges, graphData.edges)
         ) {
+            const parsedGraph = causalGraphParser(graphData, availableInputs, state.graph);
+            const newEditorMode = editorMode ?? (isDag(parsedGraph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
+
             dispatch({
+                editorMode: newEditorMode,
                 graph: causalGraphParser(graphData, availableInputs, state.graph),
                 type: GraphActionType.INIT_GRAPH,
             });

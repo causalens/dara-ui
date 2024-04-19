@@ -2,6 +2,16 @@
 title: Changelog
 ---
 
+## 1.7.5
+
+-   **Backported** Fixed an issue where `MultiSelect` component would rerender when scrolling.
+-   **Backported** Migrated `MultiSelect` to use Floating UI instead of Popper.
+
+## 1.7.2
+
+-   Fixed an issue where if a word was too long, such as in an url, the `Chat` message would overflow instead of wrap.
+-   Fixed an issue where in `Chat` component if a newline character was added to a comment, on subsequent reloads it would show '/n' in the message.
+
 ## 1.7.1
 
 -   Added a new `Chat` component.

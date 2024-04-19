@@ -226,6 +226,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** whether zoom on scroll should be enabled only when the graph is focused */
     private requireFocusToZoom: boolean;
 
+    /** Whether the graph is currently focused */
+    private isFocused: boolean;
+
     constructor(
         graph: SimulationGraph,
         layout: GraphLayout,
@@ -249,6 +252,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.zoomThresholds = zoomThresholds;
         this.errorHandler = errorHandler;
         this.processEdgeStyle = processEdgeStyle;
+        this.isFocused = false;
         PIXI.Filter.defaultResolution = 3;
     }
 
@@ -340,13 +344,20 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         const worldWidth = graphWidth + WORLD_PADDING * 2;
         const worldHeight = graphHeight + WORLD_PADDING * 2;
 
-        this.viewport.resize(this.container.clientWidth, this.container.clientHeight, worldWidth, worldHeight);
+        try {
+            this.viewport.resize(this.container.clientWidth, this.container.clientHeight, worldWidth, worldHeight);
 
-        this.viewport.setZoom(1);
-        this.viewport.center = graphCenter;
-        this.viewport.fit(true);
+            this.viewport.setZoom(1);
+            this.viewport.center = graphCenter;
+            this.viewport.fit(true);
 
-        this.updateGraphVisibility();
+            this.updateGraphVisibility();
+        } catch (err) {
+            // Resizing can sometimes fail if e.g the canvas are temporarily not accessible due to an ongoing layout shift
+            // We're simply ignoring this error as it's not critical and a future reset will likely succeed on next layout update
+            // eslint-disable-next-line no-console
+            console.error('Error resetting viewport', err);
+        }
     }
 
     /**
@@ -567,7 +578,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             // keep layout in sync - invoke a debounced update to only update it once resizing is done rather than
             // re-running a potentially expensive layout computation on every resize event
-            this.debouncedUpdateLayout();
+            // this should happen only when the graph is not currently focused
+            if (!this.isFocused) {
+                this.debouncedUpdateLayout();
+            }
         });
 
         this.resizeObserver.observe(this.container);
@@ -617,6 +631,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * @param isFocused - focus state
      */
     public setFocus(isFocused: boolean): void {
+        this.isFocused = isFocused;
         if (!this.requireFocusToZoom) {
             return;
         }
@@ -1294,7 +1309,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /**
      * Recompute the layout and apply it
      */
-    private async updateLayout(): Promise<void> {
+    private async updateLayout(retry: boolean = false): Promise<void> {
         // Cleanup previous layout
         this.onCleanup?.();
 
@@ -1310,6 +1325,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.setLayout(layout, edgePoints);
         } catch (e) {
+            if (retry) {
+                // If we're already retrying, we should stop here to avoid infinite loops
+                // This should never happen but is a safety measure
+                // eslint-disable-next-line no-console
+                console.error('Layout failed even after retrying', e);
+                return;
+            }
             // TODO: remove console below once we have a nice way of showing more info with the stack trace
             // eslint-disable-next-line no-console
             console.error(e);
@@ -1340,7 +1362,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 (this.layout as GraphLayoutWithTiers).orientation = orientation;
             }
 
-            this.updateLayout();
+            this.updateLayout(true);
         }
     }
 
