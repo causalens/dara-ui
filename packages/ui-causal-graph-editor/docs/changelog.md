@@ -2,17 +2,17 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.7.5
 
--   `CausalGraphEditor` now only recalculates its layout on resize of the graph window if the graph is not in focus.
+-   **Backported** `CausalGraphEditor` now only recalculates its layout on resize of the graph window if the graph is not in focus.
 
 ## 1.7.4
 
--   Fixed an issue where if `EditorMode` was not defined edges were always added as undirected.
+-   **Backported** Fixed an issue where if `EditorMode` was not defined edges were always added as undirected.
 
 ## 1.7.3
 
--   Fixed an issue where graph rendering would enter an infinite loop and cause crashes in some circumstances.
+-   **Backported** Fixed an issue where graph rendering would enter an infinite loop and cause crashes in some circumstances.
 
 ## 1.7.0
 

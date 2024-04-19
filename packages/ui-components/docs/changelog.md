@@ -2,10 +2,10 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.7.5
 
--   Fixed an issue where `MultiSelect` component would rerender when scrolling.
--   Migrated `MultiSelect` to use Floating UI instead of Popper.
+-   **Backported** Fixed an issue where `MultiSelect` component would rerender when scrolling.
+-   **Backported** Migrated `MultiSelect` to use Floating UI instead of Popper.
 
 ## 1.7.2
 
