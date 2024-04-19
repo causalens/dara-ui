@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.1
 
 -   `CausalGraphEditor` now only recalculates its layout on resize of the graph window if the graph is not in focus.
 
