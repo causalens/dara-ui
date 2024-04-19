@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import {
-    type ElementRects,
-    type Elements,
+    ElementRects,
+    Elements,
     autoUpdate,
     flip,
     shift,
@@ -290,12 +290,12 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     // If there is a term change function passed in then don't filter locally
     const filteredItems = useMemo(
         () =>
-            props.onTermChange ?
-                props.items
+            props.onTermChange
+                ? props.items
                 : props.items.filter(
-                    (item) =>
-                        !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
-                ),
+                      (item) =>
+                          !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
+                  ),
         [props.onTermChange, props.items, selectedItems, inputValue]
     );
 
@@ -333,18 +333,18 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         });
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
-        open: isOpen,
         middleware: [
             flip(),
             shift(),
             size({
-                apply({ rects, elements }: { rects: ElementRects; elements: Elements }) {
+                apply({ rects, elements }: { elements: Elements; rects: ElementRects }) {
                     Object.assign(elements.floating.style, {
                         width: `${rects.reference.width}px`,
                     });
                 },
             }),
         ],
+        open: isOpen,
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -414,9 +414,9 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 <DropdownList
                     {...menuProps}
                     {...getFloatingProps()}
+                    isOpen={isOpen}
                     ref={mergedRefs}
                     role="listbox"
-                    isOpen={isOpen}
                     style={{
                         ...floatingStyles,
                         ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) }),
