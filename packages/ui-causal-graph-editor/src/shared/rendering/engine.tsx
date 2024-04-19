@@ -227,6 +227,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** whether zoom on scroll should be enabled only when the graph is focused */
     private requireFocusToZoom: boolean;
 
+    /** Whether the graph is currently focused */
+    private isFocused: boolean;
+
     constructor(
         graph: SimulationGraph,
         layout: GraphLayout,
@@ -575,7 +578,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             // keep layout in sync - invoke a debounced update to only update it once resizing is done rather than
             // re-running a potentially expensive layout computation on every resize event
-            this.debouncedUpdateLayout();
+            // this should happen only when the graph is not currently focused
+            if (!this.isFocused) {
+                this.debouncedUpdateLayout();
+            }
         });
 
         this.resizeObserver.observe(this.container);
@@ -625,6 +631,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * @param isFocused - focus state
      */
     public setFocus(isFocused: boolean): void {
+        this.isFocused = isFocused;
         if (!this.requireFocusToZoom) {
             return;
         }
