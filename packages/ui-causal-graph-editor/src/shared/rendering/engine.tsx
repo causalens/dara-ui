@@ -253,6 +253,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.zoomThresholds = zoomThresholds;
         this.errorHandler = errorHandler;
         this.processEdgeStyle = processEdgeStyle;
+        this.isFocused = false;
         PIXI.Filter.defaultResolution = 3;
     }
 
