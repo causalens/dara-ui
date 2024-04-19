@@ -14,10 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+    type ElementRects,
+    type Elements,
+    autoUpdate,
+    flip,
+    shift,
+    size,
+    useFloating,
+    useInteractions,
+    useRole,
+} from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 
 import styled from '@darajs/styled-components';
 import { Cross } from '@darajs/ui-icons';
@@ -25,7 +35,7 @@ import { Cross } from '@darajs/ui-icons';
 import Button from '../button/button';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, sameWidthModifier } from '../utils';
+import { Chevron, List, ListItem } from '../utils';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -252,13 +262,6 @@ export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>>
  * @param {MultiSelectProps} props - the component props
  */
 function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectProps): JSX.Element {
-    const referenceElement = useRef<HTMLDivElement>(null);
-    const popperElement = useRef<HTMLElement>(null);
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: [sameWidthModifier],
-        placement: 'bottom-start',
-    });
-
     const [inputValue, setInputValue] = useState('');
 
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
@@ -268,7 +271,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 if (props.onSelect) {
                     props.onSelect(changes.selectedItems);
                 }
-                update();
             },
             // Only set the selectedItems key if it has been explicitly set in props
             ...('selectedItems' in props && { selectedItems: props.selectedItems }),
@@ -286,13 +288,18 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     );
 
     // If there is a term change function passed in then don't filter locally
-    const filteredItems = props.onTermChange
-        ? props.items
-        : props.items.filter(
-              (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
-          );
+    const filteredItems = useMemo(
+        () =>
+            props.onTermChange ?
+                props.items
+                : props.items.filter(
+                    (item) =>
+                        !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
+                ),
+        [props.onTermChange, props.items, selectedItems, inputValue]
+    );
 
-    const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps, openMenu, getToggleButtonProps } =
+    const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps, getToggleButtonProps } =
         useCombobox<Item>({
             defaultHighlightedIndex: -1,
             initialIsOpen: props.initialIsOpen,
@@ -325,22 +332,36 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             },
         });
 
-    // After the dropdown is opened, trigger an update of it's position, so it positions correctly.
-    useEffect(() => {
-        if (isOpen && update) {
-            update();
-        }
-    }, [isOpen, update]);
+    const { refs, floatingStyles, context } = useFloating<HTMLElement>({
+        open: isOpen,
+        middleware: [
+            flip(),
+            shift(),
+            size({
+                apply({ rects, elements }: { rects: ElementRects; elements: Elements }) {
+                    Object.assign(elements.floating.style, {
+                        width: `${rects.reference.width}px`,
+                    });
+                },
+            }),
+        ],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
+    });
 
-    // Both downshift and popper want a ref to the reference element and popper element, the following blocks combine
-    // these refs into a single function that can be applied to the elements
+    const role = useRole(context);
+    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
+
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
-    delete menuProps.ref;
-    const setMenuReference = (value: any): void => {
-        setMenuRef(value);
-        popperElement.current = value;
-    };
+    const setFloatingRef = refs.setFloating;
+
+    const mergedRefs = useCallback(
+        (node: HTMLElement | null) => {
+            setFloatingRef(node);
+            setMenuRef(node);
+        },
+        [setFloatingRef, setMenuRef]
+    );
 
     return (
         <Wrapper
@@ -352,7 +373,12 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             style={props.style}
         >
             <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
-                <InputWrapper isDisabled={props.disabled} isOpen={isOpen} ref={referenceElement}>
+                <InputWrapper
+                    isDisabled={props.disabled}
+                    isOpen={isOpen}
+                    ref={refs.setReference}
+                    {...getReferenceProps()}
+                >
                     <TagWrapper maxRows={maxRows}>
                         {selectedItems.map((selectedItem, index) => (
                             <Tag
@@ -374,7 +400,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                         <Input
                             {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
                             disabled={props.disabled}
-                            onFocus={openMenu}
                             placeholder={props.placeholder}
                             size={props.size}
                             style={{ flex: '1 1 5ch' }}
@@ -388,13 +413,13 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             {ReactDOM.createPortal(
                 <DropdownList
                     {...menuProps}
-                    {...attributes.popper}
+                    {...getFloatingProps()}
+                    ref={mergedRefs}
+                    role="listbox"
                     isOpen={isOpen}
-                    ref={setMenuReference}
                     style={{
-                        ...styles.popper,
-
-                        width: parseFloat((styles.popper as any)?.width),
+                        ...floatingStyles,
+                        ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) }),
                         zIndex: 9999,
                     }}
                 >
