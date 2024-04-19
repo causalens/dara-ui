@@ -36,6 +36,7 @@ const actionNames = Object.keys(GraphActionCreators) as ActionName[];
  * Graph API object containing all available methods to modify the graph
  */
 export type GraphApi = {
+    // eslint-disable-next-line prettier/prettier
     [k in ActionName]: (...args: Parameters<(typeof GraphActionCreators)[k]>) => void;
 };
 

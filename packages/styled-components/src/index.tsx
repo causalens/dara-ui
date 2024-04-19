@@ -26,6 +26,8 @@ import styled, {
 } from 'styled-components';
 
 /* Colors are defined in a logical order so we don't want the autofixer to change their order */
+/* eslint-disable sort-keys-fix/sort-keys-fix */
+/* eslint-disable typescript-sort-keys/interface */
 interface Theme extends DefaultTheme {
     colors: {
         primary: string;
