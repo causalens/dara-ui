@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Removed margin from `Chat` component
+
 ## 1.9.1
 
 -   Fixed an issue where `MultiSelect` component would rerender when scrolling.
