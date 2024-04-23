@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where if parent hugged content `NodeHierarchyBuilder` would always scroll.
+
 ## 1.9.1
 
 -   `CausalGraphEditor` now only recalculates its layout on resize of the graph window if the graph is not in focus.

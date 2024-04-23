@@ -34,7 +34,6 @@ const ChatWrapper = styled.div`
 
     width: 350px;
     height: calc(100vh - 2rem);
-    margin: 1rem;
     padding: 1.5rem;
 
     background-color: ${(props) => props.theme.colors.background}e6;

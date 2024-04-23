@@ -64,7 +64,7 @@ const NodesWrapper = styled.div`
 
     width: 100%;
     height: 100%;
-    padding-top: 12px;
+    padding: 12px 0;
 
     background-color: ${(props) => props.theme.colors.background};
 
