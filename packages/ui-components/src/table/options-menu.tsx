@@ -16,17 +16,16 @@
  */
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 import { ColumnInstance, Filters } from 'react-table';
 
 import styled from '@darajs/styled-components';
-import { useOnClickOutside } from '@darajs/ui-utils';
 
 import SectionedList, { ListSection } from '../sectioned-list/sectioned-list';
 import { Item } from '../types';
 import { List } from '../utils';
+import { flip, shift, useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
 
 const HeaderOptionsIcon = styled(FontAwesomeIcon)`
     cursor: pointer;
@@ -78,13 +77,7 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     setAllFilters,
     style,
 }) => {
-    const [optionsElement, setOptionsElement] = useState(null);
-    const [popperElement, setPopperElement] = useState(null);
     const [showOptions, setShowOptions] = useState(false);
-
-    const { styles, attributes, update } = usePopper(optionsElement, popperElement, {
-        placement: 'left-end',
-    });
 
     const toggleOptions = (): void => {
         setShowOptions(!showOptions);
@@ -94,19 +87,24 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
         option.onClick();
     };
 
-    const clickOutsideOptionsHandler = (): void => {
-        if (showOptions) {
-            toggleOptions();
-        }
-    };
+    const { refs, floatingStyles, context } = useFloating({
+        open: showOptions,
+        onOpenChange: setShowOptions,
+        placement: 'left-end',
+        middleware: [flip(), shift()],
+    });
 
-    useOnClickOutside(popperElement, clickOutsideOptionsHandler);
+    // const clickOutsideHandler = useCallback(() => {
+    //     if (showOptions) {
+    //         toggleOptions();
+    //     }
+    // }, [showOptions]);
 
-    useEffect(() => {
-        if (showOptions) {
-            update();
-        }
-    }, [showOptions, update]);
+    const interactions = useInteractions([
+        useClick(context, { event: 'mousedown' }),
+        useDismiss(context, { outsidePress: true, outsidePressEvent: 'mousedown' }),
+        useRole(context, { role: "menu" }),
+    ]);
 
     const resetFunctions: ListSection = useMemo(() => {
         const functions = {
@@ -158,21 +156,21 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     }, [allColumns, allowColumnHiding, numVisibleColumns]);
 
     return (
-        <HeaderOptions ref={setOptionsElement}>
+        <HeaderOptions ref={refs.setReference}>
             <HeaderOptionsIcon icon={faEllipsisV} onClick={toggleOptions} />
             {ReactDOM.createPortal(
                 <OptionsDropdownList
-                    {...attributes.popper}
+                    {...interactions.getFloatingProps({
+                        ref: refs.setFloating,
+                        style: {
+                            ...floatingStyles,
+                            maxHeight: 800,
+                            minWidth: 150,
+                            zIndex: 9999,
+                            ...style,
+                        },
+                    })}
                     isOpen={showOptions}
-                    ref={setPopperElement}
-                    style={{
-                        ...styles.popper,
-
-                        maxHeight: 800,
-                        minWidth: 150,
-                        zIndex: 9999,
-                        ...style,
-                    }}
                 >
                     <SectionedList
                         items={allowColumnHiding ? [resetFunctions, columnToggles] : [resetFunctions]}
