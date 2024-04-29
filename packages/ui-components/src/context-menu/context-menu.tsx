@@ -14,24 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
+import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
 
 import { Key } from '../constants';
 import { List, ListItem } from '../utils';
-import {
-    flip,
-    offset,
-    shift,
-    size,
-    useFloating,
-    useInteractions,
-    useRole,
-} from '@floating-ui/react';
-
-
 
 export interface MenuAction {
     action: () => void;

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { Placement } from '@popperjs/core';
 import { useSelect } from 'downshift';
 import * as React from 'react';
@@ -24,13 +25,6 @@ import styled from '@darajs/styled-components';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
-import {
-    autoUpdate,
-    flip,
-    shift, useFloating,
-    useInteractions,
-    useRole
-} from '@floating-ui/react';
 
 interface SelectedItemProps {
     size?: number;
@@ -189,11 +183,7 @@ function Select(props: SelectProps): JSX.Element {
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
-        middleware: props.applySameWidthModifier === false ? [] : [
-            flip(),
-            shift(),
-            matchWidthToReference(),
-        ],
+        middleware: props.applySameWidthModifier === false ? [] : [flip(), shift(), matchWidthToReference()],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -203,14 +193,15 @@ function Select(props: SelectProps): JSX.Element {
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
     const setFloatingRef = refs.setFloating;
+    const { dropdownRef } = props;
 
     const mergedRefs = React.useCallback(
         (node: HTMLElement | null) => {
             setFloatingRef(node);
             setMenuRef(node);
-            props.dropdownRef?.(node);
+            dropdownRef?.(node);
         },
-        [setFloatingRef, setMenuRef, props.dropdownRef]
+        [setFloatingRef, setMenuRef, dropdownRef]
     );
 
     return (

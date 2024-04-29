@@ -19,3 +19,4 @@ export { default as SubtleLabel } from './label';
 export { List, ListItem } from './list-styles';
 export { default as sameWidthModifier } from './same-width-modifier';
 export { default as useInfiniteLoader, InfiniteLoader } from './use-infinite-loader';
+export { default as matchWidthToReference } from './match-width-to-reference';

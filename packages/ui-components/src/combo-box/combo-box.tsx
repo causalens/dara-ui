@@ -14,24 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxReturnValue, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 
 import styled from '@darajs/styled-components';
 
 import Button from '../button/button';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, matchWidthToReference, sameWidthModifier } from '../utils';
-import {
-    autoUpdate,
-    flip,
-    shift, useFloating,
-    useInteractions,
-    useRole
-} from '@floating-ui/react';
+import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -272,11 +265,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
-        middleware: [
-            flip(),
-            shift(),
-            matchWidthToReference(),
-        ],
+        middleware: [flip(), shift(), matchWidthToReference()],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -304,7 +293,12 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 isOpen={isOpen}
                 style={props.style}
             >
-                <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference} {...getReferenceProps()}>
+                <InputWrapper
+                    disabled={props.disabled}
+                    isOpen={isOpen}
+                    ref={refs.setReference}
+                    {...getReferenceProps()}
+                >
                     <Input
                         {...getInputProps({
                             disabled: props.disabled,

@@ -14,17 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-    type ElementRects,
-    type Elements,
-    autoUpdate,
-    flip,
-    shift,
-    size,
-    useFloating,
-    useInteractions,
-    useRole,
-} from '@floating-ui/react';
+import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
 import { useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -35,7 +25,7 @@ import { Cross } from '@darajs/ui-icons';
 import Button from '../button/button';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem } from '../utils';
+import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -334,17 +324,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
-        middleware: [
-            flip(),
-            shift(),
-            size({
-                apply({ rects, elements }: { rects: ElementRects; elements: Elements }) {
-                    Object.assign(elements.floating.style, {
-                        width: `${rects.reference.width}px`,
-                    });
-                },
-            }),
-        ],
+        middleware: [flip(), shift(), matchWidthToReference()],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
