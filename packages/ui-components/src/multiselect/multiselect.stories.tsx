@@ -66,7 +66,11 @@ const sampleItems = [
     },
 ];
 
-export const MultiSelect = (args: MultiSelectProps): JSX.Element => <MultiSelectComponent {...args} />;
+export const MultiSelect = (args: MultiSelectProps): JSX.Element => (
+    <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+        <MultiSelectComponent {...args} />
+    </div>
+);
 
 MultiSelect.args = {
     items: sampleItems,

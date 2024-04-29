@@ -297,12 +297,14 @@ export const TableInfinite = (args: Props<any>): JSX.Element => {
     const tableRef = useRef<TableHandle>();
 
     return (
-        <div style={{ height: '100%' }}>
-            {/* eslint-disable jsx-a11y/control-has-associated-label */}
-            <button onClick={() => tableRef.current.resetFilters()} type="button">
-                Reset filters
-            </button>
-            <TableComponent ref={tableRef} {...args} />
+        <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+            <div style={{ height: '100%' }}>
+                {/* eslint-disable jsx-a11y/control-has-associated-label */}
+                <button onClick={() => tableRef.current.resetFilters()} type="button">
+                    Reset filters
+                </button>
+                <TableComponent ref={tableRef} {...args} showTableOptions />
+            </div>
         </div>
     );
 };

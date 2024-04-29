@@ -25,7 +25,9 @@ export default {
 
 export const SectionedList = (args: SectionedListProps): JSX.Element => (
     <div style={{ width: '50%' }}>
-        <SectionedListComponent {...args} />
+        <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+            <SectionedListComponent {...args} />
+        </div>
     </div>
 );
 
