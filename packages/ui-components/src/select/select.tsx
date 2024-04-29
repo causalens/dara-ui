@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { Placement } from '@popperjs/core';
+import { autoUpdate, flip, Placement, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { useSelect } from 'downshift';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
@@ -183,7 +182,8 @@ function Select(props: SelectProps): JSX.Element {
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
-        middleware: props.applySameWidthModifier === false ? [] : [flip(), shift(), matchWidthToReference()],
+        placement: props.placement || 'bottom-start',
+        middleware: [flip(), shift(), ...(props.applySameWidthModifier ? [matchWidthToReference()] : [])],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 

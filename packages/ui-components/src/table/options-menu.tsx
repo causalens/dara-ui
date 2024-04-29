@@ -16,7 +16,7 @@
  */
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { ColumnInstance, Filters } from 'react-table';
 
@@ -25,7 +25,7 @@ import styled from '@darajs/styled-components';
 import SectionedList, { ListSection } from '../sectioned-list/sectioned-list';
 import { Item } from '../types';
 import { List } from '../utils';
-import { flip, shift, useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
+import { autoUpdate, flip, shift, useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
 
 const HeaderOptionsIcon = styled(FontAwesomeIcon)`
     cursor: pointer;
@@ -77,28 +77,24 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     setAllFilters,
     style,
 }) => {
-    const [showOptions, setShowOptions] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
-    const toggleOptions = (): void => {
-        setShowOptions(!showOptions);
-    };
+    const toggleOptions = useCallback((): void => {
+        setIsOpen(prev => !prev);
+    }, []);
 
-    const onOptionSelect = (option: Item): void => {
+    const onOptionSelect = useCallback((option: Item): void => {
         option.onClick();
-    };
+        setIsOpen(false);
+    }, []);
 
     const { refs, floatingStyles, context } = useFloating({
-        open: showOptions,
-        onOpenChange: setShowOptions,
+        open: isOpen,
+        onOpenChange: setIsOpen,
         placement: 'left-end',
         middleware: [flip(), shift()],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
-
-    // const clickOutsideHandler = useCallback(() => {
-    //     if (showOptions) {
-    //         toggleOptions();
-    //     }
-    // }, [showOptions]);
 
     const interactions = useInteractions([
         useClick(context, { event: 'mousedown' }),
@@ -170,9 +166,10 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
                             ...style,
                         },
                     })}
-                    isOpen={showOptions}
+                    isOpen={isOpen}
                 >
                     <SectionedList
+                        key={isOpen ? 'open' : 'closed'} // Resets the selected item when the options menu is closed
                         items={allowColumnHiding ? [resetFunctions, columnToggles] : [resetFunctions]}
                         onSelect={onOptionSelect}
                     />

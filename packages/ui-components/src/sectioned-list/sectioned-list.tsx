@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 import { UseComboboxState, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 
 import styled, { DefaultTheme, useTheme } from '@darajs/styled-components';
 
 import Badge from '../badge/badge';
 import { ChevronButton, Input, InputWrapper, NoItemsLabel, Wrapper } from '../combo-box/combo-box';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, sameWidthModifier } from '../utils';
+import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -125,13 +125,6 @@ export interface SectionedListProps extends InteractiveComponentProps<Item> {
 function SectionedList(props: SectionedListProps): JSX.Element {
     const theme = useTheme();
 
-    const referenceElement = useRef<HTMLDivElement>(null);
-    const popperElement = useRef<HTMLElement>(null);
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: [sameWidthModifier],
-        placement: 'bottom-start',
-    });
-
     const unpackedItems = useMemo(() => unpackSectionedList(props.items), [props.items]);
 
     const [pendingHighlight, setPendingHighlight] = useState(null);
@@ -217,9 +210,9 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             ) {
                 // This is a hack to change the highlight in the next render cycle so filteredItems had time to update
                 setPendingHighlight(
-                    changes.selectedItem ?
-                        props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
-                    :   0
+                    changes.selectedItem
+                        ? props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
+                        : 0
                 );
                 return {
                     ...changes,
@@ -263,6 +256,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         // Only set the selectedItem key if it has been explicitly set in props
         ...('selectedItem' in props && { selectedItem: props.selectedItem }),
     });
+
     useEffect(() => {
         if (isOpen && pendingHighlight !== null) {
             setHighlightedIndex(pendingHighlight);
@@ -276,22 +270,31 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         }
     }, [props.selectedItem]);
 
-    // After the dropdown is opened, trigger an update of it's position, so it positions correctly.
-    useEffect(() => {
-        if (isOpen && update) {
-            update();
-        }
-    }, [isOpen, update]);
+    const { refs, floatingStyles, context } = useFloating<HTMLElement>({
+        open: isOpen,
+        placement: 'bottom-start',
+        middleware: [
+            flip(),
+            shift(),
+            matchWidthToReference(),
+        ],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
+    });
 
-    // Both downshift and popper want a ref to the reference element and popper element, the following blocks combine
-    // these refs into a single function that can be applied to the elements
+    const role = useRole(context);
+    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
+
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
-    delete menuProps.ref;
-    const setMenuReference = (value: any): void => {
-        setMenuRef(value);
-        popperElement.current = value;
-    };
+    const setFloatingRef = refs.setFloating;
+
+    const mergedRefs = useCallback(
+        (node: HTMLElement | null) => {
+            setFloatingRef(node);
+            setMenuRef(node);
+        },
+        [setFloatingRef, setMenuRef]
+    );
 
     return (
         <Wrapper
@@ -301,7 +304,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             isOpen={isOpen}
             style={props.style}
         >
-            <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={referenceElement}>
+            <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference} {...getReferenceProps()}>
                 <Input {...getInputProps({ value: inputValue })} />
                 <ChevronButton {...getToggleButtonProps()}>
                     <Chevron disabled={props.disabled} isOpen={isOpen} />
@@ -310,13 +313,13 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             {ReactDOM.createPortal(
                 <ListWrapper
                     {...menuProps}
-                    {...attributes.popper}
+                    {...getFloatingProps()}
+                    ref={mergedRefs}
+                    role="listbox"
                     isOpen={isOpen}
-                    ref={setMenuReference}
                     style={{
-                        ...styles.popper,
-
-                        width: parseFloat((styles.popper as any)?.width) + 2,
+                        ...floatingStyles,
+                        ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) + 2 }),
                         zIndex: 9999,
                     }}
                 >
@@ -352,5 +355,4 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         </Wrapper>
     );
 }
-
 export default SectionedList;

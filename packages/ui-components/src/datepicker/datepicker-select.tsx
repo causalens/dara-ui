@@ -14,18 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Placement } from '@popperjs/core';
 import { useSelect } from 'downshift';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 
 import styled from '@darajs/styled-components';
 
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, sameWidthModifier } from '../utils';
+import { Chevron, matchWidthToReference } from '../utils';
+import { autoUpdate, flip, offset, Placement, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 
 const { stateChangeTypes } = useSelect;
 
@@ -214,13 +213,6 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  * @param {SelectProps} props - the props of the component
  */
 function DatepickerSelect(props: SelectProps): JSX.Element {
-    const referenceElement = useRef<HTMLElement>(null);
-    const popperElement = useRef<HTMLElement>(null);
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: [sameWidthModifier],
-        placement: props.placement || 'bottom-start',
-    });
-
     const [pendingHighlight, setPendingHighlight] = useState(null);
 
     const {
@@ -262,31 +254,34 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
         }
     }, [isOpen, pendingHighlight, setHighlightedIndex]);
 
-    // After the dropdown is opened, trigger an update of it's position, so it positions correctly.
-    useEffect(() => {
-        if (isOpen && update) {
-            update();
-        }
-    }, [isOpen, update]);
+    const { refs, floatingStyles, context } = useFloating<HTMLElement>({
+        open: isOpen,
+        placement: props.placement || 'bottom-start',
+        middleware: [
+            offset(8),
+            flip(),
+            shift(),
+            matchWidthToReference(),
+        ],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
+    });
 
-    // Both downshift and popper want a ref to the reference element and popper element, the following blocks combine
-    // these refs into a single function that can be applied to the elements
-    const buttonProps = getToggleButtonProps({ disabled: props.disabled });
-    const setButtonRef = buttonProps.ref;
-    delete buttonProps.ref;
-    const setButtonReference = (value: any): void => {
-        setButtonRef(value);
-        referenceElement.current = value;
-    };
+    const role = useRole(context);
+    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
-    delete menuProps.ref;
-    const setMenuReference = (value: any): void => {
-        setMenuRef(value);
-        popperElement.current = value;
-        props.dropdownRef?.(value);
-    };
+    const setFloatingRef = refs.setFloating;
+    const { dropdownRef } = props;
+
+    const mergedRefs = React.useCallback(
+        (node: HTMLElement | null) => {
+            setFloatingRef(node);
+            setMenuRef(node);
+            dropdownRef?.(node);
+        },
+        [setFloatingRef, setMenuRef, dropdownRef]
+    );
 
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -297,26 +292,29 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                 onClick={props.onClick}
                 style={props.style}
             >
-                <SelectButtonPrimary disabled={props.disabled} {...buttonProps} ref={setButtonReference} type="button">
+                <SelectButtonPrimary
+                    disabled={props.disabled}
+                    {...getToggleButtonProps({ disabled: props.disabled })}
+                    ref={refs.setReference}
+                    {...getReferenceProps()}
+                    type="button"
+                >
                     <SelectedItem size={props.size}>{selectedItem ? selectedItem.label : 'Select'}</SelectedItem>
                     <Chevron disabled={props.disabled} isOpen={isOpen} />
                 </SelectButtonPrimary>
                 {ReactDOM.createPortal(
                     <DropdownList
                         {...menuProps}
-                        {...attributes.popper}
-                        className={`${(menuProps?.className as string) ?? ''} ${attributes?.popper?.className ?? ''} ${
-                            props.itemClass
-                        }`}
+                        {...getFloatingProps()}
+                        ref={mergedRefs}
+                        role="listbox"
+                        className={`${menuProps?.className ?? ''} ${props.itemClass}`}
                         displacement={props.displacement}
                         isOpen={isOpen}
                         maxItems={7}
-                        ref={setMenuReference}
                         style={{
-                            ...styles.popper,
-
-                            marginTop: `0.8rem`,
-                            width: '16.25rem',
+                            ...floatingStyles,
+                            width: floatingStyles.width,
                             zIndex: 9999,
                         }}
                     >
