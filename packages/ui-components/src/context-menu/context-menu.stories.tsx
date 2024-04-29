@@ -45,7 +45,7 @@ const actions: MenuAction[] = [
 ];
 
 export const ContextMenuItem = (): JSX.Element => (
-    <div>
+    <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
         <StyledResult actions={actions} />;
         <StyledResult actions={actions} />;
         <StyledResult actions={actions} />;
