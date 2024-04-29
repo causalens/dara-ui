@@ -135,7 +135,7 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             }
         };
 
-        const role = useRole(context, { role: "menu" });
+        const role = useRole(context, { role: 'menu' });
         const { getFloatingProps } = useInteractions([role]);
 
         return (

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { autoUpdate, flip, Placement, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
+import { Placement, autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { useSelect } from 'downshift';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
@@ -187,7 +187,7 @@ function Select(props: SelectProps): JSX.Element {
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const role = useRole(context);
+    const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
@@ -234,7 +234,6 @@ function Select(props: SelectProps): JSX.Element {
                         {...menuProps}
                         {...getFloatingProps()}
                         ref={mergedRefs}
-                        role="listbox"
                         className={`${(menuProps?.className as string) ?? ''} ${props.itemClass}`}
                         isOpen={isOpen}
                         maxItems={props.maxItems}

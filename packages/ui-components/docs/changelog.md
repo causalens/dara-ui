@@ -5,6 +5,9 @@ title: Changelog
 ## NEXT
 
 -   Removed margin from `Chat` component
+-   Fixed an issue where `Select`, `ComboBox`, `ContextMenu`, `DatepickerSelect`, `SectionedList`, `Table.OptionsMenu` components would rerender when scrolling.
+-   Migrated `Select`, `ComboBox`, `ContextMenu`, `DatepickerSelect`, `SectionedList`, `Table.OptionsMenu` to use Floating UI instead of Popper.
+-   Removed `@popperjs/core` and `react-popper` dependencies.
 
 ## 1.9.1
 

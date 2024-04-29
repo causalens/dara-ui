@@ -14,6 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+    autoUpdate,
+    flip,
+    shift,
+    useClick,
+    useDismiss,
+    useFloating,
+    useInteractions,
+    useRole,
+} from '@floating-ui/react';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
@@ -25,7 +35,6 @@ import styled from '@darajs/styled-components';
 import SectionedList, { ListSection } from '../sectioned-list/sectioned-list';
 import { Item } from '../types';
 import { List } from '../utils';
-import { autoUpdate, flip, shift, useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
 
 const HeaderOptionsIcon = styled(FontAwesomeIcon)`
     cursor: pointer;
@@ -80,7 +89,7 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleOptions = useCallback((): void => {
-        setIsOpen(prev => !prev);
+        setIsOpen((prev) => !prev);
     }, []);
 
     const onOptionSelect = useCallback((option: Item): void => {
@@ -99,7 +108,7 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     const interactions = useInteractions([
         useClick(context, { event: 'mousedown' }),
         useDismiss(context, { outsidePress: true, outsidePressEvent: 'mousedown' }),
-        useRole(context, { role: "menu" }),
+        useRole(context, { role: 'menu' }),
     ]);
 
     const resetFunctions: ListSection = useMemo(() => {

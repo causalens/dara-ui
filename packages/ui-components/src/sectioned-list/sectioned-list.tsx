@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxState, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -24,7 +25,6 @@ import Badge from '../badge/badge';
 import { ChevronButton, Input, InputWrapper, NoItemsLabel, Wrapper } from '../combo-box/combo-box';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
-import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -210,9 +210,9 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             ) {
                 // This is a hack to change the highlight in the next render cycle so filteredItems had time to update
                 setPendingHighlight(
-                    changes.selectedItem
-                        ? props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
-                        : 0
+                    changes.selectedItem ?
+                        props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
+                    :   0
                 );
                 return {
                     ...changes,
@@ -273,11 +273,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
         placement: 'bottom-start',
-        middleware: [
-            flip(),
-            shift(),
-            matchWidthToReference(),
-        ],
+        middleware: [flip(), shift(), matchWidthToReference()],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 

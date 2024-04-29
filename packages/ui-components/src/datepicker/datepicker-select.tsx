@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Placement, autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { useSelect } from 'downshift';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
@@ -23,8 +24,7 @@ import styled from '@darajs/styled-components';
 
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, matchWidthToReference } from '../utils';
-import { autoUpdate, flip, offset, Placement, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
+import { Chevron } from '../utils';
 
 const { stateChangeTypes } = useSelect;
 
@@ -257,12 +257,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
         placement: props.placement || 'bottom-start',
-        middleware: [
-            offset(8),
-            flip(),
-            shift(),
-            matchWidthToReference(),
-        ],
+        middleware: [offset(8), flip(), shift()],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -314,7 +309,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                         maxItems={7}
                         style={{
                             ...floatingStyles,
-                            width: floatingStyles.width,
+                            width: '16.25rem', // Does not use floatingStyles.width as it expands to the width of the whole Datepicker
                             zIndex: 9999,
                         }}
                     >
