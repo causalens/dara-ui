@@ -102,7 +102,7 @@ const yearItems: Item[] = [
 export const DatepickerSelect = (args: SelectProps): JSX.Element => {
     const [selectedItem, setSelectedItem] = useState<Item>(args.selectedItem);
 
-    return <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}><DatepickerSelectComponent {...args} onSelect={(e) => setSelectedItem(e)} selectedItem={selectedItem} /></div>;
+    return <DatepickerSelectComponent {...args} onSelect={(e) => setSelectedItem(e)} selectedItem={selectedItem} />;
 };
 DatepickerSelect.args = {
     items: yearItems,

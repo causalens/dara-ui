@@ -25,10 +25,36 @@ export default {
     title: 'UI Components/Combo Box',
 } as Meta;
 
-const simpleItems: Item[] = Array.from({ length: 1000 }, (v, i) => ({
-    label: `Item ${i + 1}`,
-    value: Math.random(), // Or any other logic to assign a value
-}));
+const simpleItems: Item[] = [
+    {
+        label: 'First',
+        value: 1,
+    },
+    {
+        label: 'Long Label',
+        value: 2,
+    },
+    {
+        label: 'Third Chip',
+        value: 3,
+    },
+    {
+        label: 'What if the label is too longs',
+        value: 4,
+    },
+    {
+        label: 'Fifth',
+        value: 5,
+    },
+    {
+        label: 'Sixth',
+        value: 6,
+    },
+    {
+        label: 'Seventh',
+        value: 7,
+    },
+];
 
 export const ComboBox = (props: ComboBoxProps): JSX.Element => (
     <div style={{ width: '12.5em' }}>
@@ -46,9 +72,7 @@ export const ControlledComboBox = (props: ComboBoxProps): JSX.Element => {
 
     return (
         <div style={{ width: '12.5em' }}>
-            <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                <ComboBoxComponent {...props} onSelect={(item) => setSelectedItem(item)} selectedItem={selectedItem} />
-            </div>
+            <ComboBoxComponent {...props} onSelect={(item) => setSelectedItem(item)} selectedItem={selectedItem} />
             <button onClick={() => setSelectedItem(null)} type="button">
                 Reset
             </button>

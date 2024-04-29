@@ -25,10 +25,36 @@ export default {
     title: 'UI Components/Select',
 } as Meta;
 
-const simpleItems: Item[] = Array.from({ length: 1000 }, (v, i) => ({
-    label: `Item ${i + 1}`,
-    value: Math.random(), // Or any other logic to assign a value
-}));
+const simpleItems: Item[] = [
+    {
+        label: 'First',
+        value: 1,
+    },
+    {
+        label: 'Long Label',
+        value: 2,
+    },
+    {
+        label: 'Third Chip',
+        value: 3,
+    },
+    {
+        label: 'What if the label is too longs',
+        value: 4,
+    },
+    {
+        label: 'Fifth',
+        value: 5,
+    },
+    {
+        label: 'Sixth',
+        value: 6,
+    },
+    {
+        label: 'Seventh',
+        value: 7,
+    },
+];
 
 export const Select = (props: SelectProps): JSX.Element => (
     <div style={{ width: '12.5em' }}>
@@ -46,9 +72,7 @@ export const ControlledSelect = (props: SelectProps): JSX.Element => {
 
     return (
         <div style={{ width: '12.5em' }}>
-            <div style={{ height: '3000px', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                <SelectComponent {...props} onSelect={(item) => setSelectedItem(item)} selectedItem={selectedItem} />
-            </div>
+            <SelectComponent {...props} onSelect={(item) => setSelectedItem(item)} selectedItem={selectedItem} />
             <button onClick={() => setSelectedItem(null)} type="button">
                 Clear
             </button>
