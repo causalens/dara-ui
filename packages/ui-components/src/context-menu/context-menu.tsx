@@ -16,22 +16,12 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { usePopper } from 'react-popper';
 
 import styled from '@darajs/styled-components';
 
 import { Key } from '../constants';
-import { List, ListItem, matchWidthToReference } from '../utils';
-import {
-    flip,
-    offset,
-    shift,
-    size,
-    useFloating,
-    useInteractions,
-    useRole,
-} from '@floating-ui/react';
-
-
+import { List, ListItem } from '../utils';
 
 export interface MenuAction {
     action: () => void;
@@ -62,9 +52,27 @@ export interface ContextMenuProps<T> {
  */
 function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: ContextMenuProps<T>) => JSX.Element {
     function WrappedContextMenu(props: ContextMenuProps<T>): JSX.Element {
+        const [popperElement, setPopperElement] = useState(null);
         const [showMenu, setShowMenu] = useState(false);
         const [hoveredItem, setHoveredItem] = useState(-1);
-        const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+        // This ref is updated with the current mouse position each time the context menu is open, but as it's the same
+        // element, popper doesn't need to recreate everything.
+        const boundingRectRef = useRef({
+            bottom: 0,
+            height: 0,
+            left: 0,
+            right: 0,
+            top: 0,
+            width: 0,
+        } as DOMRect);
+        const fakeElement = useMemo(
+            () => ({
+                contextElement: document.body,
+                getBoundingClientRect: () => boundingRectRef.current,
+            }),
+            []
+        );
 
         // Handle clicking outside the menu or hitting escape and make sure the menu closes.
         useEffect(() => {
@@ -104,18 +112,8 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             }
         }, [showMenu]);
 
-        const { refs, floatingStyles, context } = useFloating<HTMLElement>({
-            open: showMenu,
+        const { styles, attributes, update } = usePopper(fakeElement, popperElement, {
             placement: 'bottom-start',
-            middleware: [
-                offset({
-                    mainAxis: 4,
-                    alignmentAxis: -2,
-                }),
-                shift(),
-                flip(),
-                matchWidthToReference(),
-            ],
         });
 
         const onContextMenu = (e: React.MouseEvent): void => {
@@ -124,7 +122,12 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             e.preventDefault();
             e.stopPropagation();
 
-            setMousePosition({ x: e.clientX, y: e.clientY });
+            boundingRectRef.current = {
+                ...boundingRectRef.current,
+                left: e.clientX + 2,
+                top: e.clientY - 4,
+            };
+            update();
             setShowMenu(true);
         };
 
@@ -135,31 +138,6 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             }
         };
 
-        const role = useRole(context);
-        const { getFloatingProps } = useInteractions([role]);
-
-        const virtualElement = useMemo(
-            () => ({
-                getBoundingClientRect: () => ({
-                    x: mousePosition.x,
-                    y: mousePosition.y,
-                    width: 0,
-                    height: 0,
-                    top: mousePosition.y,
-                    right: mousePosition.x,
-                    bottom: mousePosition.y,
-                    left: mousePosition.x,
-                }),
-            }),
-            [mousePosition.x, mousePosition.y]
-        );
-
-        useEffect(() => {
-            if (showMenu) {
-                refs.setReference(virtualElement);
-            }
-        }, [showMenu, virtualElement, refs]);
-
         return (
             <>
                 <Component {...props.elementProps} className={props.className} onContextMenu={onContextMenu}>
@@ -167,10 +145,10 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
                 </Component>
                 {ReactDOM.createPortal(
                     <DropdownList
-                        {...getFloatingProps()}
-                        ref={refs.setFloating}
+                        {...attributes.popper}
                         isOpen={showMenu}
-                        style={{ ...floatingStyles, zIndex: 9999 }}
+                        ref={setPopperElement}
+                        style={{ ...styles.popper, minWidth: 150, zIndex: 9999 }}
                     >
                         {props.actions.map((action, index) => (
                             <ListItem
