@@ -16,16 +16,21 @@
  */
 import { Placement } from '@popperjs/core';
 import { useSelect } from 'downshift';
-import { useEffect, useRef } from 'react';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 
 import styled from '@darajs/styled-components';
 
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, sameWidthModifier } from '../utils';
+import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import {
+    autoUpdate,
+    flip,
+    shift, useFloating,
+    useInteractions,
+    useRole
+} from '@floating-ui/react';
 
 interface SelectedItemProps {
     size?: number;
@@ -168,13 +173,6 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  * @param {SelectProps} props - the props of the component
  */
 function Select(props: SelectProps): JSX.Element {
-    const referenceElement = useRef(null);
-    const popperElement = useRef(null);
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: props.applySameWidthModifier === false ? [] : [sameWidthModifier],
-        placement: props.placement || 'bottom-start',
-    });
-
     const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, highlightedIndex, getItemProps } =
         useSelect<Item>({
             initialIsOpen: props.initialIsOpen,
@@ -189,31 +187,31 @@ function Select(props: SelectProps): JSX.Element {
             ...('selectedItem' in props && { selectedItem: props.selectedItem }),
         });
 
-    // After the dropdown is opened, trigger an update of it's position, so it positions correctly.
-    useEffect(() => {
-        if (isOpen && update) {
-            update();
-        }
-    }, [isOpen, update]);
+    const { refs, floatingStyles, context } = useFloating<HTMLElement>({
+        open: isOpen,
+        middleware: props.applySameWidthModifier === false ? [] : [
+            flip(),
+            shift(),
+            matchWidthToReference(),
+        ],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
+    });
 
-    // Both downshift and popper want a ref to the reference element and popper element, the following blocks combine
-    // these refs into a single function that can be applied to the elements
-    const buttonProps = getToggleButtonProps({ disabled: props.disabled });
-    const setButtonRef = buttonProps.ref;
-    delete buttonProps.ref;
-    const setButtonReference = (value: any): void => {
-        setButtonRef(value);
-        referenceElement.current = value;
-    };
+    const role = useRole(context);
+    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
-    delete menuProps.ref;
-    const setMenuReference = (value: any): void => {
-        setMenuRef(value);
-        popperElement.current = value;
-        props.dropdownRef?.(value);
-    };
+    const setFloatingRef = refs.setFloating;
+
+    const mergedRefs = React.useCallback(
+        (node: HTMLElement | null) => {
+            setFloatingRef(node);
+            setMenuRef(node);
+            props.dropdownRef?.(node);
+        },
+        [setFloatingRef, setMenuRef, props.dropdownRef]
+    );
 
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -228,8 +226,9 @@ function Select(props: SelectProps): JSX.Element {
                 <SelectButton
                     disabled={props.disabled}
                     isOpen={isOpen}
-                    {...buttonProps}
-                    ref={setButtonReference}
+                    {...getToggleButtonProps({ disabled: props.disabled })}
+                    ref={refs.setReference}
+                    {...getReferenceProps()}
                     type="button"
                 >
                     <SelectedItem size={props.size}>
@@ -242,20 +241,15 @@ function Select(props: SelectProps): JSX.Element {
                 {ReactDOM.createPortal(
                     <DropdownList
                         {...menuProps}
-                        {...attributes.popper}
-                        className={`${(menuProps?.className as string) ?? ''} ${attributes?.popper?.className ?? ''} ${
-                            props.itemClass
-                        }`}
+                        {...getFloatingProps()}
+                        ref={mergedRefs}
+                        role="listbox"
+                        className={`${(menuProps?.className as string) ?? ''} ${props.itemClass}`}
                         isOpen={isOpen}
                         maxItems={props.maxItems}
-                        ref={setMenuReference}
                         style={{
-                            ...styles.popper,
-
-                            width:
-                                props.applySameWidthModifier === false ?
-                                    undefined
-                                :   parseFloat((styles.popper as any)?.width) + 2,
+                            ...floatingStyles,
+                            ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) + 2 }),
                             zIndex: 9999,
                         }}
                     >
