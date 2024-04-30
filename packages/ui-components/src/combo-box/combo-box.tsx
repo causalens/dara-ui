@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxReturnValue, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 
 import styled from '@darajs/styled-components';
 
 import Button from '../button/button';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, sameWidthModifier } from '../utils';
+import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -176,13 +176,6 @@ export interface ComboBoxProps extends InteractiveComponentProps<Item> {
  * @param {ComboBoxProps} props - the component props
  */
 function ComboBox(props: ComboBoxProps): JSX.Element {
-    const referenceElement = useRef<HTMLDivElement>(null);
-    const popperElement = useRef<HTMLElement>(null);
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: [sameWidthModifier],
-        placement: 'bottom-start',
-    });
-
     const [inputValue, setInputValue] = useState(props.initialValue?.label ?? props.selectedItem?.label ?? '');
     const [pendingHighlight, setPendingHighlight] = useState(null);
 
@@ -256,6 +249,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
         // Only set the selectedItem key if it has been explicitly set in props
         ...('selectedItem' in props && { selectedItem: props.selectedItem }),
     });
+
     useEffect(() => {
         if (isOpen && pendingHighlight !== null) {
             setHighlightedIndex(pendingHighlight);
@@ -269,22 +263,26 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
         }
     }, [props.selectedItem]);
 
-    // After the dropdown is opened, trigger an update of it's position, so it positions correctly.
-    useEffect(() => {
-        if (isOpen && update) {
-            update();
-        }
-    }, [isOpen, update]);
+    const { refs, floatingStyles, context } = useFloating<HTMLElement>({
+        open: isOpen,
+        middleware: [flip(), shift(), offset({ crossAxis: 1 }), matchWidthToReference(+2)],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
+    });
 
-    // Both downshift and popper want a ref to the reference element and popper element, the following blocks combine
-    // these refs into a single function that can be applied to the elements
+    const role = useRole(context, { role: 'combobox' });
+    const { getReferenceProps, getFloatingProps } = useInteractions([role]);
+
     const menuProps = getMenuProps();
     const setMenuRef = menuProps.ref;
-    delete menuProps.ref;
-    const setMenuReference = (value: any): void => {
-        setMenuRef(value);
-        popperElement.current = value;
-    };
+    const setFloatingRef = refs.setFloating;
+
+    const mergedRefs = useCallback(
+        (node: HTMLElement | null) => {
+            setFloatingRef(node);
+            setMenuRef(node);
+        },
+        [setFloatingRef, setMenuRef]
+    );
 
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -295,11 +293,12 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 isOpen={isOpen}
                 style={props.style}
             >
-                <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={referenceElement}>
+                <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
                     <Input
                         {...getInputProps({
                             disabled: props.disabled,
                         })}
+                        {...getReferenceProps()}
                         placeholder={
                             (selectedItem === null ? props.placeholder : selectedItem?.label) ?? props.placeholder
                         }
@@ -312,13 +311,11 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 {ReactDOM.createPortal(
                     <DropdownList
                         {...menuProps}
-                        {...attributes.popper}
+                        {...getFloatingProps()}
+                        ref={mergedRefs}
                         isOpen={isOpen}
-                        ref={setMenuReference}
                         style={{
-                            ...styles.popper,
-
-                            width: parseFloat((styles.popper as any)?.width) + 2,
+                            ...floatingStyles,
                             zIndex: 9999,
                         }}
                     >

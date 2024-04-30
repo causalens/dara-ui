@@ -21,8 +21,6 @@ import { ThemeProvider, theme } from '@darajs/styled-components';
 
 import DatePicker, { DatePickerProps } from './datepicker';
 
-jest.unmock('react-popper');
-
 function RenderDatePicker(props: DatePickerProps = { shouldCloseOnSelect: true }): JSX.Element {
     return (
         <ThemeProvider theme={theme}>

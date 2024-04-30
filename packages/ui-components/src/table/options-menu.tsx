@@ -14,15 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+    autoUpdate,
+    flip,
+    shift,
+    useClick,
+    useDismiss,
+    useFloating,
+    useInteractions,
+    useRole,
+} from '@floating-ui/react';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { usePopper } from 'react-popper';
 import { ColumnInstance, Filters } from 'react-table';
 
 import styled from '@darajs/styled-components';
-import { useOnClickOutside } from '@darajs/ui-utils';
 
 import SectionedList, { ListSection } from '../sectioned-list/sectioned-list';
 import { Item } from '../types';
@@ -78,35 +86,30 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     setAllFilters,
     style,
 }) => {
-    const [optionsElement, setOptionsElement] = useState(null);
-    const [popperElement, setPopperElement] = useState(null);
-    const [showOptions, setShowOptions] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
-    const { styles, attributes, update } = usePopper(optionsElement, popperElement, {
+    const toggleOptions = useCallback((): void => {
+        setIsOpen((prev) => !prev);
+    }, []);
+
+    const onOptionSelect = useCallback((option: Item): void => {
+        option.onClick();
+        setIsOpen(false);
+    }, []);
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: setIsOpen,
         placement: 'left-end',
+        middleware: [flip(), shift()],
+        whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const toggleOptions = (): void => {
-        setShowOptions(!showOptions);
-    };
-
-    const onOptionSelect = (option: Item): void => {
-        option.onClick();
-    };
-
-    const clickOutsideOptionsHandler = (): void => {
-        if (showOptions) {
-            toggleOptions();
-        }
-    };
-
-    useOnClickOutside(popperElement, clickOutsideOptionsHandler);
-
-    useEffect(() => {
-        if (showOptions) {
-            update();
-        }
-    }, [showOptions, update]);
+    const interactions = useInteractions([
+        useClick(context, { event: 'mousedown' }),
+        useDismiss(context, { outsidePress: true, outsidePressEvent: 'mousedown' }),
+        useRole(context, { role: 'menu' }),
+    ]);
 
     const resetFunctions: ListSection = useMemo(() => {
         const functions = {
@@ -158,23 +161,24 @@ const OptionsMenu: FunctionComponent<OptionsMenuProps> = ({
     }, [allColumns, allowColumnHiding, numVisibleColumns]);
 
     return (
-        <HeaderOptions ref={setOptionsElement}>
+        <HeaderOptions ref={refs.setReference}>
             <HeaderOptionsIcon icon={faEllipsisV} onClick={toggleOptions} />
             {ReactDOM.createPortal(
                 <OptionsDropdownList
-                    {...attributes.popper}
-                    isOpen={showOptions}
-                    ref={setPopperElement}
-                    style={{
-                        ...styles.popper,
-
-                        maxHeight: 800,
-                        minWidth: 150,
-                        zIndex: 9999,
-                        ...style,
-                    }}
+                    {...interactions.getFloatingProps({
+                        ref: refs.setFloating,
+                        style: {
+                            ...floatingStyles,
+                            maxHeight: 800,
+                            minWidth: 150,
+                            zIndex: 9999,
+                            ...style,
+                        },
+                    })}
+                    isOpen={isOpen}
                 >
                     <SectionedList
+                        key={isOpen ? 'open' : 'closed'} // Resets the selected item when the options menu is closed
                         items={allowColumnHiding ? [resetFunctions, columnToggles] : [resetFunctions]}
                         onSelect={onOptionSelect}
                     />

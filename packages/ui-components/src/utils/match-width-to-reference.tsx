@@ -14,8 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { default as Chevron } from './chevron';
-export { default as SubtleLabel } from './label';
-export { List, ListItem } from './list-styles';
-export { default as useInfiniteLoader, InfiniteLoader } from './use-infinite-loader';
-export { default as matchWidthToReference } from './match-width-to-reference';
+import { type ElementRects, type Elements, Middleware, size } from '@floating-ui/react';
+
+/**
+ * A middleware for Floating UI that auto sizes the floating content to be the same as the reference element.
+ * Optionally, a delta can be added to the width.
+ */
+const matchWidthToReference = (delta = 0): Middleware =>
+    size({
+        apply({ rects, elements }: { rects: ElementRects; elements: Elements }) {
+            Object.assign(elements.floating.style, {
+                width: `${rects.reference.width + delta}px`,
+            });
+        },
+    });
+
+export default matchWidthToReference;
