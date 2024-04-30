@@ -259,14 +259,19 @@ export function getTieredLayoutProperties(
     orientation: DirectionType,
     tierSeparation: number
 ): TiersProperties {
-    const tiersArray = getTiersArray(tiers, graph);
+    let tiersArray = getTiersArray(tiers, graph);
     let nodesOrder: Record<string, string>;
+    const nodes = graph.nodes();
 
     if (!Array.isArray(tiers)) {
         // must be of type TiersConfig
         const { order_nodes_by } = tiers;
-        const nodes = graph.nodes();
         nodesOrder = order_nodes_by ? getNodeOrder(nodes, order_nodes_by, graph) : undefined;
+    } else {
+        // if in the array of tiers passed a node present does not exist in the graph we remove it
+        tiersArray = tiersArray
+            .map((tier) => tier.filter((node) => nodes.includes(node)))
+            .filter((filteredTier) => filteredTier.length > 0);
     }
 
     return {
