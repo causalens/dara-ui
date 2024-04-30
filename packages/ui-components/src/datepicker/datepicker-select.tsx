@@ -302,7 +302,6 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                         {...menuProps}
                         {...getFloatingProps()}
                         ref={mergedRefs}
-                        role="listbox"
                         className={`${menuProps?.className ?? ''} ${props.itemClass}`}
                         displacement={props.displacement}
                         isOpen={isOpen}

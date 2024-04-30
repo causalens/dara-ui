@@ -313,7 +313,6 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                         {...menuProps}
                         {...getFloatingProps()}
                         ref={mergedRefs}
-                        role="listbox"
                         isOpen={isOpen}
                         style={{
                             ...floatingStyles,

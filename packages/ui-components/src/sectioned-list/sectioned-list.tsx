@@ -311,7 +311,6 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                     {...menuProps}
                     {...getFloatingProps()}
                     ref={mergedRefs}
-                    // role="listbox"
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
