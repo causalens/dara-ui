@@ -273,7 +273,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
         placement: 'bottom-start',
-        middleware: [flip(), shift(), matchWidthToReference()],
+        middleware: [flip(), shift(), matchWidthToReference(+2)],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -315,7 +315,6 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
-                        ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) + 2 }),
                         zIndex: 9999,
                     }}
                 >

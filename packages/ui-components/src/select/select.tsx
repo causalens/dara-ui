@@ -166,6 +166,7 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  * @param {SelectProps} props - the props of the component
  */
 function Select(props: SelectProps): JSX.Element {
+    const { applySameWidthModifier = true } = props;
     const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, highlightedIndex, getItemProps } =
         useSelect<Item>({
             initialIsOpen: props.initialIsOpen,
@@ -183,7 +184,7 @@ function Select(props: SelectProps): JSX.Element {
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
         placement: props.placement || 'bottom-start',
-        middleware: [flip(), shift(), ...(props.applySameWidthModifier ? [matchWidthToReference()] : [])],
+        middleware: [flip(), shift(), ...(applySameWidthModifier ? [matchWidthToReference(+2)] : [])],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -239,7 +240,6 @@ function Select(props: SelectProps): JSX.Element {
                         maxItems={props.maxItems}
                         style={{
                             ...floatingStyles,
-                            ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) + 2 }),
                             zIndex: 9999,
                         }}
                     >

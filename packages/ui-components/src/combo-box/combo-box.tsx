@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
+import { autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxReturnValue, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
 import { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -265,7 +265,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
-        middleware: [flip(), shift(), matchWidthToReference()],
+        middleware: [flip(), shift(), offset({ crossAxis: 1 }), matchWidthToReference(+2)],
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
@@ -321,7 +321,6 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                         isOpen={isOpen}
                         style={{
                             ...floatingStyles,
-                            width: floatingStyles.width ? parseFloat(floatingStyles.width as string) + 2 : undefined,
                             zIndex: 9999,
                         }}
                     >

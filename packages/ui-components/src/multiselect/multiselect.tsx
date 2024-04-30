@@ -399,7 +399,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
-                        ...(floatingStyles.width && { width: parseFloat(floatingStyles.width as string) }),
                         zIndex: 9999,
                     }}
                 >
