@@ -277,7 +277,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const role = useRole(context);
+    const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
@@ -300,8 +300,8 @@ function SectionedList(props: SectionedListProps): JSX.Element {
             isOpen={isOpen}
             style={props.style}
         >
-            <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference} {...getReferenceProps()}>
-                <Input {...getInputProps({ value: inputValue })} />
+            <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
+                <Input {...getInputProps({ value: inputValue })} {...getReferenceProps()} />
                 <ChevronButton {...getToggleButtonProps()}>
                     <Chevron disabled={props.disabled} isOpen={isOpen} />
                 </ChevronButton>
@@ -311,7 +311,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                     {...menuProps}
                     {...getFloatingProps()}
                     ref={mergedRefs}
-                    role="listbox"
+                    // role="listbox"
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,

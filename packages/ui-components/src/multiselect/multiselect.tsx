@@ -328,7 +328,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const role = useRole(context);
+    const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
@@ -353,12 +353,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             style={props.style}
         >
             <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
-                <InputWrapper
-                    isDisabled={props.disabled}
-                    isOpen={isOpen}
-                    ref={refs.setReference}
-                    {...getReferenceProps()}
-                >
+                <InputWrapper isDisabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
                     <TagWrapper maxRows={maxRows}>
                         {selectedItems.map((selectedItem, index) => (
                             <Tag
@@ -379,6 +374,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                         ))}
                         <Input
                             {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+                            {...getReferenceProps()}
                             disabled={props.disabled}
                             placeholder={props.placeholder}
                             size={props.size}
@@ -395,7 +391,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                     {...menuProps}
                     {...getFloatingProps()}
                     ref={mergedRefs}
-                    role="listbox"
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,

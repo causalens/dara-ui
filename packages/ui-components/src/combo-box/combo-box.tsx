@@ -269,7 +269,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const role = useRole(context);
+    const role = useRole(context, { role: 'combobox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
@@ -293,16 +293,12 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 isOpen={isOpen}
                 style={props.style}
             >
-                <InputWrapper
-                    disabled={props.disabled}
-                    isOpen={isOpen}
-                    ref={refs.setReference}
-                    {...getReferenceProps()}
-                >
+                <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
                     <Input
                         {...getInputProps({
                             disabled: props.disabled,
                         })}
+                        {...getReferenceProps()}
                         placeholder={
                             (selectedItem === null ? props.placeholder : selectedItem?.label) ?? props.placeholder
                         }

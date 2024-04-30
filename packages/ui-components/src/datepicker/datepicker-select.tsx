@@ -261,7 +261,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const role = useRole(context);
+    const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
     const menuProps = getMenuProps();
