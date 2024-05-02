@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.2
 
 -   Removed margin from `Chat` component
 -   Fixed an issue where `Select`, `ComboBox`, `ContextMenu`, `DatepickerSelect`, `SectionedList`, `Table.OptionsMenu` components would rerender when scrolling.

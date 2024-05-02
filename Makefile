@@ -50,13 +50,13 @@ test:
 	lerna run test
 
 version-patch:
-	@lerna version patch --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version patch && borg lock
+	@pnpm lerna version patch --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version patch && borg lock
 
 version-minor:
-	@lerna version minor --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version minor && borg lock
+	@pnpm lerna version minor --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version minor && borg lock
 
 version-major:
-	@lerna version major --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version major && borg lock
+	@pnpm lerna version major --no-git-tag-version --force-publish --yes && pnpm i --lockfile-only && borg version major && borg lock
 # Publish all the packages to the appropriate repositories
 publish:
 	git reset --hard
