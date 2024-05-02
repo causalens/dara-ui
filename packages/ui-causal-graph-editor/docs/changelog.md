@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.2
 
 -   Fixed an issue where if parent hugged content `NodeHierarchyBuilder` would always scroll.
 -   Fixed an issue where `FcoseLayout` would crash when an array of array of nodes was passed to tiers which included a node that did not exist on the graph.
