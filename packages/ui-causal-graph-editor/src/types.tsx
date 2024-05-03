@@ -309,3 +309,11 @@ export interface TieredGraphLayoutBuilder {
     orientation?: DirectionType;
     tiers: GraphTiers;
 }
+
+/**
+ * Defines necessary properties that need to be implemented by graph layouts to support grouping/cluster layouts
+ */
+export interface GroupingLayoutBuilder {
+    /** The path for the property in the node that should be used for defining their layer */
+    group: string;
+}

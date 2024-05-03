@@ -31,6 +31,7 @@ import { CausalGraph, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
 import {
     Template,
+    nodeTiersCausalGraph,
     pagCausalGraph,
     timeSeriesCausalGraph,
 } from './utils/stories-utils';
@@ -135,6 +136,18 @@ FcoseTiers.args = {
     editable: true,
     graphData: FRAUD,
     graphLayout: layout,
+};
+
+export const FcoseGrouping = Template.bind({});
+
+const groupingLayout = FcoseLayout.Builder.build();
+groupingLayout.group = 'meta.test';
+// groupingLayout.nodeRepulsion = 10000000;
+
+FcoseGrouping.args = {
+    // graphData: FRAUD,
+    graphData: nodeTiersCausalGraph,
+    graphLayout: groupingLayout,
 };
 
 const PredefinedGraph = deepCopy(SHIPPED_UNITS);

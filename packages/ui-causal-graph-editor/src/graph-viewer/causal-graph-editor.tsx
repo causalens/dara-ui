@@ -29,6 +29,7 @@ import { ConfirmationModal } from '@darajs/ui-widgets';
 import {
     AddNodeButton,
     CenterGraphButton,
+    CollapseAllButton,
     DragModeButton,
     EdgeInfoContent,
     GraphLegendDefinition,
@@ -181,6 +182,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         getCenterPosition,
         useEngineEvent,
         resetViewport,
+        collapseGroups,
         resetLayout,
         onSetDragMode,
         onNodeSelected,
@@ -697,6 +699,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                         selectedResult={currentSearchNode + 1}
                                         totalNumberOfResults={searchResults.length}
                                     />
+                                    <CollapseAllButton onCollapseAll={collapseGroups} />
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />

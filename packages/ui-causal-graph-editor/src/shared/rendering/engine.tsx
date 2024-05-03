@@ -27,7 +27,7 @@ import { Status } from '@darajs/ui-utils';
 
 import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
-import { getNodeGroup } from '@shared/utils';
+import { getNodeGroup, getNodeGroups } from '@shared/utils';
 
 import {
     EdgeConstraint,
@@ -45,7 +45,9 @@ import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } fro
 import { NodeObject, PixiNodeStyle, getNodeSize } from './node';
 import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
-import { colorToPixi, getZoomState, isGraphLayoutWithTiers } from './utils';
+import { colorToPixi, getZoomState, isGraphLayoutWithTiers, isGraphLayoutWithGroups } from './utils';
+import { GroupContainerObject } from './grouping/group-container-object';
+import { get } from 'lodash';
 
 const WORLD_PADDING = 100;
 
@@ -156,6 +158,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
     /** Callback executed when engine is being destroyed */
     private onCleanup?: () => void = null;
+
+    /** Container storing edge graphics */
+    private groupContainerLayer: PIXI.Container;
+
+    /** Node ID -> NodeObject cache */
+    private groupContainerMap = new Map<string, GroupContainerObject>();
 
     // Bound versions of handlers
     private onGraphAttributesUpdatedBound = this.onGraphAttributesUpdated.bind(this);
@@ -332,10 +340,34 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // figure out the x/y bounds
         const nodesX = this.graph.mapNodes((nodeKey) => this.graph.getNodeAttribute(nodeKey, 'x'));
         const nodesY = this.graph.mapNodes((nodeKey) => this.graph.getNodeAttribute(nodeKey, 'y'));
-        const minX = Math.min(...nodesX);
-        const maxX = Math.max(...nodesX);
-        const minY = Math.min(...nodesY);
-        const maxY = Math.max(...nodesY);
+        let minX = Math.min(...nodesX);
+        let maxX = Math.max(...nodesX);
+        let minY = Math.min(...nodesY);
+        let maxY = Math.max(...nodesY);
+
+        // if we have groups, we need to adjust the bounds so that the groups have a gap before the canvas border
+        if (isGraphLayoutWithGroups(this.layout)) {
+            const nodes = this.graph.mapNodes(nodeKey => this.graph.getNodeAttributes(nodeKey));
+            const nodesInGroups = Object.values(getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)).flat();
+
+            const updateBoundary = (node: SimulationNode, delta: number,) => {
+                if (nodesInGroups.includes(node.id)) {
+                    return delta;
+                }
+                return 0;
+            };
+
+            const nodeWithMinX = nodes.find(node => node.x === minX);
+            const nodeWithMaxX = nodes.find(node => node.x === maxX);
+            const nodeWithMinY = nodes.find(node => node.y === minY);
+            const nodeWithMaxY = nodes.find(node => node.y === maxY);
+
+            minX += updateBoundary(nodeWithMinX, -20);
+            maxX += updateBoundary(nodeWithMaxX, 20);
+            minY += updateBoundary(nodeWithMinY, -20);
+            maxY += updateBoundary(nodeWithMaxY, 20);
+        }
+
 
         // compute graph size
         const graphWidth = Math.abs(maxX - minX);
@@ -359,6 +391,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             // eslint-disable-next-line no-console
             console.error('Error resetting viewport', err);
         }
+    }
+
+    /**
+     * Reset the viewport to fit the graph centered on screen
+     */
+    public collapseGroups(): void {
+        console.log('Collapse groups');
     }
 
     /**
@@ -562,10 +601,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.app.stage.addChild(this.viewport);
 
         // create layers - containers to hold different rendered parts of the graph
+        this.groupContainerLayer = new PIXI.Container();
         this.edgeLayer = new PIXI.Container();
         this.edgeSymbolsLayer = new PIXI.Container();
         this.nodeLayer = new PIXI.Container();
         this.nodeLabelLayer = new PIXI.Container();
+        this.viewport.addChild(this.groupContainerLayer);
         this.viewport.addChild(this.edgeLayer);
         this.viewport.addChild(this.edgeSymbolsLayer);
         this.viewport.addChild(this.nodeLayer);
@@ -728,8 +769,26 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Creates edges and nodes based on current graph state.
      */
     private createGraph(): void {
+        // Check if the current layout has groups
+        let group;
+        if (isGraphLayoutWithGroups(this.layout)) {
+            group = this.layout.group;
+        }
+
+        // Create group containers
+        if (group !== undefined) {
+            const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
+            Object.keys(groups).forEach((group) => {
+                console.log('CREATING GROUP 😀', group)
+                const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
+                this.createGroupContainer(group, nodesIngroup)
+            })
+        }
+
+        // Create nodes and edges
         this.graph.forEachNode(this.createNode.bind(this));
         this.graph.forEachEdge(this.createEdge.bind(this));
+
         this.updateStrengthRange();
     }
 
@@ -810,6 +869,85 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         this.updateNodeStyle(id, attributes);
+    }
+
+    /**
+   * Create a node
+   *
+   * @param id node id
+   * @param attributes node attributes
+   */
+    private createGroupContainer(id: string, nodes: SimulationNode[]): void {
+        console.log('createGroupContainer', id, nodes)
+        const groupContainer = new GroupContainerObject();
+        this.groupContainerLayer.addChild(groupContainer.groupContainerGfx);
+        this.groupContainerMap.set(id, groupContainer);
+
+        groupContainer.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
+            // Always show hover state
+            this.hoverNode(id);
+
+            // Only trigger the event (i.e. tooltip) if not currently dragging
+            if (!this.mousedownNodeKey) {
+                this.emit('nodeMouseover', event, id);
+            }
+        });
+        groupContainer.addListener('mouseout', (event: PIXI.FederatedMouseEvent) => {
+            const local = groupContainer.groupContainerGfx.toLocal(event.global);
+            const isInNode = groupContainer.groupContainerGfx.hitArea.contains(local.x, local.y);
+
+            // only trigger mouseout if it's actually outside the node (could be within label)
+            if (!isInNode) {
+                this.unhoverNode(id);
+                this.emit('nodeMouseout', event, id);
+            }
+
+            // don't reset mousedownKey if we're dragging as this can prevent the drag
+            // from working correctly when dragging quickly outside of a node
+            if (!this.editable && !this.isMovingNode && !this.isCreatingEdge) {
+                // resets mousedown position
+                this.mousedownNodeKey = null;
+            }
+        });
+
+        groupContainer.addListener('mousedown', (event: PIXI.FederatedMouseEvent) => {
+            this.mousedownEdgeKey = null;
+            this.mousedownNodeKey = id;
+
+            if (this.dragMode) {
+                this.enableDragBehaviour();
+            }
+
+            this.nodeMousedownCenterPosition = groupContainer.groupContainerGfx.getGlobalPosition().clone();
+            this.nodeMousedownPosition = event.global.clone();
+        });
+        groupContainer.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
+            // If mouseup happened on the same node mousedown happened
+            if (this.mousedownNodeKey === id && this.nodeMousedownPosition) {
+                const xOffset = Math.abs(this.nodeMousedownPosition.x - event.global.x);
+                const yOffset = Math.abs(this.nodeMousedownPosition.y - event.global.y);
+
+                // only trigger click if the mousedown&mouseup happened very close to each other
+                if (xOffset <= 2 && yOffset <= 2) {
+                    this.emit('nodeClick', event, id);
+                }
+            }
+
+            // If mouseup happened on a different node
+            if (this.isCreatingEdge && this.mousedownNodeKey && this.mousedownNodeKey !== id) {
+                // check if the edge doesn't already exist
+                if (!this.graph.hasEdge(this.mousedownNodeKey, id)) {
+                    // emit event to create a real edge
+                    this.emit('createEdge', event, this.mousedownNodeKey, id);
+                }
+            }
+            if (!this.editable) {
+                // resets mousedown position
+                this.mousedownNodeKey = null;
+            }
+        });
+
+        this.updateGroupContainerStyle(id, nodes);
     }
 
     /**
@@ -1385,6 +1523,25 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
+ * Update style of given node
+ *
+ * @param id id of node to update
+ * @param attributes node attributes
+ */
+    private updateGroupContainerStyle(id: string, nodes: SimulationNode[]): void {
+        const groupContainer = this.groupContainerMap.get(id);
+
+        console.log('updateGroupContainerStyle', groupContainer, id, nodes)
+
+        if (groupContainer) {
+            // const nodePosition = { x: 100, y: 100 };
+            // groupContainer.updatePosition(nodePosition);
+
+            groupContainer.updateStyle(nodes, this.textureCache);
+        }
+    }
+
+    /**
      * Update style for given node
      *
      * @param nodeKey id of node to update
@@ -1414,10 +1571,25 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Update the visuals of each node and edge
+     * Update the visuals of each node, edge and group containers
      */
     private updateStyles(): void {
+        console.log('updateStyles')
         this.graph.forEachNode(this.updateNodeStyle.bind(this));
         this.graph.forEachEdge(this.updateEdgeStyle.bind(this));
+
+        let group;
+        if (isGraphLayoutWithGroups(this.layout)) {
+            group = this.layout.group;
+        }
+
+        if (group !== undefined) {
+            const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
+            Object.keys(groups).forEach((group) => {
+                console.log('CREATING GROUP', group)
+                const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
+                this.updateGroupContainerStyle(group, nodesIngroup)
+            })
+        }
     }
 }

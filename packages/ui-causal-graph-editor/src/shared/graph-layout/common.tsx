@@ -96,3 +96,7 @@ export interface GraphLayoutWithTiers extends GraphLayout {
     orientation: DirectionType;
     tiers: GraphTiers;
 }
+
+export interface GraphLayoutWithGrouping extends GraphLayout {
+    group: string;
+}

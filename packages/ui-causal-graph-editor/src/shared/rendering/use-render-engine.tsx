@@ -75,6 +75,10 @@ interface UseRenderEngineApi {
      */
     resetViewport: () => void;
     /**
+     * Collapses all groups
+     */
+    collapseGroups: () => void;
+    /**
      * Register a handler for a given engine event.
      *
      * @param eventName name of event to respond to
@@ -207,6 +211,11 @@ export function useRenderEngine({
         resetViewport: () => {
             if (engine.current.initialized) {
                 engine.current.resetViewport();
+            }
+        },
+        collapseGroups: () => {
+            if (engine.current.initialized) {
+                engine.current.collapseGroups();
             }
         },
         useEngineEvent,
