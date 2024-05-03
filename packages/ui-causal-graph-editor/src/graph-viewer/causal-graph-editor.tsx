@@ -21,7 +21,7 @@ import * as React from 'react';
 import { GetReferenceClientRect } from 'tippy.js';
 
 import styled, { useTheme } from '@darajs/styled-components';
-import { Tooltip } from '@darajs/ui-components';
+import { Button, Tooltip } from '@darajs/ui-components';
 import { Notification, NotificationPayload } from '@darajs/ui-notifications';
 import { Status, useOnClickOutside, useUpdateEffect } from '@darajs/ui-utils';
 import { ConfirmationModal } from '@darajs/ui-widgets';
@@ -182,6 +182,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         useEngineEvent,
         resetViewport,
         resetLayout,
+        saveImage,
         onSetDragMode,
         onNodeSelected,
         onEdgeSelected,
@@ -700,6 +701,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />
+                                    <Button style={{'pointerEvents': 'all'}} styling="ghost" onClick={saveImage}>save</Button>
                                 </>
                             }
                             validContentSelected={contentSelected}

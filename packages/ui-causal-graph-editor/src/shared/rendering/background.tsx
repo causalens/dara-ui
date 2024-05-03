@@ -67,15 +67,19 @@ export class Background extends PIXI.utils.EventEmitter<'click'> {
     // eslint-disable-next-line class-methods-use-this
     private createGfx(theme: DefaultTheme): SmoothGraphics {
         const gfx = new SmoothGraphics();
-        const [color] = colorToPixi(theme.colors.grey2);
-        gfx.beginFill(color, 1, true);
+
         // we're applying scale to tileSprite, so we need to scale the distance between dots
         const distance = DOT_DISTANCE / SCALE;
+
+        // then draw the dots
+        const [color] = colorToPixi(theme.colors.grey2);
+        gfx.beginFill(color, 1, true);
         gfx.drawCircle(0, distance, 1);
         gfx.drawCircle(distance, distance, 1);
         gfx.drawCircle(0, 0, 1);
         gfx.drawCircle(distance, 0, 1);
         gfx.endFill();
+
 
         return gfx;
     }

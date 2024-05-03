@@ -663,6 +663,37 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         event.preventDefault();
     }
 
+    public async saveToImage(): Promise<void> {
+        // create a new container to render
+        const containerWithBackground = new PIXI.Container();
+
+        // Add custom background since renderer background is not rendered
+        const bg = new PIXI.Graphics();
+        bg.beginFill(this.app.renderer.background.color, 1);
+        bg.drawRect(0, 0, this.app.renderer.width, this.app.renderer.height);
+        bg.endFill();
+        containerWithBackground.addChild(bg);
+
+        // add the stage
+        containerWithBackground.addChild(this.app.stage);
+
+        const renderTexture = this.app.renderer.generateTexture(containerWithBackground, {
+            scaleMode: PIXI.SCALE_MODES.LINEAR,
+            // multiply the resolution for better quality
+            resolution: window.devicePixelRatio * 4,
+            multisample: PIXI.MSAA_QUALITY.HIGH,
+        });
+
+        // generate the data URL
+        const dataUrl = await this.app.renderer.extract.base64(renderTexture, 'image/png');
+
+        // create a link and download the image
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'graph.png';
+        link.click();
+    }
+
     /**
      * Update the set of constraints
      *

@@ -75,6 +75,10 @@ interface UseRenderEngineApi {
      */
     resetViewport: () => void;
     /**
+     * Save current canvas state as an image
+     */
+    saveImage: () => Promise<void>;
+    /**
      * Register a handler for a given engine event.
      *
      * @param eventName name of event to respond to
@@ -207,6 +211,11 @@ export function useRenderEngine({
         resetViewport: () => {
             if (engine.current.initialized) {
                 engine.current.resetViewport();
+            }
+        },
+        saveImage: () => {
+            if (engine.current.initialized) {
+                return engine.current.saveToImage();
             }
         },
         useEngineEvent,
