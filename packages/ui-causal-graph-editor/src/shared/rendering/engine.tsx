@@ -423,7 +423,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                 // remove the container and add a group node
                 this.dropGroupContainer(group)
-                this.createNode(group, groupNodeAttributes);
+                // this.createNode(group, groupNodeAttributes);
                 this.graph.addNode(group, groupNodeAttributes)
             })
 
@@ -452,7 +452,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
                     if (!this.graph.hasEdge(finalSource, finalTarget)) {
                         // if it doesn't exist create it
-                        this.createEdge(`${edgeKey}_group`, edgeAttributes, finalSource, finalTarget, sourceNodeAttributes, targetNodeAttributes)
+                        // this.createEdge(`${edgeKey}_group`, edgeAttributes, finalSource, finalTarget, sourceNodeAttributes, targetNodeAttributes)
                         this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
                     }
                 });
