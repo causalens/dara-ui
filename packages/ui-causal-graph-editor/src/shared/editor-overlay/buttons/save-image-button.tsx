@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { useTheme } from '@darajs/styled-components';
 import { Tooltip } from '@darajs/ui-components';
-import { Image } from '@darajs/ui-icons';
+import { ArrowDown, Circle, FarImage } from '@darajs/ui-icons';
 
 import PointerContext from '../../pointer-context';
 import { FloatingButton } from '../floating-elements';
@@ -29,7 +29,9 @@ interface SaveImageButtonProps {
 }
 
 function SaveImageButton(props: SaveImageButtonProps): JSX.Element {
+    const [hovered, setHovered] = useState(false);
     const { disablePointerEvents } = useContext(PointerContext);
+    const theme = useTheme();
 
     return (
         <Tooltip content="Save as Image" placement="bottom">
@@ -38,9 +40,17 @@ function SaveImageButton(props: SaveImageButtonProps): JSX.Element {
                 disableEvents={disablePointerEvents}
                 fixedSize
                 onClick={props.onSave}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
                 style={{ padding: '0 0.75rem' }}
+                className="fa-layers fa-fw"
             >
-                <Image />
+                <FarImage />
+                <Circle
+                    style={{ color: hovered ? theme.colors.grey2 : theme.colors.blue1 }}
+                    transform="shrink-6 down-6 right-6"
+                />
+                <ArrowDown transform="shrink-6 down-6 right-6" />
             </FloatingButton>
         </Tooltip>
     );

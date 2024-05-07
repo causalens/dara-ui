@@ -69,11 +69,12 @@ const Message = styled.div`
 const Heading = styled.h2`
     overflow: hidden;
     display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
-    -webkit-box-orient: vertical;
 
     font-size: 1rem;
     font-weight: 700;
     text-overflow: ellipsis;
+
+    -webkit-box-orient: vertical;
 
     -webkit-line-clamp: 1;
 `;
@@ -81,11 +82,12 @@ const Heading = styled.h2`
 const Body = styled.span<NotificationBodyProps>`
     overflow: hidden;
     display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
-    -webkit-box-orient: vertical;
 
     font-weight: 400;
     line-height: 1.25rem;
     text-overflow: ellipsis;
+
+    -webkit-box-orient: vertical;
 
     -webkit-line-clamp: ${(props) => (props.moreDetailsShown ? 1 : 2)};
 `;

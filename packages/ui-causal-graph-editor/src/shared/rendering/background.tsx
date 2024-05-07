@@ -80,7 +80,6 @@ export class Background extends PIXI.utils.EventEmitter<'click'> {
         gfx.drawCircle(distance, 0, 1);
         gfx.endFill();
 
-
         return gfx;
     }
 

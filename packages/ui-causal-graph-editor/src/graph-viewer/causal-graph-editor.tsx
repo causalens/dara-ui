@@ -21,7 +21,7 @@ import * as React from 'react';
 import { GetReferenceClientRect } from 'tippy.js';
 
 import styled, { useTheme } from '@darajs/styled-components';
-import { Button, Tooltip } from '@darajs/ui-components';
+import { Tooltip } from '@darajs/ui-components';
 import { Notification, NotificationPayload } from '@darajs/ui-notifications';
 import { Status, useOnClickOutside, useUpdateEffect } from '@darajs/ui-utils';
 import { ConfirmationModal } from '@darajs/ui-widgets';
@@ -40,6 +40,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
+import { SaveImageButton } from '@shared/editor-overlay/buttons';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import useGraphTooltip from '@shared/use-graph-tooltip';
 import { getTooltipContent, willCreateCycle } from '@shared/utils';
@@ -68,7 +69,6 @@ import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
-import { SaveImageButton } from '@shared/editor-overlay/buttons';
 
 const NotificationWrapper = styled.div`
     position: relative;

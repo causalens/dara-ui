@@ -77,7 +77,7 @@ interface UseRenderEngineApi {
     /**
      * Get current canvas state as an image
      */
-    extractImage: () => Promise<string>;
+    extractImage: () => Promise<string | undefined>;
     /**
      * Register a handler for a given engine event.
      *
