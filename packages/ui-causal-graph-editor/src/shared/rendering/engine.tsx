@@ -47,6 +47,11 @@ import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
 import { colorToPixi, getZoomState, isGraphLayoutWithTiers } from './utils';
 
+// Use 4k as a max reasonable resolution to render
+const MAX_REASONABLE_HEIGHT = 2160;
+const MAX_REASONABLE_WIDTH = 3840;
+const MAX_REASONABLE_PIXELS = MAX_REASONABLE_HEIGHT * MAX_REASONABLE_WIDTH;
+
 const WORLD_PADDING = 100;
 
 const TEMP_EDGE_SYMBOL = Symbol('TEMP_EDGE');
@@ -663,11 +668,14 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         event.preventDefault();
     }
 
-    public async saveToImage(): Promise<void> {
+    /**
+     * Extract current visible canvas state to an image
+     */
+    public async extractImage(): Promise<string> {
         // create a new container to render
         const containerWithBackground = new PIXI.Container();
 
-        // Add custom background since renderer background is not rendered
+        // Add a custom background since renderer background is not rendered, simply render a single-color rect
         const bg = new PIXI.Graphics();
         bg.beginFill(this.app.renderer.background.color, 1);
         bg.drawRect(0, 0, this.app.renderer.width, this.app.renderer.height);
@@ -677,21 +685,54 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // add the stage
         containerWithBackground.addChild(this.app.stage);
 
+        // compute x/y bounds of the graph, this is to not waste resolution on empty space
+        const nodesCoords = this.nodeLayer.children.map((nodeObj) => nodeObj.getGlobalPosition());
+        const nodesX = nodesCoords.map((nodeCoord) => nodeCoord.x);
+        const nodesY = nodesCoords.map((nodeCoord) => nodeCoord.y);
+        const minX = Math.min(...nodesX);
+        const maxX = Math.max(...nodesX);
+        const minY = Math.min(...nodesY);
+        const maxY = Math.max(...nodesY);
+
+        const region = new PIXI.Rectangle(
+            minX - WORLD_PADDING,
+            minY - WORLD_PADDING,
+            maxX - minX + WORLD_PADDING * 2,
+            maxY - minY + WORLD_PADDING * 2
+        );
+
+        let resolution = window.devicePixelRatio;
+
+        // make sure WEBGL renderer is available
+        if (this.app.renderer.type === PIXI.RENDERER_TYPE.WEBGL) {
+            // compute what's the max safe WEBGL dimension size we can render without crashing
+            const { gl } = this.app.renderer as PIXI.Renderer;
+            const maxRenderBufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+            const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+            const maxSafeDimension = Math.min(maxRenderBufferSize, maxTextureSize);
+
+            // now calculate our ideal resolution to get to 4k resolution in the generated image
+            const area = region.width * region.height;
+            const desiredResolution = Math.sqrt(MAX_REASONABLE_PIXELS / area);
+
+            // scale the dimensions, capping each on the max safe dimension
+            const scaledWidth = Math.min(region.width * desiredResolution, maxSafeDimension);
+            const scaledHeight = Math.min(region.height * desiredResolution, maxSafeDimension);
+
+            // pick the smaller scale factor
+            resolution = Math.floor(Math.min(scaledWidth / region.width, scaledHeight / region.height));
+        }
+
         const renderTexture = this.app.renderer.generateTexture(containerWithBackground, {
             scaleMode: PIXI.SCALE_MODES.LINEAR,
-            // multiply the resolution for better quality
-            resolution: window.devicePixelRatio * 4,
+            // increase the resolution for better quality
+            resolution,
             multisample: PIXI.MSAA_QUALITY.HIGH,
+            region,
         });
 
         // generate the data URL
-        const dataUrl = await this.app.renderer.extract.base64(renderTexture, 'image/png');
-
-        // create a link and download the image
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = 'graph.png';
-        link.click();
+        return this.app.renderer.extract.base64(renderTexture, 'image/png');
     }
 
     /**

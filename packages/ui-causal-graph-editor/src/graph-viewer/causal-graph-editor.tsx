@@ -68,6 +68,7 @@ import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
+import { SaveImageButton } from '@shared/editor-overlay/buttons';
 
 const NotificationWrapper = styled.div`
     position: relative;
@@ -182,7 +183,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         useEngineEvent,
         resetViewport,
         resetLayout,
-        saveImage,
+        extractImage,
         onSetDragMode,
         onNodeSelected,
         onEdgeSelected,
@@ -625,6 +626,19 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         onSetDragMode
     );
 
+    // save image
+    const saveImage = React.useCallback(async () => {
+        const dataUrl = await extractImage();
+
+        if (dataUrl) {
+            // create a link and download the image
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'graph.png';
+            link.click();
+        }
+    }, [extractImage]);
+
     let contentSelected = false;
     let panelTitle = '';
 
@@ -701,7 +715,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />
-                                    <Button style={{'pointerEvents': 'all'}} styling="ghost" onClick={saveImage}>save</Button>
+                                    <SaveImageButton onSave={saveImage} />
                                 </>
                             }
                             validContentSelected={contentSelected}
