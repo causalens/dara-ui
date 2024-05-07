@@ -30,6 +30,9 @@ import { getNodeColor, getNodeSize } from './utils';
 const NODE_CIRCLE = 'NODE_CIRCLE';
 const NODE_BORDER = 'NODE_BORDER';
 const NODE_LABEL = 'NODE_LABEL';
+const NODE_SQUARE = 'NODE_SQUARE';
+const NODE_SQUARE_BORDER = 'NODE_SQUARE_BORDER';
+
 
 /**
  * Represents a drawn Node object
@@ -130,26 +133,42 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         }
         const dropShadow = nodeGfx.filters[0] as DropShadowFilter;
 
+        const nodeTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE : NODE_CIRCLE
+        const nodeBorderTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE_BORDER : NODE_BORDER
+
         // Get/create circle texture
-        const circleTexture = textureCache.get(createKey(NODE_CIRCLE, nodeStyle.size), () => {
+        let nodeTexture = textureCache.get(createKey(nodeTextureKey, nodeStyle.size), () => {
             const graphics = new SmoothGraphics();
             graphics.beginFill(0xffffff, 1, true);
-            graphics.drawCircle(nodeStyle.size, nodeStyle.size, nodeStyle.size);
+
+
+            if (nodeStyle.isGroupNode) {
+                graphics.drawRoundedRect(nodeStyle.size, nodeStyle.size, 2 * nodeStyle.size, 2 * nodeStyle.size, 8);
+
+            } else {
+                graphics.drawCircle(nodeStyle.size, nodeStyle.size, nodeStyle.size);
+            }
             return graphics;
         });
 
+
         // Set the node texture and adjust its styles
         const circle = nodeGfx.getChildByName<PIXI.Sprite>(NODE_CIRCLE);
-        circle.texture = circleTexture;
+        circle.texture = nodeTexture;
         [circle.tint, circle.alpha] = colorToPixi(nodeStyle.color);
 
         // Get/create border texture
         const borderTexture = textureCache.get(
-            createKey(NODE_BORDER, outerRadius, borderWidth, nodeStyle.size),
+            createKey(nodeBorderTextureKey, outerRadius, borderWidth, nodeStyle.size),
             () => {
                 const graphics = new SmoothGraphics();
                 graphics.lineStyle({ color: 0xffffff, width: borderWidth });
-                graphics.drawCircle(outerRadius, outerRadius, nodeStyle.size);
+                if (nodeStyle.isGroupNode) {
+                    graphics.drawRoundedRect(outerRadius, outerRadius, 2 * nodeStyle.size, 2 * nodeStyle.size, 8);
+
+                } else {
+                    graphics.drawCircle(outerRadius, outerRadius, nodeStyle.size);
+                }
                 return graphics;
             },
             BORDER_PADDING
@@ -261,6 +280,25 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
     }
 
     /**
+     * Update visibility of node label elements based on zoomstep
+     *
+     * @param nodeGfx node label graphics container
+     * @param zoomStep zoom step
+     */
+    hideNode(): void {
+        const nodeLabel = this.nodeLabelGfx.getChildByName<PIXI.Sprite>(NODE_LABEL);
+        const nodeCircle = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_CIRCLE)
+        const nodeBorder = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_BORDER)
+
+        this.nodeGfx.visible = false;
+        this.nodeLabelGfx.visible = false;
+        nodeCircle.visible = false;
+        nodeLabel.visible = false;
+        nodeBorder.visible = false;
+
+    }
+
+    /**
      * Moves all node graphics to given position
      *
      * @param position position to move to
@@ -278,7 +316,6 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
      */
     updateStyle(nodeStyle: PixiNodeStyle, textureCache: TextureCache): void {
         const [defaultColor, defaultFontColor] = getNodeColor(nodeStyle.group, nodeStyle.theme);
-
         // Apply default styles
         nodeStyle.color ??= defaultColor;
         nodeStyle.highlight_color ??= nodeStyle.theme.colors.primary;

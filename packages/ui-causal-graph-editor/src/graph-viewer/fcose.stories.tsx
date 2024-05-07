@@ -41,65 +41,6 @@ export default {
     title: 'CausalGraphEditor/GraphEditor/Fcose',
 } as Meta;
 
-function graphToCausalGraph(graph: Graph): CausalGraph {
-    return {
-        edges: graph.reduceEdges((acc, edge, attrs, source, target) => {
-            if (!(source in acc)) {
-                acc[source] = {};
-            }
-
-            acc[source][target] = {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {},
-            };
-
-            return acc;
-        }, {}),
-        nodes: graph.reduceNodes((acc, nodeKey) => {
-            acc[nodeKey] = {
-                meta: {},
-                variable_type: VariableType.UNSPECIFIED,
-            };
-
-            return acc;
-        }, {}),
-        version: '2.0',
-    };
-}
-
-export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
-    const [numClusters, setNumClusters] = useState(2);
-    const [numEdges, setNumEdges] = useState(1600);
-    const [numNodes, setNumNodes] = useState(800);
-    const [parsedData, setParsedData] = useState<CausalGraph>();
-
-    useEffect(() => {
-        const newGraph = clusters(Graph, {
-            clusters: numClusters,
-            order: numNodes,
-            size: numEdges,
-        });
-        setParsedData(graphToCausalGraph(newGraph));
-    }, [numClusters, numEdges, numNodes]);
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div>
-                <span>Numer of Clusters</span>
-                <input defaultValue={numClusters} onChange={(e) => setNumClusters(e.target.valueAsNumber)} />
-                <span>Numer of Edges</span>
-                <input defaultValue={numEdges} onChange={(e) => setNumEdges(e.target.valueAsNumber)} />
-                <span>Numer of Nodes</span>
-                <input defaultValue={numNodes} onChange={(e) => setNumNodes(e.target.valueAsNumber)} />
-            </div>
-            {parsedData && <CausalGraphViewerComponent {...args} graphData={parsedData} style={{ margin: 0 }} />}
-        </div>
-    );
-};
-RandomClusters.args = {
-    editable: true,
-    graphLayout: FcoseLayout.Builder.nodeRepulsion(100_000_000).nodeSeparation(20).build(),
-};
 // Real world example graph to test layouts
 export const Fcose = Template.bind({});
 Fcose.args = {
@@ -141,13 +82,16 @@ FcoseTiers.args = {
 export const FcoseGrouping = Template.bind({});
 
 const groupingLayout = FcoseLayout.Builder.build();
+// groupingLayout.group = 'meta.group';
 groupingLayout.group = 'meta.test';
+
 // groupingLayout.nodeRepulsion = 10000000;
 
 FcoseGrouping.args = {
     // graphData: FRAUD,
     graphData: nodeTiersCausalGraph,
     graphLayout: groupingLayout,
+    editable: true,
 };
 
 const PredefinedGraph = deepCopy(SHIPPED_UNITS);
@@ -270,4 +214,64 @@ PredefinedPositions.args = {
     editable: true,
     graphData: PredefinedGraph,
     graphLayout: FcoseLayout.Builder.build(),
+};
+
+function graphToCausalGraph(graph: Graph): CausalGraph {
+    return {
+        edges: graph.reduceEdges((acc, edge, attrs, source, target) => {
+            if (!(source in acc)) {
+                acc[source] = {};
+            }
+
+            acc[source][target] = {
+                edge_type: EdgeType.DIRECTED_EDGE,
+                meta: {},
+            };
+
+            return acc;
+        }, {}),
+        nodes: graph.reduceNodes((acc, nodeKey) => {
+            acc[nodeKey] = {
+                meta: {},
+                variable_type: VariableType.UNSPECIFIED,
+            };
+
+            return acc;
+        }, {}),
+        version: '2.0',
+    };
+}
+
+export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
+    const [numClusters, setNumClusters] = useState(2);
+    const [numEdges, setNumEdges] = useState(1600);
+    const [numNodes, setNumNodes] = useState(800);
+    const [parsedData, setParsedData] = useState<CausalGraph>();
+
+    useEffect(() => {
+        const newGraph = clusters(Graph, {
+            clusters: numClusters,
+            order: numNodes,
+            size: numEdges,
+        });
+        setParsedData(graphToCausalGraph(newGraph));
+    }, [numClusters, numEdges, numNodes]);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div>
+                <span>Numer of Clusters</span>
+                <input defaultValue={numClusters} onChange={(e) => setNumClusters(e.target.valueAsNumber)} />
+                <span>Numer of Edges</span>
+                <input defaultValue={numEdges} onChange={(e) => setNumEdges(e.target.valueAsNumber)} />
+                <span>Numer of Nodes</span>
+                <input defaultValue={numNodes} onChange={(e) => setNumNodes(e.target.valueAsNumber)} />
+            </div>
+            {parsedData && <CausalGraphViewerComponent {...args} graphData={parsedData} style={{ margin: 0 }} />}
+        </div>
+    );
+};
+RandomClusters.args = {
+    editable: true,
+    graphLayout: FcoseLayout.Builder.nodeRepulsion(100_000_000).nodeSeparation(20).build(),
 };

@@ -30,6 +30,7 @@ import {
     AddNodeButton,
     CenterGraphButton,
     CollapseAllButton,
+    ExpandAllButton,
     DragModeButton,
     EdgeInfoContent,
     GraphLegendDefinition,
@@ -700,6 +701,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                         totalNumberOfResults={searchResults.length}
                                     />
                                     <CollapseAllButton onCollapseAll={collapseGroups} />
+                                    <ExpandAllButton onExpandAll={collapseGroups} />
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />

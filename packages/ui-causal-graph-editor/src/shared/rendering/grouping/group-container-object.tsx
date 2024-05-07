@@ -90,7 +90,6 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
         nodes.forEach(node => {
-            console.log('NODE', node.x, node.y, node['meta.rendering_properties.size'] ?? 100)
             const radius = node['meta.rendering_properties.size'] ?? 100;
             minX = Math.min(minX, node.x - radius);
             maxX = Math.max(maxX, node.x + radius);
@@ -98,9 +97,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
             maxY = Math.max(maxY, node.y + radius);
         });
 
-        console.log('NODES', nodes)
 
-        console.log('DRAWING RECTANGLE', minX, maxX, minY, maxY)
 
         const borderWidth = 1;
 
@@ -128,7 +125,6 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
 
 
 
-        console.log(`Drawing rectangle from (${minX}, ${minY}) to (${maxX}, ${maxY})`);
 
 
         // Set the node texture and adjust its styles
@@ -215,7 +211,6 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         const centerX = minX + (maxX - minX) / 2;
         const centerY = minY + (maxY - minY) / 2;
 
-        console.log(this.groupContainerGfx)
 
         GroupContainerObject.updateContainerStyle(this.groupContainerGfx, nodes, textureCache);
         this.groupContainerGfx.position.copyFrom({ x: centerX, y: centerY });

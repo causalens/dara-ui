@@ -17,32 +17,32 @@
 import { useContext } from 'react';
 
 import { Tooltip } from '@darajs/ui-components';
-import { DownLeftAndUpRightToCenter } from '@darajs/ui-icons'
+import { UpRightAndDownLeftFromCenter } from '@darajs/ui-icons'
 
 import PointerContext from '../../pointer-context';
 import { FloatingButton } from '../floating-elements';
 
-interface CollapseGroupButtonProps {
+interface ExpandGroupButtonProps {
     /** Handler for resetting the zoom */
-    onCollapseAll: () => void | Promise<void>;
+    onExpandAll: () => void | Promise<void>;
 }
 
-function CollapseGroupButton(props: CollapseGroupButtonProps): JSX.Element {
+function ExpandGroupButton(props: ExpandGroupButtonProps): JSX.Element {
     const { disablePointerEvents } = useContext(PointerContext);
 
     return (
-        <Tooltip content="Collapse All" placement="bottom">
+        <Tooltip content="Expand All" placement="bottom">
             <FloatingButton
-                aria-label="Collapse All"
+                aria-label="Expand All"
                 disableEvents={disablePointerEvents}
                 fixedSize
-                onClick={props.onCollapseAll}
+                onClick={props.onExpandAll}
                 style={{ padding: '0 0.75rem' }}
             >
-                <DownLeftAndUpRightToCenter />
+                <UpRightAndDownLeftFromCenter />
             </FloatingButton>
         </Tooltip>
     );
 }
 
-export default CollapseGroupButton;
+export default ExpandGroupButton;

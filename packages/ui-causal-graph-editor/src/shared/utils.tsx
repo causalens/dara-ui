@@ -32,12 +32,12 @@ export function willCreateCycle(graphOriginal: SimulationGraph, edge: [string, s
     try {
         graph.dropEdge(edge);
         // eslint-disable-next-line no-empty
-    } catch {}
+    } catch { }
 
     try {
         graph.dropEdge([edge[1], edge[0]]);
         // eslint-disable-next-line no-empty
-    } catch {}
+    } catch { }
 
     // Add the edge in the direction we want to check
     graph.addEdge(edge[0], edge[1], { edge_type: EdgeType.DIRECTED_EDGE, originalMeta: {} });
@@ -148,7 +148,7 @@ export function getNodeGroup(graph: SimulationGraph, id: string, isLatent?: bool
     let group: NodeGroup = 'other';
     if (isLatent) {
         group = 'latent';
-    } else if (graph.inDegree(id) > 0 && graph.outDegree(id) === 0) {
+    } else if (graph.hasNode(id) && graph.inDegree(id) > 0 && graph.outDegree(id) === 0) {
         group = 'target';
     }
 

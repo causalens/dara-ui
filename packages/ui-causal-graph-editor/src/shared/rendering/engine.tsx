@@ -47,7 +47,7 @@ import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
 import { colorToPixi, getZoomState, isGraphLayoutWithTiers, isGraphLayoutWithGroups } from './utils';
 import { GroupContainerObject } from './grouping/group-container-object';
-import { get } from 'lodash';
+import { get, includes } from 'lodash';
 
 const WORLD_PADDING = 100;
 
@@ -351,7 +351,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             const nodesInGroups = Object.values(getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)).flat();
 
             const updateBoundary = (node: SimulationNode, delta: number,) => {
-                if (nodesInGroups.includes(node.id)) {
+                if (nodesInGroups.includes(node?.id)) {
                     return delta;
                 }
                 return 0;
@@ -394,10 +394,78 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Reset the viewport to fit the graph centered on screen
+     * Collapse all groups present in the graph
      */
     public collapseGroups(): void {
+        function findKeyByValue(obj: Record<string, string[]>, searchValue: string) {
+            if (Object.values(obj).flat().includes(searchValue)) {
+                let returnKey: string
+                Object.keys(obj).forEach((key) => {
+                    if (obj[key].includes(searchValue)) {
+                        returnKey = key
+                    }
+                })
+                return returnKey
+            }
+            return searchValue;
+        }
+
         console.log('Collapse groups');
+        if (isGraphLayoutWithGroups(this.layout)) {
+            const layoutGroup = this.layout.group
+            const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph)
+
+            // first create all group nodes so that we have something to connect the edges to
+            Object.keys(groupsObject).forEach((group) => {
+                // set attributes for group node, getting the same position as the container had
+                const container = this.groupContainerMap.get(group).groupContainerGfx
+                const groupNodeAttributes = { id: group, originalMeta: {}, variable_type: 'groupNode', x: container.x, y: container.y }
+
+                // remove the container and add a group node
+                this.dropGroupContainer(group)
+                this.createNode(group, groupNodeAttributes);
+                this.graph.addNode(group, groupNodeAttributes)
+            })
+
+            // collapse edges
+            Object.keys(groupsObject).forEach((group) => {
+                const nodesToHide = groupsObject[group]
+
+                this.graph.forEachEdge((edgeKey) => {
+                    const initialSource = this.graph.source(edgeKey);
+                    const initialTarget = this.graph.target(edgeKey);
+
+                    const finalTarget = findKeyByValue(groupsObject, initialTarget)
+                    const finalSource = findKeyByValue(groupsObject, initialSource)
+                    const sourceNodeAttributes = this.graph.getNodeAttributes(finalSource)
+                    const targetNodeAttributes = this.graph.getNodeAttributes(finalTarget)
+
+                    const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+
+
+                    // if source or target changed we drop the edge
+                    if (initialSource !== finalSource || initialTarget !== finalTarget) {
+                        this.graph.dropEdge(edgeKey);
+                        this.dropEdge(edgeKey);
+                    }
+
+                    // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
+                    if (!this.graph.hasEdge(finalSource, finalTarget)) {
+                        // if it doesn't exist create it
+                        this.createEdge(`${edgeKey}_group`, edgeAttributes, finalSource, finalTarget, sourceNodeAttributes, targetNodeAttributes)
+                        this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
+                    }
+                });
+
+                // hide all the nodes within the group
+                nodesToHide.forEach((node) => {
+                    this.dropNode(node);
+                })
+
+            })
+            this.requestRender();
+        }
+
     }
 
     /**
@@ -769,17 +837,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Creates edges and nodes based on current graph state.
      */
     private createGraph(): void {
-        // Check if the current layout has groups
-        let group;
+        // Create group containers if these are set
         if (isGraphLayoutWithGroups(this.layout)) {
-            group = this.layout.group;
-        }
-
-        // Create group containers
-        if (group !== undefined) {
+            const group = this.layout.group;
             const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
             Object.keys(groups).forEach((group) => {
-                console.log('CREATING GROUP 😀', group)
                 const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
                 this.createGroupContainer(group, nodesIngroup)
             })
@@ -878,7 +940,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
    * @param attributes node attributes
    */
     private createGroupContainer(id: string, nodes: SimulationNode[]): void {
-        console.log('createGroupContainer', id, nodes)
         const groupContainer = new GroupContainerObject();
         this.groupContainerLayer.addChild(groupContainer.groupContainerGfx);
         this.groupContainerMap.set(id, groupContainer);
@@ -982,6 +1043,21 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
+    * Drop the node graphics from the renderer
+    *
+    * @param id node id
+    */
+    private dropGroupContainer(id: string): void {
+        const container = this.groupContainerMap.get(id);
+
+        if (container) {
+            this.groupContainerLayer.removeChild(container.groupContainerGfx);
+            this.groupContainerMap.delete(id);
+            this.requestRender();
+        }
+    }
+
+    /**
      * Enables drag behaviour
      *
      * Pauses viewport dragging and installs listeners for mouse movement
@@ -1072,6 +1148,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 getNodeSize(attributes['meta.rendering_properties.size'] ?? this.layout.nodeSize, group),
             state: node.state,
             theme: this.theme,
+            isGroupNode: attributes.variable_type === "groupNode"
         };
     }
 
@@ -1375,11 +1452,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             const sourceNode = this.nodeMap.get(source);
             const targetNode = this.nodeMap.get(target);
 
+            // const isSourceGroupNode = this.graph.getNodeAttributes(sourceNode).variable_type === 'groupNode'
+            // const isTargetGroupNode = this.graph.getNodeAttributes(targetNode).variable_type === 'groupNode'
+
             // Recompute edge position
             const sourceNodePosition = { x: sourceNodeAttributes.x, y: sourceNodeAttributes.y };
             const targetNodePosition = { x: targetNodeAttributes.x, y: targetNodeAttributes.y };
             const edgeStyle = this.getEdgeStyle(edge, attributes, this.getConstraint(source, target));
-
             edge.updatePosition(
                 edgeStyle,
                 sourceNodePosition,
@@ -1387,7 +1466,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 sourceNode.nodeGfx.width,
                 targetNode.nodeGfx.width,
                 this.viewport,
-                this.textureCache
+                this.textureCache,
+                // isSourceGroupNode,
+                // isTargetGroupNode
             );
         }
     }
@@ -1517,7 +1598,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         if (node) {
             const nodePosition = { x: attributes.x, y: attributes.y };
             node.updatePosition(nodePosition);
-
             node.updateStyle(this.getNodeStyle(node, attributes), this.textureCache);
         }
     }
@@ -1531,7 +1611,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     private updateGroupContainerStyle(id: string, nodes: SimulationNode[]): void {
         const groupContainer = this.groupContainerMap.get(id);
 
-        console.log('updateGroupContainerStyle', groupContainer, id, nodes)
+        // console.log('updateGroupContainerStyle', groupContainer, id, nodes)
 
         if (groupContainer) {
             // const nodePosition = { x: 100, y: 100 };
@@ -1574,20 +1654,14 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Update the visuals of each node, edge and group containers
      */
     private updateStyles(): void {
-        console.log('updateStyles')
         this.graph.forEachNode(this.updateNodeStyle.bind(this));
         this.graph.forEachEdge(this.updateEdgeStyle.bind(this));
 
-        let group;
         if (isGraphLayoutWithGroups(this.layout)) {
-            group = this.layout.group;
-        }
-
-        if (group !== undefined) {
-            const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
-            Object.keys(groups).forEach((group) => {
-                console.log('CREATING GROUP', group)
-                const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
+            const group = this.layout.group
+            const groupsObject = getNodeGroups(this.graph.nodes(), group, this.graph)
+            Object.keys(groupsObject).forEach((group) => {
+                const nodesIngroup = groupsObject[group].map((node) => this.graph.getNodeAttributes(node))
                 this.updateGroupContainerStyle(group, nodesIngroup)
             })
         }

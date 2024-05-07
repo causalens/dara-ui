@@ -282,8 +282,13 @@ export function getTieredLayoutProperties(
 }
 
 
-// Function to assign parents to nodes based on relationships
-function assignParents(nodes, relationships) {
+/**
+ * Updates elements object for each node child to append a parent prop containing the group they belong to
+ * 
+ * @param elements cytoscape elements, includes nodes and edges
+ * @param relationships an object containing the group as a key and array of node ids as value
+ */
+function assignParents(elements: cytoscape.ElementDefinition[], relationships: Record<string, string[]>) {
     // Iterate over each parent in the relationships object
     for (const parent in relationships) {
         if (relationships.hasOwnProperty(parent)) {
@@ -293,7 +298,7 @@ function assignParents(nodes, relationships) {
             // Iterate over each child ID
             children.forEach(childId => {
                 // Find the node that matches this child ID
-                const node = nodes.find(node => node.data.id === childId);
+                const node = elements.find(element => element.data.id === childId);
 
                 // If the node is found, set its 'parent' attribute
                 if (node) {
