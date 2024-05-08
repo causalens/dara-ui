@@ -421,7 +421,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         }
 
         console.log('Collapse groups');
-        console.log('initial edges', this.edgeMap, this.graph.edges())
 
         if (isGraphLayoutWithGroups(this.layout)) {
             const layoutGroup = this.layout.group
@@ -465,34 +464,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         this.dropEdge(edgeKey);
                     }
 
-
-                    // // if the graph has the edge but it is not in edgeMap, we need to recreate it
-                    // if (this.graph.hasEdge(finalSource, finalTarget) && !this.edgeMap.has(edgeKey)) {
-                    //     console.log('ADD EDGE', finalSource, finalTarget, this.graph.hasEdge(finalSource, finalTarget), !this.edgeMap.has(edgeKey))
-
-                    //     this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
-                    // }
-
                     // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
                     if (!this.graph.hasEdge(finalSource, finalTarget)) {
-                        // if (!this.edgeMap.has(`${finalSource}_${finalTarget}`)) {
-
-                        // if it doesn't exist create it
-                        console.log('CREATE EDGE', finalSource, finalTarget)
                         this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
-                        // this.createEdge(`${finalSource}_${finalTarget}`, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                        // and if it hasn't changed and it's not in the edgeMap we need to display it
                     } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
-                        console.log('ADD EDGE', edgeKey, finalSource, finalTarget, this.edgeMap.has(edgeKey))
                         this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
                     }
-
-
-
-                    // else if (!this.edgeMap.has(`${group}_${finalSource}_${finalTarget}`)) {
-                    //     console.log('ADD EDGE', finalSource, finalTarget)
-
-                    //     this.createEdge(`${group}_${finalSource}_${finalTarget}`, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
-                    // }
                 });
 
                 // for the group set all collapsed edges so that we can rebuild them later
@@ -507,8 +485,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.requestRender();
         }
-        console.log('final edges', this.edgeMap, this.graph.edges())
-
 
     }
 
@@ -517,7 +493,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      */
     public expandAllGroups(): void {
         console.log('EXPAND ALL GROUPS')
-        console.log('initial edges', this.edgeMap, this.graph.edges())
         // We only need to expand groups if the graph has at least one of the group nodes
         if (this.graph.nodes().some(node => this.graph.getNodeAttribute(node, 'variable_type') === 'groupNode')) {
             // cleanup the edges that were created between groups
@@ -527,9 +502,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                 const isSourceGroupNode = this.graph.getNodeAttribute(source, 'variable_type') === 'groupNode';
                 const isTargetGroupNode = this.graph.getNodeAttribute(target, 'variable_type') === 'groupNode';
-                console.log('CHECK EDGE', edgeKey, source, target, isSourceGroupNode, isTargetGroupNode)
                 if (isSourceGroupNode || isTargetGroupNode) {
-                    console.log('DROP EDGE', edgeKey, source, target)
                     this.dropEdge(edgeKey)
 
 
@@ -552,7 +525,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     if (!this.edgeMap.has(edge.id)) {
                         const source = edge.extras?.source.identifier
                         const target = edge.extras?.destination.identifier
-                        console.log('DRAWING EDGE', source, target)
                         const sourceNodeAttributes = this.graph.getNodeAttributes(source)
                         const targetNodeAttributes = this.graph.getNodeAttributes(target)
                         this.createEdge(edge.id, edge, source, target, sourceNodeAttributes, targetNodeAttributes)
@@ -572,7 +544,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.requestRender();
         }
-        console.log('end edges', this.edgeMap, this.graph.edges())
 
     }
 
