@@ -66,6 +66,10 @@ export interface EngineEvents {
     nodeClick: (event: PIXI.FederatedMouseEvent, nodeKey: string) => void;
     nodeMouseout: (event: PIXI.FederatedMouseEvent, nodeKey: string) => void;
     nodeMouseover: (event: PIXI.FederatedMouseEvent, nodeKey: string) => void;
+    groupMouseout: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
+    groupMouseover: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
+    groupDoubleClick: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
+
 }
 export const ENGINE_EVENTS: Array<keyof EngineEvents> = [
     'createEdge',
@@ -78,6 +82,9 @@ export const ENGINE_EVENTS: Array<keyof EngineEvents> = [
     'nodeMouseout',
     'edgeMouseout',
     'edgeMouseover',
+    'groupMouseout',
+    'groupMouseover',
+    'groupDoubleClick'
 ];
 
 export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
@@ -934,7 +941,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.nodeLabelLayer.addChild(node.nodeLabelGfx);
         this.nodeMap.set(id, node);
 
+
         node.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
+            console.log('mouseover NODE', id)
+
             // Always show hover state
             this.hoverNode(id);
 
@@ -946,6 +956,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         node.addListener('mouseout', (event: PIXI.FederatedMouseEvent) => {
             const local = node.nodeGfx.toLocal(event.global);
             const isInNode = node.nodeGfx.hitArea.contains(local.x, local.y);
+            console.log('NODE HIT AREA', node.nodeGfx.hitArea)
+
 
             // only trigger mouseout if it's actually outside the node (could be within label)
             if (!isInNode) {
@@ -1012,23 +1024,28 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.groupContainerLayer.addChild(groupContainer.groupContainerGfx);
         this.groupContainerMap.set(id, groupContainer);
 
+        console.log('CONTAINER HIT AREA', groupContainer.groupContainerGfx.hitArea)
+
         groupContainer.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
+            console.log('mouseover', id, groupContainer.groupContainerGfx.hitArea)
+
             // Always show hover state
-            this.hoverNode(id);
+            this.hoverGroupContainer(id, nodes);
 
             // Only trigger the event (i.e. tooltip) if not currently dragging
             if (!this.mousedownNodeKey) {
-                this.emit('nodeMouseover', event, id);
+                this.emit('groupMouseover', event, id);
             }
         });
         groupContainer.addListener('mouseout', (event: PIXI.FederatedMouseEvent) => {
+            console.log('mouseout', id, groupContainer.groupContainerGfx.hitArea)
             const local = groupContainer.groupContainerGfx.toLocal(event.global);
-            const isInNode = groupContainer.groupContainerGfx.hitArea.contains(local.x, local.y);
+            const isInGroupContainer = groupContainer.groupContainerGfx.hitArea.contains(local.x, local.y);
 
             // only trigger mouseout if it's actually outside the node (could be within label)
-            if (!isInNode) {
-                this.unhoverNode(id);
-                this.emit('nodeMouseout', event, id);
+            if (!isInGroupContainer) {
+                this.unhoverGroupContainer(id, nodes);
+                this.emit('groupMouseout', event, id);
             }
 
             // don't reset mousedownKey if we're dragging as this can prevent the drag
@@ -1039,41 +1056,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             }
         });
 
-        groupContainer.addListener('mousedown', (event: PIXI.FederatedMouseEvent) => {
-            this.mousedownEdgeKey = null;
-            this.mousedownNodeKey = id;
-
-            if (this.dragMode) {
-                this.enableDragBehaviour();
-            }
-
-            this.nodeMousedownCenterPosition = groupContainer.groupContainerGfx.getGlobalPosition().clone();
-            this.nodeMousedownPosition = event.global.clone();
-        });
-        groupContainer.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
-            // If mouseup happened on the same node mousedown happened
-            if (this.mousedownNodeKey === id && this.nodeMousedownPosition) {
-                const xOffset = Math.abs(this.nodeMousedownPosition.x - event.global.x);
-                const yOffset = Math.abs(this.nodeMousedownPosition.y - event.global.y);
-
-                // only trigger click if the mousedown&mouseup happened very close to each other
-                if (xOffset <= 2 && yOffset <= 2) {
-                    this.emit('nodeClick', event, id);
-                }
-            }
-
-            // If mouseup happened on a different node
-            if (this.isCreatingEdge && this.mousedownNodeKey && this.mousedownNodeKey !== id) {
-                // check if the edge doesn't already exist
-                if (!this.graph.hasEdge(this.mousedownNodeKey, id)) {
-                    // emit event to create a real edge
-                    this.emit('createEdge', event, this.mousedownNodeKey, id);
-                }
-            }
-            if (!this.editable) {
-                // resets mousedown position
-                this.mousedownNodeKey = null;
-            }
+        groupContainer.addListener('dblclick', (event: PIXI.FederatedMouseEvent) => {
+            console.log('double click on group container', id)
+            this.emit('groupDoubleClick', event, id);
         });
 
         this.updateGroupContainerStyle(id, nodes);
@@ -1234,6 +1219,23 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // update style
         edge.state.hover = true;
         this.updateEdgeStyleByKey(id);
+        this.requestRender();
+    }
+
+    /**
+     * Enable hover state for given edge
+     *
+     * @param id id of edge to hover
+     */
+    private hoverGroupContainer(id: string, nodes: SimulationNode[]): void {
+        const groupContainer = this.groupContainerMap.get(id);
+        if (groupContainer.state.hover) {
+            return;
+        }
+
+        // update style
+        groupContainer.state.hover = true;
+        this.updateGroupContainerStyle(id, nodes);
         this.requestRender();
     }
 
@@ -1493,6 +1495,23 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // update style
         node.state.hover = false;
         this.updateNodeStyleByKey(id);
+        this.requestRender();
+    }
+
+    /**
+     * Disable hover state for given node
+     *
+     * @param id id of node to unhover
+     */
+    private unhoverGroupContainer(id: string, nodes: SimulationNode[]): void {
+        const groupContainer = this.groupContainerMap.get(id);
+        if (!groupContainer.state.hover) {
+            return;
+        }
+
+        // update style
+        groupContainer.state.hover = false;
+        this.updateGroupContainerStyle(id, nodes);
         this.requestRender();
     }
 

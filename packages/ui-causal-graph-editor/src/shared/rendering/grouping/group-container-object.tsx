@@ -103,29 +103,32 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
 
         // const outerRadius = nodeStyle.size + borderWidth;
 
-        // // Adjust hit area
-        // (groupContainerGfx.hitArea as PIXI.Circle).radius = outerRadius;
+        const height = maxY - minY;
+        const width = maxX - minX;
+
+        // Adjust hit area
+        (groupContainerGfx.hitArea as PIXI.Rectangle).x = - width / 2;
+        (groupContainerGfx.hitArea as PIXI.Rectangle).y = - height / 2;
+
+        (groupContainerGfx.hitArea as PIXI.Rectangle).width = width;
+        (groupContainerGfx.hitArea as PIXI.Rectangle).height = height;
+
 
         // // Create filter the first time
         // if (!groupContainerGfx.filters || groupContainerGfx.filters.length === 0) {
         //     groupContainerGfx.filters = [new DropShadowFilter({ offset: { x: 0, y: 0 } })];
         // }
         // const dropShadow = groupContainerGfx.filters[0] as DropShadowFilter;
+
         // Get/create rectangle texture
         const rectangleTexture = textureCache.get(createKey(GROUP_RECTANGLE, minX, maxX, minY, maxY), () => {
             const graphics = new PIXI.Graphics();
             graphics.lineStyle(2, 0x3796F6, 0.5);  // Half-transparent border
-            graphics.beginFill(0xECF2FD, 1);  // Half-transparent red fill
-            graphics.drawRoundedRect(minX, minY, maxX - minX, maxY - minY, 8);
+            graphics.beginFill(0xECF2FD, 1);
+            graphics.drawRoundedRect(minX, minY, width, height, 8);
             graphics.endFill();
             return graphics;
         });
-
-
-
-
-
-
 
         // Set the node texture and adjust its styles
         const rectangle = groupContainerGfx.getChildByName<PIXI.Sprite>(GROUP_RECTANGLE);
@@ -157,7 +160,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         // if (nodeStyle.state.selected) {
         //     shadowColor = nodeStyle.highlight_color;
         //     blur = 4;
-        // } else if (nodeStyle.state.hover || nodeStyle.isSourceOfNewEdge) {
+        // if (nodeStyle.state.hover) {
         //     shadowColor = themeShadows.shadowHover;
         //     blur = 4;
         // }

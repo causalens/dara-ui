@@ -498,6 +498,32 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setTooltipContent(edgeTooltipContent);
     });
 
+    useEngineEvent('groupMouseover', (event, nodeId) => {
+        console.log('groupMouseover', nodeId, event);
+        // const nodeAttributes = state.graph.getNodeAttributes(nodeId);
+        tooltipRef.current = () =>
+            ({
+                bottom: event.clientY,
+                height: 0,
+                left: event.clientX,
+                right: event.clientX,
+                top: event.clientY,
+                width: 0,
+            }) as DOMRect;
+
+        setTooltipContent(
+            getTooltipContent(
+                nodeId,
+                '',
+                theme,
+            )
+        );
+    });
+
+    useEngineEvent('groupMouseout', () => {
+        setTooltipContent(null);
+    });
+
     useEngineEvent('edgeMouseout', () => {
         setTooltipContent(null);
     });
