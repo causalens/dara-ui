@@ -40,6 +40,7 @@ import {
     getLegendData,
     useSearch,
 } from '@shared/editor-overlay';
+import { SaveImageButton } from '@shared/editor-overlay/buttons';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import useGraphTooltip from '@shared/use-graph-tooltip';
 import { getTooltipContent, willCreateCycle } from '@shared/utils';
@@ -182,6 +183,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         useEngineEvent,
         resetViewport,
         resetLayout,
+        extractImage,
         onSetDragMode,
         onNodeSelected,
         onEdgeSelected,
@@ -624,6 +626,19 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         onSetDragMode
     );
 
+    // save image
+    const saveImage = React.useCallback(async () => {
+        const dataUrl = await extractImage();
+
+        if (dataUrl) {
+            // create a link and download the image
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'graph.png';
+            link.click();
+        }
+    }, [extractImage]);
+
     let contentSelected = false;
     let panelTitle = '';
 
@@ -700,6 +715,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />
+                                    <SaveImageButton onSave={saveImage} />
                                 </>
                             }
                             validContentSelected={contentSelected}

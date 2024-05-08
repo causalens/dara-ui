@@ -544,6 +544,7 @@ export { default as IdCard } from './id-card';
 export { default as IdCardAlt } from './id-card-alt';
 export { default as Igloo } from './igloo';
 export { default as Image } from './image';
+export { default as FarImage } from './far-image';
 export { default as Images } from './images';
 export { default as Inbox } from './inbox';
 export { default as Indent } from './indent';

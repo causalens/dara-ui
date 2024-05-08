@@ -14,9 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { default as AddNodeButton } from './add-node-button';
-export { default as CenterGraphButton } from './center-graph-button';
-export { default as DragModeButton } from './drag-mode-button';
-export { default as RecalculateLayoutButton } from './recalculate-layout-button';
-export { default as SoftEdgeArrowButton } from './soft-edge-arrow-button';
-export { default as SaveImageButton } from './save-image-button';
+import { faImage } from '@fortawesome/free-regular-svg-icons';
+
+import { IconProps, StyledFAIcon } from './icon-utils';
+
+/**
+ * Image regular icon from FontAwesome
+ *
+ * @param {IconProps} props - the component props
+ */
+const FarImage = (props: IconProps): JSX.Element => {
+    return <StyledFAIcon icon={faImage} {...props} />;
+};
+
+export default FarImage;

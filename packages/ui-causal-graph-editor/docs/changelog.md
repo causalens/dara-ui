@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Added a new 'Save as Image' button to the graph viewer UI to download the currently displayed graph pane as a high-resolution PNG image.
+
 ## 1.9.2
 
 -   Fixed an issue where if parent hugged content `NodeHierarchyBuilder` would always scroll.
