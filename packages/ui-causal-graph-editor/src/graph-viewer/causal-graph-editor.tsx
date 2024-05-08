@@ -498,8 +498,8 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setTooltipContent(edgeTooltipContent);
     });
 
-    useEngineEvent('groupMouseover', (event, nodeId) => {
-        console.log('groupMouseover', nodeId, event);
+    useEngineEvent('groupMouseover', (event, groupId) => {
+        console.log('groupMouseover', groupId, event);
         // const nodeAttributes = state.graph.getNodeAttributes(nodeId);
         tooltipRef.current = () =>
             ({
@@ -513,7 +513,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
 
         setTooltipContent(
             getTooltipContent(
-                nodeId,
+                groupId,
                 '',
                 theme,
             )
@@ -522,6 +522,10 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
 
     useEngineEvent('groupMouseout', () => {
         setTooltipContent(null);
+    });
+
+    useEngineEvent('groupDoubleClick', (event, nodeId) => {
+        console.log('groupDoubleClick');
     });
 
     useEngineEvent('edgeMouseout', () => {

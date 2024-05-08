@@ -421,29 +421,31 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         }
 
         console.log('Collapse groups');
+        console.log('initial edges', this.edgeMap, this.graph.edges())
+
         if (isGraphLayoutWithGroups(this.layout)) {
             const layoutGroup = this.layout.group
             const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph)
 
-
             // first create all group nodes so that we have something to connect the edges to
             Object.keys(groupsObject).forEach((group) => {
+                const container = this.groupContainerMap.get(group).groupContainerGfx
+                const groupNodeAttributes = { id: group, originalMeta: {}, variable_type: 'groupNode', x: container.x, y: container.y }
+                // remove all group containers
+                this.dropGroupContainer(group)
+                // if the group node doesn't exist create it
                 if (!this.graph.hasNode(group)) {
-                    // set attributes for group node, getting the same position as the container had
-                    const container = this.groupContainerMap.get(group).groupContainerGfx
-                    const groupNodeAttributes = { id: group, originalMeta: {}, variable_type: 'groupNode', x: container.x, y: container.y }
-
-                    // remove the container and add a group node
-                    this.dropGroupContainer(group)
-                    // this.createNode(group, groupNodeAttributes);
                     this.graph.addNode(group, groupNodeAttributes)
+                }
+                // otherwise we just add them to the canvas
+                else {
+                    this.createNode(group, groupNodeAttributes);
                 }
             })
 
             // collapse edges
             Object.keys(groupsObject).forEach((group) => {
                 const nodesToHide = groupsObject[group]
-
                 const collapsedEdges: SimulationEdge[] = []
 
                 this.graph.forEachEdge((edgeKey) => {
@@ -452,9 +454,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                     const finalTarget = findKeyByValue(groupsObject, initialTarget)
                     const finalSource = findKeyByValue(groupsObject, initialSource)
+                    const finalSourceAttributes = this.graph.getNodeAttributes(finalSource)
+                    const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget)
 
                     const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
-
 
                     // if source or target changed we drop the edge
                     if (initialSource !== finalSource || initialTarget !== finalTarget) {
@@ -462,11 +465,34 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         this.dropEdge(edgeKey);
                     }
 
+
+                    // // if the graph has the edge but it is not in edgeMap, we need to recreate it
+                    // if (this.graph.hasEdge(finalSource, finalTarget) && !this.edgeMap.has(edgeKey)) {
+                    //     console.log('ADD EDGE', finalSource, finalTarget, this.graph.hasEdge(finalSource, finalTarget), !this.edgeMap.has(edgeKey))
+
+                    //     this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                    // }
+
                     // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
                     if (!this.graph.hasEdge(finalSource, finalTarget)) {
+                        // if (!this.edgeMap.has(`${finalSource}_${finalTarget}`)) {
+
                         // if it doesn't exist create it
+                        console.log('CREATE EDGE', finalSource, finalTarget)
                         this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
+                        // this.createEdge(`${finalSource}_${finalTarget}`, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                    } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
+                        console.log('ADD EDGE', edgeKey, finalSource, finalTarget, this.edgeMap.has(edgeKey))
+                        this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
                     }
+
+
+
+                    // else if (!this.edgeMap.has(`${group}_${finalSource}_${finalTarget}`)) {
+                    //     console.log('ADD EDGE', finalSource, finalTarget)
+
+                    //     this.createEdge(`${group}_${finalSource}_${finalTarget}`, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                    // }
                 });
 
                 // for the group set all collapsed edges so that we can rebuild them later
@@ -481,6 +507,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.requestRender();
         }
+        console.log('final edges', this.edgeMap, this.graph.edges())
+
 
     }
 
@@ -489,41 +517,46 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      */
     public expandAllGroups(): void {
         console.log('EXPAND ALL GROUPS')
+        console.log('initial edges', this.edgeMap, this.graph.edges())
         // We only need to expand groups if the graph has at least one of the group nodes
         if (this.graph.nodes().some(node => this.graph.getNodeAttribute(node, 'variable_type') === 'groupNode')) {
             // cleanup the edges that were created between groups
             this.graph.forEachEdge((edgeKey) => {
-                console.log('DROP EDGE', edgeKey)
                 const source = this.graph.source(edgeKey);
                 const target = this.graph.target(edgeKey);
+
                 const isSourceGroupNode = this.graph.getNodeAttribute(source, 'variable_type') === 'groupNode';
                 const isTargetGroupNode = this.graph.getNodeAttribute(target, 'variable_type') === 'groupNode';
+                console.log('CHECK EDGE', edgeKey, source, target, isSourceGroupNode, isTargetGroupNode)
                 if (isSourceGroupNode || isTargetGroupNode) {
+                    console.log('DROP EDGE', edgeKey, source, target)
                     this.dropEdge(edgeKey)
+
 
                 }
             })
+
             // first we add all the nodes that were hidden
             this.graph.forEachNode((node, attributes) => {
                 if (this.graph.getNodeAttribute(node, 'variable_type') !== 'groupNode') {
-                    console.log('ADD NODE', node)
                     this.createNode(node, attributes)
                 }
                 else {
-                    console.log('DROP NODE', node)
                     this.dropNode(node)
                 }
             })
 
             // then we need to recreate all the edges that were collapsed
             this.collapsedEdgesMap.forEach((edges, group) => {
-                console.log('RECREATE EDGES', edges, this.edgeMap)
                 edges.forEach((edge) => {
-                    const source = edge.extras?.source.identifier
-                    const target = edge.extras?.destination.identifier
-                    const sourceNodeAttributes = this.graph.getNodeAttributes(source)
-                    const targetNodeAttributes = this.graph.getNodeAttributes(target)
-                    this.createEdge(edge.id, edge, source, target, sourceNodeAttributes, targetNodeAttributes)
+                    if (!this.edgeMap.has(edge.id)) {
+                        const source = edge.extras?.source.identifier
+                        const target = edge.extras?.destination.identifier
+                        console.log('DRAWING EDGE', source, target)
+                        const sourceNodeAttributes = this.graph.getNodeAttributes(source)
+                        const targetNodeAttributes = this.graph.getNodeAttributes(target)
+                        this.createEdge(edge.id, edge, source, target, sourceNodeAttributes, targetNodeAttributes)
+                    }
                 })
             })
 
@@ -539,6 +572,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             this.requestRender();
         }
+        console.log('end edges', this.edgeMap, this.graph.edges())
+
     }
 
     /**
@@ -875,7 +910,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         targetAttributes: SimulationNode
     ): void {
 
-        console.log('CREATE EDGE', { id, attributes, source, target, sourceAttributes, targetAttributes })
         const edge = new EdgeObject();
         this.edgeLayer.addChild(edge.edgeGfx);
         this.edgeSymbolsLayer.addChild(edge.edgeSymbolsGfx);
@@ -943,7 +977,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
 
         node.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
-            console.log('mouseover NODE', id)
 
             // Always show hover state
             this.hoverNode(id);
@@ -956,7 +989,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         node.addListener('mouseout', (event: PIXI.FederatedMouseEvent) => {
             const local = node.nodeGfx.toLocal(event.global);
             const isInNode = node.nodeGfx.hitArea.contains(local.x, local.y);
-            console.log('NODE HIT AREA', node.nodeGfx.hitArea)
 
 
             // only trigger mouseout if it's actually outside the node (could be within label)
@@ -1024,10 +1056,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.groupContainerLayer.addChild(groupContainer.groupContainerGfx);
         this.groupContainerMap.set(id, groupContainer);
 
-        console.log('CONTAINER HIT AREA', groupContainer.groupContainerGfx.hitArea)
 
         groupContainer.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
-            console.log('mouseover', id, groupContainer.groupContainerGfx.hitArea)
 
             // Always show hover state
             this.hoverGroupContainer(id, nodes);
@@ -1038,7 +1068,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             }
         });
         groupContainer.addListener('mouseout', (event: PIXI.FederatedMouseEvent) => {
-            console.log('mouseout', id, groupContainer.groupContainerGfx.hitArea)
             const local = groupContainer.groupContainerGfx.toLocal(event.global);
             const isInGroupContainer = groupContainer.groupContainerGfx.hitArea.contains(local.x, local.y);
 
