@@ -749,15 +749,19 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
         // create layers - containers to hold different rendered parts of the graph
         this.groupContainerLayer = new PIXI.Container();
-        this.edgeLayer = new PIXI.Container();
-        this.edgeSymbolsLayer = new PIXI.Container();
+
         this.nodeLayer = new PIXI.Container();
         this.nodeLabelLayer = new PIXI.Container();
+
+        this.edgeLayer = new PIXI.Container();
+        this.edgeSymbolsLayer = new PIXI.Container();
         this.viewport.addChild(this.groupContainerLayer);
-        this.viewport.addChild(this.edgeLayer);
-        this.viewport.addChild(this.edgeSymbolsLayer);
+
         this.viewport.addChild(this.nodeLayer);
         this.viewport.addChild(this.nodeLabelLayer);
+
+        this.viewport.addChild(this.edgeLayer);
+        this.viewport.addChild(this.edgeSymbolsLayer);
 
         // obesrve window resizing
         this.resizeObserver = new ResizeObserver(() => {

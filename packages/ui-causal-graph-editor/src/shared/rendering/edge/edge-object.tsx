@@ -28,8 +28,7 @@ import { MOUSE_EVENTS, colorToPixi, createKey } from '../utils';
 import { getCirclesAlongCurve, getCurvePoints, getPolygonFromCurve } from './curve';
 import { EdgeState, PixiEdgeStyle } from './definitions';
 import { createCenterSymbol, createSideSymbol, createStrengthSymbol } from './symbols';
-import { Position } from 'graphology-layout/utils';
-import { calculateSquareBoundPosition } from './utils'
+import { calculateTargetBoundPosition, calculateSourceBoundPosition } from './utils'
 
 const EDGE_LINE_SPRITE = 'EDGE_LINE_SPRITE';
 const EDGE_LINE_GFX = 'EDGE_LINE_GFX';
@@ -409,41 +408,33 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             targetNodePosition.y - sourceNodePosition.y
         );
 
-        let targetBoundPosition: Position
-        let sourceBoundPosition: Position
-
         const sourceRadius = (sourceSize - BORDER_PADDING) / 2;
         const targetRadius = (targetSize - BORDER_PADDING) / 2;
 
+        let targetBoundPosition;
+        let sourceBoundPosition;
 
-        // if (isTargetSquare) {
-        //     targetBoundPosition = calculateSquareBoundPosition(targetNodePosition.x, targetBoundPosition.y, rotation, targetRadius)
-        // } else {
-        //     // Position at the edge of the node
-        //     targetBoundPosition = {
-        //         x: targetNodePosition.x + Math.sin(rotation) * targetRadius,
-        //         y: targetNodePosition.y - Math.cos(rotation) * targetRadius,
-        //     };
-        // }
 
-        targetBoundPosition = {
-            x: targetNodePosition.x + Math.sin(rotation) * targetRadius,
-            y: targetNodePosition.y - Math.cos(rotation) * targetRadius,
-        };
+        if (isTargetSquare) {
+            targetBoundPosition = calculateTargetBoundPosition(targetNodePosition.x, targetNodePosition.y, rotation, targetSize - BORDER_PADDING)
+        } else {
+            // Position at the edge of the node
+            targetBoundPosition = {
+                x: targetNodePosition.x + Math.sin(rotation) * targetRadius,
+                y: targetNodePosition.y - Math.cos(rotation) * targetRadius,
+            };
+        }
 
-        sourceBoundPosition = {
-            x: sourceNodePosition.x - Math.sin(rotation) * sourceRadius,
-            y: sourceNodePosition.y + Math.cos(rotation) * sourceRadius,
-        };
+        if (isSourceSquare) {
+            sourceBoundPosition = calculateSourceBoundPosition(sourceNodePosition.x, sourceNodePosition.y, rotation, sourceSize - BORDER_PADDING)
+        } else {
+            sourceBoundPosition = {
+                x: sourceNodePosition.x - Math.sin(rotation) * sourceRadius,
+                y: sourceNodePosition.y + Math.cos(rotation) * sourceRadius,
+            };
+        }
 
-        // if (isSourceSquare) {
-        //     sourceBoundPosition = calculateSquareBoundPosition(sourceNodePosition.x, sourceNodePosition.y, rotation, sourceRadius)
-        // } else {
-        //     sourceBoundPosition = {
-        //         x: sourceNodePosition.x - Math.sin(rotation) * sourceRadius,
-        //         y: sourceNodePosition.y + Math.cos(rotation) * sourceRadius,
-        //     };
-        // }
+        console.log('updatePosition', { sourceNodePosition, sourceBoundPosition, targetNodePosition, targetBoundPosition })
 
         // Edge centre should be between the two bounds
         const position = {
@@ -456,6 +447,7 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             targetBoundPosition.x - sourceBoundPosition.x,
             targetBoundPosition.y - sourceBoundPosition.y
         );
+
         this.edgeGfx.position.copyFrom(position);
         this.edgeGfx.rotation = rotation;
 
