@@ -184,6 +184,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         useEngineEvent,
         resetViewport,
         collapseGroups,
+        expandGroups,
         resetLayout,
         onSetDragMode,
         onNodeSelected,
@@ -701,7 +702,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                         totalNumberOfResults={searchResults.length}
                                     />
                                     <CollapseAllButton onCollapseAll={collapseGroups} />
-                                    <ExpandAllButton onExpandAll={collapseGroups} />
+                                    <ExpandAllButton onExpandAll={expandGroups} />
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />

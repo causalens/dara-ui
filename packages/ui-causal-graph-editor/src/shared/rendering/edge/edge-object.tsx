@@ -415,7 +415,6 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         const sourceRadius = (sourceSize - BORDER_PADDING) / 2;
         const targetRadius = (targetSize - BORDER_PADDING) / 2;
 
-        console.log(isTargetSquare, isSourceSquare)
 
         // if (isTargetSquare) {
         //     targetBoundPosition = calculateSquareBoundPosition(targetNodePosition.x, targetBoundPosition.y, rotation, targetRadius)

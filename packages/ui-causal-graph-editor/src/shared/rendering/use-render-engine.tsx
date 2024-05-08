@@ -79,6 +79,10 @@ interface UseRenderEngineApi {
      */
     collapseGroups: () => void;
     /**
+     * Expand all groups
+     */
+    expandGroups: () => void;
+    /**
      * Register a handler for a given engine event.
      *
      * @param eventName name of event to respond to
@@ -215,7 +219,12 @@ export function useRenderEngine({
         },
         collapseGroups: () => {
             if (engine.current.initialized) {
-                engine.current.collapseGroups();
+                engine.current.collapseAllGroups();
+            }
+        },
+        expandGroups: () => {
+            if (engine.current.initialized) {
+                engine.current.expandAllGroups();
             }
         },
         useEngineEvent,

@@ -181,6 +181,8 @@ export interface SimulationEdge extends FlatEdgeRenderingMeta {
 
     /**  optional list of positions the edge should be curved through */
     points?: XYPosition[];
+    /** The edge id */
+    id: string;
 }
 
 /**
