@@ -17,15 +17,15 @@ export function calculateTargetBoundPosition(centerX: number, centerY: number, r
     let x, y;
 
     if (rotation >= 0 && rotation < Math.PI / 4) {
-        console.log('1', { centerX, centerY })
+        // console.log('1', { centerX, centerY })
         x = centerX + Math.tan(rotation) * halfSize;
         y = centerY + halfSize;
     } else if (rotation >= Math.PI / 4 && rotation < Math.PI / 2) {
-        console.log('2', { centerX, centerY })
+        // console.log('2', { centerX, centerY })
         x = centerX + halfSize;
         y = centerY + Math.tan(Math.PI / 2 - rotation) * halfSize;
     } else if (rotation >= Math.PI / 2 && rotation < 3 * Math.PI / 4) {
-        console.log('3', { centerX, centerY })
+        // console.log('3', { centerX, centerY })
         // y = centerY - halfSize;
         // x = centerX - Math.tan(rotation - Math.PI / 2) * halfSize;
         x = centerX + halfSize;
@@ -33,32 +33,32 @@ export function calculateTargetBoundPosition(centerX: number, centerY: number, r
 
     }
     else if (rotation >= 3 * Math.PI / 4 && rotation < Math.PI) {
-        console.log('4', { centerX, centerY })
+        // console.log('4', { centerX, centerY })
         x = centerX + Math.tan(Math.PI - rotation) * halfSize;
         y = centerY - halfSize;
     }
     else if (rotation >= Math.PI && rotation < 5 * Math.PI / 4) {
-        console.log('5', { centerX, centerY })
+        // console.log('5', { centerX, centerY })
         x = centerX - Math.tan(rotation - Math.PI) * halfSize;
         y = centerY - halfSize;
     }
     else if (rotation >= 5 * Math.PI / 4 && rotation < 3 * Math.PI / 2) {
-        console.log('6', { centerX, centerY })
+        // console.log('6', { centerX, centerY })
         x = centerX - halfSize;
         y = centerY - Math.tan(3 * Math.PI / 2 - rotation) * halfSize;
     }
     else if (rotation >= 3 * Math.PI / 2 && rotation < 7 * Math.PI / 4) {
-        console.log('7', { centerX, centerY })
+        // console.log('7', { centerX, centerY })
 
         x = centerX - halfSize;
         y = centerY + Math.tan(rotation - 3 * Math.PI / 2) * halfSize;
     }
     else {
-        console.log('8', { centerX, centerY })
+        // console.log('8', { centerX, centerY })
         x = centerX - halfSize;
         y = centerY + Math.tan(2 * Math.PI - rotation) * halfSize;
     }
-    console.log('calculateTargetBoundPosition', { centerX, centerY, x, y })
+    // console.log('calculateTargetBoundPosition', { centerX, centerY, x, y })
 
 
     return { x, y };
@@ -83,36 +83,47 @@ export function calculateSourceBoundPosition(centerX: number, centerY: number, r
     let x, y;
 
     if (rotation >= 0 && rotation < Math.PI / 4) {
+        console.log('1', { centerX, centerY })
         x = centerX - Math.tan(rotation) * halfSize;
         y = centerY - halfSize;
     } else if (rotation >= Math.PI / 4 && rotation < Math.PI / 2) {
+        console.log('2', { centerX, centerY })
         x = centerX - halfSize;
         y = centerY - Math.tan(Math.PI / 2 - rotation) * halfSize;
     } else if (rotation >= Math.PI / 2 && rotation < 3 * Math.PI / 4) {
+        console.log('3', { centerX, centerY })
         x = centerX - halfSize;
         y = centerY + Math.tan(rotation - Math.PI / 2) * halfSize;
     }
     else if (rotation >= 3 * Math.PI / 4 && rotation < Math.PI) {
+        console.log('4', { centerX, centerY })
         x = centerX - Math.tan(Math.PI - rotation) * halfSize;
         y = centerY + halfSize;
     }
     else if (rotation >= Math.PI && rotation < 5 * Math.PI / 4) {
+        console.log('5', { centerX, centerY })
         x = centerX + Math.tan(rotation - Math.PI) * halfSize;
         y = centerY + halfSize;
     }
     else if (rotation >= 5 * Math.PI / 4 && rotation < 3 * Math.PI / 2) {
+        console.log('6', { centerX, centerY })
         x = centerX + halfSize;
         y = centerY + Math.tan(3 * Math.PI / 2 - rotation) * halfSize;
     }
     else if (rotation >= 3 * Math.PI / 2 && rotation < 7 * Math.PI / 4) {
+        console.log('7', { centerX, centerY })
 
         x = centerX + halfSize;
         y = centerY - Math.tan(rotation - 3 * Math.PI / 2) * halfSize;
     }
     else {
+        console.log('8', { centerX, centerY })
         x = centerX + halfSize;
         y = centerY - Math.tan(2 * Math.PI - rotation) * halfSize;
     }
+
+    console.log('calculateSourceBoundPosition', { centerX, centerY, x, y })
+
 
     return { x, y };
 }
