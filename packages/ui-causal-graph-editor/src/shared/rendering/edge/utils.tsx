@@ -98,7 +98,6 @@ export function calculateTargetBoundPosition(centerX: number, centerY: number, r
     }
     else {
         // edge arrives from somewhere on the left top half side of the square
-        console.log('8 TARGET', { centerX, centerY })
         x = centerX + halfSize;
         y = centerY - Math.tan(-rotation) * halfSize;
     }

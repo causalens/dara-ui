@@ -70,6 +70,7 @@ import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
+import { GraphLayoutWithGrouping } from '@shared/graph-layout/common';
 
 const NotificationWrapper = styled.div`
     position: relative;
@@ -179,6 +180,10 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setError(e);
     };
 
+    const layoutHasGroup = useMemo(() => (props.graphLayout as GraphLayoutWithGrouping).group !== undefined, [
+        props.graphLayout,
+    ]);
+
     const {
         getCenterPosition,
         useEngineEvent,
@@ -217,6 +222,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     }
 
     const [hasFocus, setHasFocus] = useState(false);
+    const [showCollapseAll, setShowCollapseAll] = useState(true);
 
     function onPaneFocus(focus: boolean): void {
         setHasFocus(focus);
@@ -731,8 +737,16 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                         selectedResult={currentSearchNode + 1}
                                         totalNumberOfResults={searchResults.length}
                                     />
-                                    <CollapseAllButton onCollapseAll={collapseGroups} />
-                                    <ExpandAllButton onExpandAll={expandGroups} />
+                                    {layoutHasGroup && showCollapseAll &&
+                                        <CollapseAllButton onCollapseAll={() => {
+                                            setShowCollapseAll(false)
+                                            collapseGroups()
+                                        }} />}
+                                    {layoutHasGroup && !showCollapseAll &&
+                                        <ExpandAllButton onExpandAll={() => {
+                                            setShowCollapseAll(true)
+                                            expandGroups()
+                                        }} />}
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />
