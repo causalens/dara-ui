@@ -465,12 +465,15 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                     }
 
-                    // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
-                    if (!this.graph.hasEdge(finalSource, finalTarget) && finalSource !== finalTarget) {
-                        this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
-                        // and if it hasn't changed and it's not in the edgeMap we need to display it
-                    } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget) && finalSource !== finalTarget) {
-                        this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                    // if the edge is within the same group we don't need to add them
+                    if (finalSource !== finalTarget) {
+                        // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
+                        if (!this.graph.hasEdge(finalSource, finalTarget)) {
+                            this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
+                            // and if it hasn't changed and it's not in the edgeMap we need to display it
+                        } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
+                            this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                        }
                     }
                 });
 
