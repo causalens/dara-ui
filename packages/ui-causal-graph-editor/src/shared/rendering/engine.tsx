@@ -462,6 +462,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     if (initialSource !== finalSource || initialTarget !== finalTarget) {
                         collapsedEdges.push({ id: edgeKey, ...edgeAttributes })
                         this.dropEdge(edgeKey);
+
                     }
 
                     // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups

@@ -1,129 +1,106 @@
 /**
  * Calculates the x and y position that the edge should be connected to a square node
+  * Note that we do not take into account the rounded edges of the square, if required the below can be modified to include it
  * 
- * @param centerX 
- * @param centerY 
- * @param rotation 
- * @param nodeSize 
+ * @param centerX center x coordinate of the square node
+ * @param centerY center y coordinate of the square node
+ * @param rotation goes from -pi to pi inclusive and represents the angle between the x axis going counterclockwise to the edge from the centre of source node
+ * @param width of the square node
  */
-export function calculateTargetBoundPosition(centerX: number, centerY: number, rotation: number, nodeSize: number) {
+export function calculateSourceBoundPosition(centerX: number, centerY: number, rotation: number, width: number) {
 
     // Calculate half size of the square
-    const halfSize = nodeSize / 2;
-
-    // Normalize rotation angle to be within [0, 2π)
-    rotation = (rotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    const halfSize = width / 2;
 
     let x, y;
 
     if (rotation >= 0 && rotation < Math.PI / 4) {
-        // console.log('1', { centerX, centerY })
-        x = centerX + Math.tan(rotation) * halfSize;
-        y = centerY + halfSize;
+        // edge leaves from somewhere on the right top half side of the square
+        x = centerX + halfSize;
+        y = centerY + Math.tan(rotation) * halfSize;
     } else if (rotation >= Math.PI / 4 && rotation < Math.PI / 2) {
-        // console.log('2', { centerX, centerY })
-        x = centerX + halfSize;
-        y = centerY + Math.tan(Math.PI / 2 - rotation) * halfSize;
+        // edge leaves from somewhere on the top right half side of the square
+        x = centerX + Math.tan(Math.PI / 2 - rotation) * halfSize;
+        y = centerY + halfSize;
     } else if (rotation >= Math.PI / 2 && rotation < 3 * Math.PI / 4) {
-        // console.log('3', { centerX, centerY })
-        // y = centerY - halfSize;
-        // x = centerX - Math.tan(rotation - Math.PI / 2) * halfSize;
-        x = centerX + halfSize;
-        y = centerY - Math.tan(rotation - Math.PI / 2) * halfSize;
-
-    }
-    else if (rotation >= 3 * Math.PI / 4 && rotation < Math.PI) {
-        // console.log('4', { centerX, centerY })
-        x = centerX + Math.tan(Math.PI - rotation) * halfSize;
-        y = centerY - halfSize;
-    }
-    else if (rotation >= Math.PI && rotation < 5 * Math.PI / 4) {
-        // console.log('5', { centerX, centerY })
-        x = centerX - Math.tan(rotation - Math.PI) * halfSize;
-        y = centerY - halfSize;
-    }
-    else if (rotation >= 5 * Math.PI / 4 && rotation < 3 * Math.PI / 2) {
-        // console.log('6', { centerX, centerY })
+        // edge leaves from somewhere on the top left half side of the square
+        x = centerX - Math.tan(rotation - Math.PI / 2) * halfSize;
+        y = centerY + halfSize
+    } else if (rotation >= Math.PI / 4 && rotation < 3 * Math.PI) {
+        // edge leaves from somewhere on the left top half side of the square
         x = centerX - halfSize;
-        y = centerY - Math.tan(3 * Math.PI / 2 - rotation) * halfSize;
-    }
-    else if (rotation >= 3 * Math.PI / 2 && rotation < 7 * Math.PI / 4) {
-        // console.log('7', { centerX, centerY })
-
-        x = centerX - halfSize;
-        y = centerY + Math.tan(rotation - 3 * Math.PI / 2) * halfSize;
+        y = centerY + Math.tan(Math.PI - rotation) * halfSize;
+    } else if (rotation <= 0 && rotation > - Math.PI / 4) {
+        // edge leaves from somewhere on the left bottom half side of the square
+        y = centerY + Math.tan(Math.PI + rotation) * halfSize;
+        x = centerX + halfSize
+    } else if (rotation <= - Math.PI / 4 && rotation > - Math.PI / 2) {
+        // edge leaves from somewhere on the bottom left half side of the square
+        x = centerX - Math.tan(- rotation - Math.PI / 2) * halfSize;
+        y = centerY - halfSize
+    } else if (rotation <= - Math.PI / 2 && rotation > - 3 * Math.PI / 4) {
+        // edge leaves from somewhere on the bottom right half side of the square
+        x = centerX + Math.tan(Math.PI / 2 + rotation) * halfSize;
+        y = centerY - halfSize;
     }
     else {
-        // console.log('8', { centerX, centerY })
+        // edge leaves from somewhere on the right bottom half side of the square
         x = centerX - halfSize;
-        y = centerY + Math.tan(2 * Math.PI - rotation) * halfSize;
+        y = centerY + Math.tan(-rotation) * halfSize;
     }
-    // console.log('calculateTargetBoundPosition', { centerX, centerY, x, y })
-
-
     return { x, y };
 }
 
 /**
  * Calculates the x and y position that the edge should be connected to a square node
+ * Note that we do not take into account the rounded edges of the square, if required the below can be modified to include it
  * 
- * @param centerX 
- * @param centerY 
- * @param rotation 
- * @param nodeSize 
+ * @param centerX center x coordinate of the square node
+ * @param centerY center y coordinate of the square node
+ * @param rotation goes from -pi to pi inclusive and represents the angle between the x axis going counterclockwise to the edge from the centre of source node
+ * @param width width of the square node
  */
-export function calculateSourceBoundPosition(centerX: number, centerY: number, rotation: number, nodeSize: number) {
+export function calculateTargetBoundPosition(centerX: number, centerY: number, rotation: number, width: number) {
 
     // Calculate half size of the square
-    const halfSize = nodeSize / 2;
-
-    // Normalize rotation angle to be within [0, 2π)
-    rotation = (rotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    const halfSize = width / 2;
 
     let x, y;
 
     if (rotation >= 0 && rotation < Math.PI / 4) {
-        console.log('1', { centerX, centerY })
-        x = centerX - Math.tan(rotation) * halfSize;
-        y = centerY - halfSize;
+        // edge arrives from somewhere on the left bottom half side of the square
+        x = centerX - halfSize;
+        y = centerY - Math.tan(rotation) * halfSize;
     } else if (rotation >= Math.PI / 4 && rotation < Math.PI / 2) {
-        console.log('2', { centerX, centerY })
-        x = centerX - halfSize;
-        y = centerY - Math.tan(Math.PI / 2 - rotation) * halfSize;
+        // edge arrives from somewhere on the left bottom half side of the square
+        x = centerX - Math.tan(Math.PI / 2 - rotation) * halfSize;
+        y = centerY - halfSize;
     } else if (rotation >= Math.PI / 2 && rotation < 3 * Math.PI / 4) {
-        console.log('3', { centerX, centerY })
+        // edge arrives from somewhere on the bottom right half side of the square
+        x = centerX + Math.tan(rotation - Math.PI / 2) * halfSize;
+        y = centerY - halfSize
+    } else if (rotation >= Math.PI / 4 && rotation < 3 * Math.PI) {
+        // edge arrives from somewhere on the right bottom half side of the square
+        x = centerX + halfSize;
+        y = centerY - Math.tan(Math.PI - rotation) * halfSize;
+    } else if (rotation <= 0 && rotation > - Math.PI / 4) {
+        // edge arrives from somewhere on the right top half side of the square
         x = centerX - halfSize;
-        y = centerY + Math.tan(rotation - Math.PI / 2) * halfSize;
-    }
-    else if (rotation >= 3 * Math.PI / 4 && rotation < Math.PI) {
-        console.log('4', { centerX, centerY })
-        x = centerX - Math.tan(Math.PI - rotation) * halfSize;
+        y = centerY - Math.tan(Math.PI + rotation) * halfSize;
+    } else if (rotation <= - Math.PI / 4 && rotation > - Math.PI / 2) {
+        // edge arrives from somewhere on the top right half side of the square
+        x = centerX + Math.tan(- rotation - Math.PI / 2) * halfSize;
+        y = centerY + halfSize
+    } else if (rotation <= - Math.PI / 2 && rotation > - 3 * Math.PI / 4) {
+        // edge arrives from somewhere on the top left half side of the square
+        x = centerX - Math.tan(Math.PI / 2 + rotation) * halfSize;
         y = centerY + halfSize;
-    }
-    else if (rotation >= Math.PI && rotation < 5 * Math.PI / 4) {
-        console.log('5', { centerX, centerY })
-        x = centerX + Math.tan(rotation - Math.PI) * halfSize;
-        y = centerY + halfSize;
-    }
-    else if (rotation >= 5 * Math.PI / 4 && rotation < 3 * Math.PI / 2) {
-        console.log('6', { centerX, centerY })
-        x = centerX + halfSize;
-        y = centerY + Math.tan(3 * Math.PI / 2 - rotation) * halfSize;
-    }
-    else if (rotation >= 3 * Math.PI / 2 && rotation < 7 * Math.PI / 4) {
-        console.log('7', { centerX, centerY })
-
-        x = centerX + halfSize;
-        y = centerY - Math.tan(rotation - 3 * Math.PI / 2) * halfSize;
     }
     else {
-        console.log('8', { centerX, centerY })
+        // edge arrives from somewhere on the left top half side of the square
+        console.log('8 TARGET', { centerX, centerY })
         x = centerX + halfSize;
-        y = centerY - Math.tan(2 * Math.PI - rotation) * halfSize;
+        y = centerY - Math.tan(-rotation) * halfSize;
     }
-
-    console.log('calculateSourceBoundPosition', { centerX, centerY, x, y })
-
-
     return { x, y };
 }

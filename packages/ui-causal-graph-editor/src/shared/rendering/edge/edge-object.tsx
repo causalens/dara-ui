@@ -402,10 +402,11 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         isSourceSquare?: boolean,
         isTargetSquare?: boolean,
     ): void {
-        // Edge angle
-        const rotation = -Math.atan2(
+        // Edge angle, this goes from -pi to pi inclusive
+        // Math.atan2 is measured at the centre of the source node, and anticlockwise from the x-axis
+        const rotation = Math.atan2(
+            targetNodePosition.y - sourceNodePosition.y,
             targetNodePosition.x - sourceNodePosition.x,
-            targetNodePosition.y - sourceNodePosition.y
         );
 
         const sourceRadius = (sourceSize - BORDER_PADDING) / 2;
@@ -418,19 +419,21 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         if (isTargetSquare) {
             targetBoundPosition = calculateTargetBoundPosition(targetNodePosition.x, targetNodePosition.y, rotation, targetSize - BORDER_PADDING)
         } else {
-            // Position at the edge of the node
+            // we transform the x and y positions to be at the edge of the circumference of the node
+            //  note that here is minus because the target node receives the line by a 180 degree rotation
             targetBoundPosition = {
-                x: targetNodePosition.x + Math.sin(rotation) * targetRadius,
-                y: targetNodePosition.y - Math.cos(rotation) * targetRadius,
+                x: targetNodePosition.x - Math.cos(rotation) * targetRadius,
+                y: targetNodePosition.y - Math.sin(rotation) * targetRadius,
             };
         }
 
         if (isSourceSquare) {
             sourceBoundPosition = calculateSourceBoundPosition(sourceNodePosition.x, sourceNodePosition.y, rotation, sourceSize - BORDER_PADDING)
         } else {
+            // we transform the x and y positions to be at the edge of the circumference of the node
             sourceBoundPosition = {
-                x: sourceNodePosition.x - Math.sin(rotation) * sourceRadius,
-                y: sourceNodePosition.y + Math.cos(rotation) * sourceRadius,
+                x: sourceNodePosition.x + Math.cos(rotation) * sourceRadius,
+                y: sourceNodePosition.y + Math.sin(rotation) * sourceRadius,
             };
         }
 
@@ -449,11 +452,12 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         );
 
         this.edgeGfx.position.copyFrom(position);
-        this.edgeGfx.rotation = rotation;
+        // not sure why we need to rotate by -90 degrees, but it works
+        this.edgeGfx.rotation = rotation - Math.PI / 2;
 
         // Put symbols in the center and align rotation to the line
         this.edgeSymbolsGfx.position.copyFrom(position);
-        this.edgeSymbolsGfx.rotation = rotation;
+        this.edgeSymbolsGfx.rotation = rotation - Math.PI / 2
 
         // Default styles
         edgeStyle.color ??= edgeStyle.theme.colors.grey5;
