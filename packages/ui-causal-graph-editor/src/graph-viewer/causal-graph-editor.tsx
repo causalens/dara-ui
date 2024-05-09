@@ -505,7 +505,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     });
 
     useEngineEvent('groupMouseover', (event, groupId) => {
-        console.log('groupMouseover', groupId, event);
         // const nodeAttributes = state.graph.getNodeAttributes(nodeId);
         tooltipRef.current = () =>
             ({

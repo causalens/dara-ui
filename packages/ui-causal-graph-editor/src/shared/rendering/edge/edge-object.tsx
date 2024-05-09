@@ -437,8 +437,6 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             };
         }
 
-        console.log('updatePosition', { sourceNodePosition, sourceBoundPosition, targetNodePosition, targetBoundPosition })
-
         // Edge centre should be between the two bounds
         const position = {
             x: (sourceBoundPosition.x + targetBoundPosition.x) / 2,
