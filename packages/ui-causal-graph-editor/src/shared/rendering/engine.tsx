@@ -425,9 +425,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         if (isGraphLayoutWithGroups(this.layout)) {
             const layoutGroup = this.layout.group
             const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph)
+            const groupsArray = Object.keys(groupsObject)
 
             // first create all group nodes so that we have something to connect the edges to
-            Object.keys(groupsObject).forEach((group) => {
+            groupsArray.forEach((group) => {
                 const container = this.groupContainerMap.get(group).groupContainerGfx
                 const groupNodeAttributes = { id: group, originalMeta: {}, variable_type: 'groupNode', x: container.x, y: container.y }
                 // remove all group containers
@@ -443,7 +444,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             })
 
             // collapse edges
-            Object.keys(groupsObject).forEach((group) => {
+            groupsArray.forEach((group) => {
                 const nodesToHide = groupsObject[group]
                 const collapsedEdges: SimulationEdge[] = []
 
@@ -451,29 +452,34 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     const initialSource = this.graph.source(edgeKey);
                     const initialTarget = this.graph.target(edgeKey);
 
-                    const finalTarget = findKeyByValue(groupsObject, initialTarget)
-                    const finalSource = findKeyByValue(groupsObject, initialSource)
-                    const finalSourceAttributes = this.graph.getNodeAttributes(finalSource)
-                    const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget)
+                    // if the edge comes to or from the group we need to collapse it
+                    if (nodesToHide.includes(initialSource) || nodesToHide.includes(initialTarget) || groupsArray.includes(initialSource) || groupsArray.includes(initialTarget)) {
+                        const finalTarget = findKeyByValue(groupsObject, initialTarget)
+                        const finalSource = findKeyByValue(groupsObject, initialSource)
+                        const finalSourceAttributes = this.graph.getNodeAttributes(finalSource)
+                        const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget)
+                        const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
 
-                    const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+                        // if source or target changed, i.e. they are part of a group, we should drop the edge
+                        if (initialSource !== finalSource || initialTarget !== finalTarget) {
+                            collapsedEdges.push({ id: edgeKey, ...edgeAttributes })
+                            this.dropEdge(edgeKey);
 
-                    // if source or target changed we drop the edge
-                    if (initialSource !== finalSource || initialTarget !== finalTarget) {
-                        collapsedEdges.push({ id: edgeKey, ...edgeAttributes })
-                        this.dropEdge(edgeKey);
-
-                    }
-
-                    // if the edge is within the same group we don't need to add them
-                    if (finalSource !== finalTarget) {
-                        // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
-                        if (!this.graph.hasEdge(finalSource, finalTarget)) {
-                            this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
-                            // and if it hasn't changed and it's not in the edgeMap we need to display it
-                        } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
-                            this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
                         }
+
+                        // if the edge is within the same group we don't need to add them
+                        if (finalSource !== finalTarget) {
+                            // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
+                            if (!this.graph.hasEdge(finalSource, finalTarget)) {
+                                this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
+
+                                // on further collapses the condition to display the edge is whether it is in the edgeMap
+                                // whe should also only add edges that go to or from a group node
+                            } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
+                                this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                            }
+                        }
+
                     }
                 });
 
