@@ -729,7 +729,13 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                             topRight={
                                 <>
                                     <SearchBar
-                                        onChange={onSearchBarChange}
+                                        onChange={(value) => {
+                                            onSearchBarChange(value)
+                                            // if the user searches, we want to expand all groups to perform the search
+                                            if (layoutHasGroup) {
+                                                expandGroups()
+                                            }
+                                        }}
                                         onClose={() => setSelectedNode(null)}
                                         onNext={onNextSearchResult}
                                         onPrev={onPrevSearchResult}
