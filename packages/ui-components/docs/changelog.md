@@ -2,6 +2,11 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed a downshift ref warning in `Select` and `DatepickerSelect` components.
+
+
 ## 1.9.2
 
 -   Removed margin from `Chat` component
