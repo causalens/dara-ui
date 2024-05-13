@@ -81,11 +81,23 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         nodeCircle.anchor.set(0.5);
         nodeGfx.addChild(nodeCircle);
 
+        //square
+        const nodeSquare = new PIXI.Sprite();
+        nodeSquare.name = NODE_SQUARE;
+        nodeSquare.anchor.set(0.5);
+        nodeGfx.addChild(nodeSquare);
+
         // border
         const nodeBorder = new PIXI.Sprite();
         nodeBorder.name = NODE_BORDER;
         nodeBorder.anchor.set(0.5);
         nodeGfx.addChild(nodeBorder);
+
+        //square border
+        const nodeSquareBorder = new PIXI.Sprite();
+        nodeSquareBorder.name = NODE_SQUARE_BORDER;
+        nodeSquareBorder.anchor.set(0.5);
+        nodeGfx.addChild(nodeSquareBorder);
 
         return nodeGfx;
     }
@@ -150,6 +162,8 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             }
             return graphics;
         });
+
+        console.log(nodeTextureKey)
 
 
         // Set the node texture and adjust its styles
