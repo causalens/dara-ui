@@ -348,29 +348,11 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             let text = new PIXI.Text(edgeStyle.collapsedEdges / 2, textStyle);
             return text;
         });
+
         edgeNumberSymbol.texture = numberSymbolTexture;
-        edgeNumberSymbol.position.y = edgeTopSymbol.position.y - 30; // leave gap from arrow
-        edgeNumberSymbol.rotation = -1 * edgeGfx.rotation;
+        edgeNumberSymbol.position.y = edgeTopSymbol.position.y - 30;
+        edgeNumberSymbol.rotation = (edgeGfx.rotation <= Math.PI / 2 && edgeGfx.rotation > 0) || (edgeGfx.rotation >= - 3 * Math.PI / 2 && edgeGfx.rotation < - Math.PI) ? - Math.PI / 2 : Math.PI / 2;
         [edgeNumberSymbol.tint] = colorToPixi(edgeStyle.color);
-
-        // const edgeTargetNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_TARGET_NUMBER_SYMBOL);
-        // const targetNumberSymbolTexture = textureCache.get(createKey(EDGE_TARGET_NUMBER_SYMBOL, edgeStyle.collapsedEdges?.target), () => {
-        //     if (edgeStyle.collapsedEdges?.target === undefined) return new PIXI.Graphics();
-
-        //     let textStyle = new PIXI.TextStyle({
-        //         fontFamily: 'Arial',
-        //         fontSize: 24,
-        //         fill: 'black',
-        //         align: 'center'
-        //     });
-        //     let text = new PIXI.Text(edgeStyle.collapsedEdges.target / 2, textStyle);
-        //     return text;
-        // });
-        // edgeTargetNumberSymbol.texture = targetNumberSymbolTexture;
-        // edgeTargetNumberSymbol.position.y = - edgeTopSymbol.position.y + 30; // leave gap from arrow
-        // edgeTargetNumberSymbol.rotation = -1 * edgeGfx.rotation;
-        // [edgeSourceNumberSymbol.tint] = colorToPixi(edgeStyle.color);
-
 
         // If selection is active but the edge itself is not selected, adjust opacity
         if (edgeStyle.isEdgeSelected && !edgeStyle.state.selected && !edgeStyle.state.hover) {
