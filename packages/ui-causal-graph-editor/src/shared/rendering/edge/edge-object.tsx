@@ -36,8 +36,7 @@ const EDGE_TOP_SYMBOL = 'EDGE_TOP_SYMBOL';
 const EDGE_CENTER_SYMBOL = 'EDGE_CENTER_SYMBOL';
 const EDGE_BOTTOM_SYMBOL = 'EDGE_BOTTOM_SYMBOL';
 const EDGE_STRENGTH_SYMBOL = 'EDGE_STRENGTH_SYMBOL';
-const EDGE_SOURCE_NUMBER_SYMBOL = 'EDGE_SOURCE_NUMBER_SYMBOL';
-const EDGE_TARGET_NUMBER_SYMBOL = 'EDGE_TARGET_NUMBER_SYMBOL';
+const EDGE_NUMBER_SYMBOL = 'EDGE_NUMBER_SYMBOL';
 
 const EDGE_OFFSET = 10;
 /**
@@ -131,14 +130,9 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         edgeSymbolsGfx.addChild(edgeStrengthSymbol);
 
         const edgeSourceNumberSymbol = new PIXI.Sprite();
-        edgeSourceNumberSymbol.name = EDGE_SOURCE_NUMBER_SYMBOL;
+        edgeSourceNumberSymbol.name = EDGE_NUMBER_SYMBOL;
         edgeSourceNumberSymbol.anchor.set(0.5);
         edgeSymbolsGfx.addChild(edgeSourceNumberSymbol);
-
-        const edgeTargetNumberSymbol = new PIXI.Sprite();
-        edgeTargetNumberSymbol.name = EDGE_TARGET_NUMBER_SYMBOL;
-        edgeTargetNumberSymbol.anchor.set(0.5);
-        edgeSymbolsGfx.addChild(edgeTargetNumberSymbol);
 
         return edgeSymbolsGfx;
     }
@@ -336,14 +330,14 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         edgeStrengthSymbol.alpha = 1;
 
         // Number symbols
-        const edgeNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_SOURCE_NUMBER_SYMBOL);
-        const numberSymbolTexture = textureCache.get(createKey(EDGE_SOURCE_NUMBER_SYMBOL, edgeStyle.collapsedEdges), () => {
+        const edgeNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_NUMBER_SYMBOL);
+        const numberSymbolTexture = textureCache.get(createKey(EDGE_NUMBER_SYMBOL, edgeStyle.collapsedEdges), () => {
             if (edgeStyle.collapsedEdges === undefined) return new PIXI.Graphics();
+
             let textStyle = new PIXI.TextStyle({
-                fontFamily: 'Arial',
-                fontSize: 24,
-                fill: 'black',
-                align: 'center'
+                fontFamily: 'Manrope',
+                fontSize: 18,
+                fill: colorToPixi(edgeStyle.color)
             });
             let text = new PIXI.Text(edgeStyle.collapsedEdges / 2, textStyle);
             return text;
@@ -351,8 +345,10 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
 
         edgeNumberSymbol.texture = numberSymbolTexture;
         edgeNumberSymbol.position.y = edgeTopSymbol.position.y - 30;
+        // Depending on the edge rotation, we need to rotate the number symbol so that they appear upright to the user
         edgeNumberSymbol.rotation = (edgeGfx.rotation <= Math.PI / 2 && edgeGfx.rotation > 0) || (edgeGfx.rotation >= - 3 * Math.PI / 2 && edgeGfx.rotation < - Math.PI) ? - Math.PI / 2 : Math.PI / 2;
-        [edgeNumberSymbol.tint] = colorToPixi(edgeStyle.color);
+        [edgeStrengthSymbol.tint] = colorToPixi(edgeStyle.color);
+        edgeNumberSymbol.alpha = 1;
 
         // If selection is active but the edge itself is not selected, adjust opacity
         if (edgeStyle.isEdgeSelected && !edgeStyle.state.selected && !edgeStyle.state.hover) {

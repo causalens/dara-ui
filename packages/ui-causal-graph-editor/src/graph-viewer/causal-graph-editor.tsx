@@ -44,7 +44,7 @@ import {
 } from '@shared/editor-overlay';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import useGraphTooltip from '@shared/use-graph-tooltip';
-import { getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getNodeGroups, getTooltipContent, willCreateCycle } from '@shared/utils';
 
 import {
     CausalGraph,
@@ -352,6 +352,22 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     // other api handlers
 
     function onAddEdge(edge: [string, string]): void {
+        if (layoutHasGroup) {
+            const layoutGroup = (layout as GraphLayoutWithGrouping).group
+            const groupsObject = getNodeGroups(state.graph.nodes(), layoutGroup, state.graph)
+            const groups = Object.keys(groupsObject)
+
+            if (groups.includes(edge[0]) && groups.includes(edge[1])) {
+                props.onNotify?.({
+                    key: 'create-edge-group',
+                    message: 'Could not create an edge between a group node as it is not supported',
+                    status: Status.WARNING,
+                    title: 'Group edge detected',
+                });
+                return;
+            }
+
+        }
         // Skip if a cycle would be created
         // The check needs to happen before we commit an action
         if (willCreateCycle(state.graph, edge)) {

@@ -149,10 +149,9 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         const nodeBorderTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE_BORDER : NODE_BORDER
 
         // Get/create circle texture
-        let nodeTexture = textureCache.get(createKey(nodeTextureKey, nodeStyle.size), () => {
+        const nodeTexture = textureCache.get(createKey(nodeTextureKey, nodeStyle.size), () => {
             const graphics = new SmoothGraphics();
             graphics.beginFill(0xffffff, 1, true);
-
 
             if (nodeStyle.isGroupNode) {
                 graphics.drawRoundedRect(nodeStyle.size, nodeStyle.size, 2 * nodeStyle.size, 2 * nodeStyle.size, 8);
@@ -289,28 +288,6 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
     static updateNodeLabelVisibility(nodeLabelGfx: PIXI.Container, zoomState: ZoomState): void {
         const nodeLabel = nodeLabelGfx.getChildByName<PIXI.Sprite>(NODE_LABEL);
         nodeLabel.visible = nodeLabel.visible && zoomState.label;
-    }
-
-    /**
-     * Update visibility of node label elements based on zoomstep
-     *
-     * @param nodeGfx node label graphics container
-     * @param zoomStep zoom step
-     */
-    hideNode(): void {
-        const nodeLabel = this.nodeLabelGfx.getChildByName<PIXI.Sprite>(NODE_LABEL);
-        const nodeCircle = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_CIRCLE)
-        const nodeBorder = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_BORDER)
-        const nodeSquare = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_SQUARE)
-        const nodeSquareBorder = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_SQUARE_BORDER)
-
-        this.nodeGfx.visible = false;
-        this.nodeLabelGfx.visible = false;
-        nodeCircle.visible = false;
-        nodeLabel.visible = false;
-        nodeBorder.visible = false;
-        nodeSquare.visible = false;
-        nodeSquareBorder.visible = false;
     }
 
     /**

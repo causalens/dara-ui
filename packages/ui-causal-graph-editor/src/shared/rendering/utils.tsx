@@ -20,7 +20,7 @@ import { ZoomState, ZoomThresholds } from '@types';
 
 import { GraphLayout, GraphLayoutWithTiers, GraphLayoutWithGrouping } from '../graph-layout/common';
 
-export const MOUSE_EVENTS = ['mousemove', 'mouseover', 'mouseout', 'mousedown', 'mouseup', 'dblclick'] as const;
+export const MOUSE_EVENTS = ['mousemove', 'mouseover', 'mouseout', 'mousedown', 'mouseup'] as const;
 
 const colorCache = new Map<string, [number, number]>();
 

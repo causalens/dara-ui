@@ -763,18 +763,20 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // create layers - containers to hold different rendered parts of the graph
         this.groupContainerLayer = new PIXI.Container();
 
+        this.edgeLayer = new PIXI.Container();
+        this.edgeSymbolsLayer = new PIXI.Container();
+
         this.nodeLayer = new PIXI.Container();
         this.nodeLabelLayer = new PIXI.Container();
 
-        this.edgeLayer = new PIXI.Container();
-        this.edgeSymbolsLayer = new PIXI.Container();
-        this.viewport.addChild(this.groupContainerLayer);
 
-        this.viewport.addChild(this.nodeLayer);
-        this.viewport.addChild(this.nodeLabelLayer);
+        this.viewport.addChild(this.groupContainerLayer);
 
         this.viewport.addChild(this.edgeLayer);
         this.viewport.addChild(this.edgeSymbolsLayer);
+
+        this.viewport.addChild(this.nodeLayer);
+        this.viewport.addChild(this.nodeLabelLayer);
 
         // obesrve window resizing
         this.resizeObserver = new ResizeObserver(() => {
@@ -923,7 +925,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 if (isGraphLayoutWithGroups(this.layout)) {
                     const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
                     if (Object.keys(groupsObject).includes(source) || Object.keys(groupsObject).includes(target)) {
-                        console.log('Edge between groups')
                         return;
                     }
                 }
@@ -972,7 +973,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
 
         node.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
-            console.log('NODE MOURSEOVER')
 
             // Always show hover state
             this.hoverNode(id);
@@ -1002,7 +1002,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         node.addListener('mousedown', (event: PIXI.FederatedMouseEvent) => {
-            console.log('NODE MOUSEDOWN')
             this.mousedownEdgeKey = null;
             this.mousedownNodeKey = id;
 
@@ -1015,20 +1014,24 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         node.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
-            console.log('NODE MOUSEUP')
+            console.log('MOUSEUP')
+
             // If mouseup happened on the same node mousedown happened
             if (this.mousedownNodeKey === id && this.nodeMousedownPosition) {
+                console.log('IF 1')
+
                 const xOffset = Math.abs(this.nodeMousedownPosition.x - event.global.x);
                 const yOffset = Math.abs(this.nodeMousedownPosition.y - event.global.y);
 
-                console.log('A')
 
                 // only trigger click if the mousedown&mouseup happened very close to each other
                 if (xOffset <= 2 && yOffset <= 2) {
+                    console.log('IF 2')
                     if (isGraphLayoutWithGroups(this.layout)) {
+                        console.log('IF 3')
                         const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
                         if (Object.keys(groupsObject).includes(id)) {
-                            console.log('Node is part of a group')
+                            console.log('IF 4')
                             return;
                         }
                     }
@@ -1036,12 +1039,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 }
             }
 
-            console.log('mouseup', this.isCreatingEdge, this.mousedownNodeKey, id)
             // If mouseup happened on a different node
             if (this.isCreatingEdge && this.mousedownNodeKey && this.mousedownNodeKey !== id) {
-                console.log('mouseup2', this.graph.hasEdge(this.mousedownNodeKey, id))
+                console.log('TRIGGER IF')
+
                 // check if the edge doesn't already exist
                 if (!this.graph.hasEdge(this.mousedownNodeKey, id)) {
+                    console.log('TRIGGER CREATE EDGE')
                     // emit event to create a real edge
                     this.emit('createEdge', event, this.mousedownNodeKey, id);
                 }
@@ -1360,7 +1364,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             this.onEndDrag?.();
         }
         if (this.isCreatingEdge) {
-            console.log('creating edge mouse up')
             // remove the temp edge
             const tempEdge = this.edgeMap.get(TEMP_EDGE_SYMBOL);
             this.edgeLayer.removeChild(tempEdge.edgeGfx);
@@ -1413,7 +1416,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         target: string;
         undirected: boolean;
     }): void {
-        console.log('onGraphEdegeAdded')
         const sourceNodeAttrs = this.graph.getNodeAttributes(source);
         const targetNodeAttrs = this.graph.getNodeAttributes(target);
         this.createEdge(key, attributes, source, target, sourceNodeAttrs, targetNodeAttrs);
@@ -1735,12 +1737,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     private updateGroupContainerStyle(id: string, nodes: SimulationNode[]): void {
         const groupContainer = this.groupContainerMap.get(id);
 
-        // console.log('updateGroupContainerStyle', groupContainer, id, nodes)
-
         if (groupContainer) {
-            // const nodePosition = { x: 100, y: 100 };
-            // groupContainer.updatePosition(nodePosition);
-
             groupContainer.updateStyle(nodes, this.textureCache);
         }
     }
