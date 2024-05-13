@@ -153,9 +153,9 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
 
 
         // Set the node texture and adjust its styles
-        const circle = nodeGfx.getChildByName<PIXI.Sprite>(NODE_CIRCLE);
-        circle.texture = nodeTexture;
-        [circle.tint, circle.alpha] = colorToPixi(nodeStyle.color);
+        const nodeBody = nodeGfx.getChildByName<PIXI.Sprite>(nodeTextureKey);
+        nodeBody.texture = nodeTexture;
+        [nodeBody.tint, nodeBody.alpha] = colorToPixi(nodeStyle.color);
 
         // Get/create border texture
         const borderTexture = textureCache.get(
@@ -175,7 +175,7 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         );
 
         // Set the border texture and adjust its styles
-        const border = nodeGfx.getChildByName<PIXI.Sprite>(NODE_BORDER);
+        const border = nodeGfx.getChildByName<PIXI.Sprite>(nodeBorderTextureKey);
         border.texture = borderTexture;
         [border.tint, border.alpha] = colorToPixi(nodeStyle.highlight_color);
 
@@ -204,7 +204,7 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             !nodeStyle.state.hover &&
             !nodeStyle.isSourceOfNewEdge
         ) {
-            circle.alpha = 0.3;
+            nodeBody.alpha = 0.3;
             border.alpha = 0.3;
         }
     }
@@ -289,13 +289,16 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         const nodeLabel = this.nodeLabelGfx.getChildByName<PIXI.Sprite>(NODE_LABEL);
         const nodeCircle = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_CIRCLE)
         const nodeBorder = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_BORDER)
+        const nodeSquare = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_SQUARE)
+        const nodeSquareBorder = this.nodeGfx.getChildByName<PIXI.Sprite>(NODE_SQUARE_BORDER)
 
         this.nodeGfx.visible = false;
         this.nodeLabelGfx.visible = false;
         nodeCircle.visible = false;
         nodeLabel.visible = false;
         nodeBorder.visible = false;
-
+        nodeSquare.visible = false;
+        nodeSquareBorder.visible = false;
     }
 
     /**

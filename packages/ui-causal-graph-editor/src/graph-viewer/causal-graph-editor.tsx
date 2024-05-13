@@ -529,10 +529,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setTooltipContent(null);
     });
 
-    useEngineEvent('groupDoubleClick', (event, nodeId) => {
-        console.log('groupDoubleClick');
-    });
-
     useEngineEvent('edgeMouseout', () => {
         setTooltipContent(null);
     });
