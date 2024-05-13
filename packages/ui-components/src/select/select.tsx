@@ -196,13 +196,24 @@ function Select(props: SelectProps): JSX.Element {
     const setFloatingRef = refs.setFloating;
     const { dropdownRef } = props;
 
-    const mergedRefs = React.useCallback(
+    const mergedDropdownRef = React.useCallback(
         (node: HTMLElement | null) => {
             setFloatingRef(node);
             setMenuRef(node);
             dropdownRef?.(node);
         },
         [setFloatingRef, setMenuRef, dropdownRef]
+    );
+
+    const toggleButtonProps = getToggleButtonProps({ disabled: props.disabled });
+    const { ref: buttonRef } = toggleButtonProps;
+
+    const mergedButtonRef = React.useCallback(
+        (node: HTMLButtonElement | null) => {
+            refs.setReference(node);
+            buttonRef(node);
+        },
+        [refs, buttonRef]
     );
 
     return (
@@ -218,8 +229,8 @@ function Select(props: SelectProps): JSX.Element {
                 <SelectButton
                     disabled={props.disabled}
                     isOpen={isOpen}
-                    {...getToggleButtonProps({ disabled: props.disabled })}
-                    ref={refs.setReference}
+                    {...toggleButtonProps}
+                    ref={mergedButtonRef}
                     {...getReferenceProps()}
                     type="button"
                 >
@@ -234,7 +245,7 @@ function Select(props: SelectProps): JSX.Element {
                     <DropdownList
                         {...menuProps}
                         {...getFloatingProps()}
-                        ref={mergedRefs}
+                        ref={mergedDropdownRef}
                         className={`${(menuProps?.className as string) ?? ''} ${props.itemClass}`}
                         isOpen={isOpen}
                         maxItems={props.maxItems}
