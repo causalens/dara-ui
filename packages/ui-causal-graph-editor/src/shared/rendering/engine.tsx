@@ -446,26 +446,16 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                         let numberOfCollapsedEdges = currentEdgeAttributes['meta.rendering_properties.collapsedEdges'] ?? 1
 
-                        console.log('INITIAL', initialSource, initialTarget, finalSource, finalTarget, currentEdgeAttributes['meta.rendering_properties.collapsedEdges'])
-                        // const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
-
                         if (this.graph.hasEdge(finalSource, finalTarget)) {
                             const attributes = this.graph.getEdgeAttributes(finalSource, finalTarget)
 
                             numberOfCollapsedEdges = attributes['meta.rendering_properties.collapsedEdges']
 
-                            console.log('IF VALUES', numberOfCollapsedEdges)
-
                             // if the target has changed, and edge is not within the same group, we need to increment the number of collapsed edges for the target
                             if (initialTarget !== finalTarget && finalSource !== finalTarget) {
                                 numberOfCollapsedEdges += 1
                             }
-
-
-
                         }
-                        console.log('FINAL VALUES', numberOfCollapsedEdges)
-
                         const edgeAttributes = { ...currentEdgeAttributes, 'meta.rendering_properties.collapsedEdges': numberOfCollapsedEdges }
 
                         // if source or target changed, i.e. they are part of a group, we should drop the edge
