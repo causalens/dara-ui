@@ -5,6 +5,7 @@ title: Changelog
 ## NEXT
 
 -   Fixed an issue where if parent hugged content `NodeHierarchyBuilder` would always scroll.
+-   Fixed an issue where a graph `Legend` node and edge could not have the same label.
 
 ## 1.9.1
 
