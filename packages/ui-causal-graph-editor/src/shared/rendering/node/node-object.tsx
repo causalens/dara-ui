@@ -163,8 +163,6 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
             return graphics;
         });
 
-        console.log(nodeTextureKey)
-
 
         // Set the node texture and adjust its styles
         const nodeBody = nodeGfx.getChildByName<PIXI.Sprite>(nodeTextureKey);

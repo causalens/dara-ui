@@ -36,6 +36,8 @@ const EDGE_TOP_SYMBOL = 'EDGE_TOP_SYMBOL';
 const EDGE_CENTER_SYMBOL = 'EDGE_CENTER_SYMBOL';
 const EDGE_BOTTOM_SYMBOL = 'EDGE_BOTTOM_SYMBOL';
 const EDGE_STRENGTH_SYMBOL = 'EDGE_STRENGTH_SYMBOL';
+const EDGE_SOURCE_NUMBER_SYMBOL = 'EDGE_SOURCE_NUMBER_SYMBOL';
+const EDGE_TARGET_NUMBER_SYMBOL = 'EDGE_TARGET_NUMBER_SYMBOL';
 
 const EDGE_OFFSET = 10;
 /**
@@ -127,6 +129,16 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         edgeStrengthSymbol.name = EDGE_STRENGTH_SYMBOL;
         edgeStrengthSymbol.anchor.set(0.5, 1);
         edgeSymbolsGfx.addChild(edgeStrengthSymbol);
+
+        const edgeSourceNumberSymbol = new PIXI.Sprite();
+        edgeSourceNumberSymbol.name = EDGE_SOURCE_NUMBER_SYMBOL;
+        edgeSourceNumberSymbol.anchor.set(0.5);
+        edgeSymbolsGfx.addChild(edgeSourceNumberSymbol);
+
+        const edgeTargetNumberSymbol = new PIXI.Sprite();
+        edgeTargetNumberSymbol.name = EDGE_TARGET_NUMBER_SYMBOL;
+        edgeTargetNumberSymbol.anchor.set(0.5);
+        edgeSymbolsGfx.addChild(edgeTargetNumberSymbol);
 
         return edgeSymbolsGfx;
     }
@@ -322,6 +334,43 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         edgeStrengthSymbol.position.y = edgeTopSymbol.position.y - 5; // leave gap from arrow
         [edgeStrengthSymbol.tint] = colorToPixi(edgeStyle.color);
         edgeStrengthSymbol.alpha = 1;
+
+        // Number symbols
+        const edgeNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_SOURCE_NUMBER_SYMBOL);
+        const numberSymbolTexture = textureCache.get(createKey(EDGE_SOURCE_NUMBER_SYMBOL, edgeStyle.collapsedEdges), () => {
+            if (edgeStyle.collapsedEdges === undefined) return new PIXI.Graphics();
+            let textStyle = new PIXI.TextStyle({
+                fontFamily: 'Arial',
+                fontSize: 24,
+                fill: 'black',
+                align: 'center'
+            });
+            let text = new PIXI.Text(edgeStyle.collapsedEdges / 2, textStyle);
+            return text;
+        });
+        edgeNumberSymbol.texture = numberSymbolTexture;
+        edgeNumberSymbol.position.y = edgeTopSymbol.position.y - 30; // leave gap from arrow
+        edgeNumberSymbol.rotation = -1 * edgeGfx.rotation;
+        [edgeNumberSymbol.tint] = colorToPixi(edgeStyle.color);
+
+        // const edgeTargetNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_TARGET_NUMBER_SYMBOL);
+        // const targetNumberSymbolTexture = textureCache.get(createKey(EDGE_TARGET_NUMBER_SYMBOL, edgeStyle.collapsedEdges?.target), () => {
+        //     if (edgeStyle.collapsedEdges?.target === undefined) return new PIXI.Graphics();
+
+        //     let textStyle = new PIXI.TextStyle({
+        //         fontFamily: 'Arial',
+        //         fontSize: 24,
+        //         fill: 'black',
+        //         align: 'center'
+        //     });
+        //     let text = new PIXI.Text(edgeStyle.collapsedEdges.target / 2, textStyle);
+        //     return text;
+        // });
+        // edgeTargetNumberSymbol.texture = targetNumberSymbolTexture;
+        // edgeTargetNumberSymbol.position.y = - edgeTopSymbol.position.y + 30; // leave gap from arrow
+        // edgeTargetNumberSymbol.rotation = -1 * edgeGfx.rotation;
+        // [edgeSourceNumberSymbol.tint] = colorToPixi(edgeStyle.color);
+
 
         // If selection is active but the edge itself is not selected, adjust opacity
         if (edgeStyle.isEdgeSelected && !edgeStyle.state.selected && !edgeStyle.state.hover) {

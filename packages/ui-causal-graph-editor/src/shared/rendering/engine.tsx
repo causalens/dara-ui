@@ -45,9 +45,8 @@ import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } fro
 import { NodeObject, PixiNodeStyle, getNodeSize } from './node';
 import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
-import { colorToPixi, getZoomState, isGraphLayoutWithTiers, isGraphLayoutWithGroups } from './utils';
+import { colorToPixi, getZoomState, isGraphLayoutWithTiers, isGraphLayoutWithGroups, findKeyByValue } from './utils';
 import { GroupContainerObject } from './grouping/group-container-object';
-import { get, includes } from 'lodash';
 
 const WORLD_PADDING = 100;
 
@@ -405,19 +404,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Collapse all groups present in the graph
      */
     public collapseAllGroups(): void {
-        function findKeyByValue(obj: Record<string, string[]>, searchValue: string) {
-            if (Object.values(obj).flat().includes(searchValue)) {
-                let returnKey: string
-                Object.keys(obj).forEach((key) => {
-                    if (obj[key].includes(searchValue)) {
-                        returnKey = key
-                    }
-                })
-                return returnKey
-            }
-            return searchValue;
-        }
-
         console.log('Collapse groups');
 
         if (isGraphLayoutWithGroups(this.layout)) {
@@ -456,7 +442,31 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         const finalSource = findKeyByValue(groupsObject, initialSource)
                         const finalSourceAttributes = this.graph.getNodeAttributes(finalSource)
                         const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget)
-                        const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+                        const currentEdgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+
+                        let numberOfCollapsedEdges = currentEdgeAttributes['meta.rendering_properties.collapsedEdges'] ?? 1
+
+                        console.log('INITIAL', initialSource, initialTarget, finalSource, finalTarget, currentEdgeAttributes['meta.rendering_properties.collapsedEdges'])
+                        // const edgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+
+                        if (this.graph.hasEdge(finalSource, finalTarget)) {
+                            const attributes = this.graph.getEdgeAttributes(finalSource, finalTarget)
+
+                            numberOfCollapsedEdges = attributes['meta.rendering_properties.collapsedEdges']
+
+                            console.log('IF VALUES', numberOfCollapsedEdges)
+
+                            // if the target has changed, and edge is not within the same group, we need to increment the number of collapsed edges for the target
+                            if (initialTarget !== finalTarget && finalSource !== finalTarget) {
+                                numberOfCollapsedEdges += 1
+                            }
+
+
+
+                        }
+                        console.log('FINAL VALUES', numberOfCollapsedEdges)
+
+                        const edgeAttributes = { ...currentEdgeAttributes, 'meta.rendering_properties.collapsedEdges': numberOfCollapsedEdges }
 
                         // if source or target changed, i.e. they are part of a group, we should drop the edge
                         if (initialSource !== finalSource || initialTarget !== finalTarget) {
@@ -475,6 +485,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                                 // whe should also only add edges that go to or from a group node
                             } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
                                 this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
+                            }
+                            else {
+                                this.graph.setEdgeAttribute(finalSource, finalTarget, 'meta.rendering_properties.collapsedEdges', numberOfCollapsedEdges);
+
+                                // this.graph.setEdgeAttribute(edgeAttributes,)
                             }
                         }
 
@@ -967,6 +982,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
 
         node.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
+            console.log('NODE MOURSEOVER')
 
             // Always show hover state
             this.hoverNode(id);
@@ -1199,6 +1215,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             theme: this.theme,
             thickness: attributes['meta.rendering_properties.thickness'],
             type: attributes.edge_type,
+            collapsedEdges: attributes['meta.rendering_properties.collapsedEdges']
         };
         if (this.processEdgeStyle) {
             return this.processEdgeStyle(edgeStyle, attributes);
