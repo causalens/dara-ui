@@ -68,7 +68,6 @@ export interface EngineEvents {
     nodeMouseover: (event: PIXI.FederatedMouseEvent, nodeKey: string) => void;
     groupMouseout: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
     groupMouseover: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
-    groupDoubleClick: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
 
 }
 export const ENGINE_EVENTS: Array<keyof EngineEvents> = [
@@ -84,7 +83,6 @@ export const ENGINE_EVENTS: Array<keyof EngineEvents> = [
     'edgeMouseover',
     'groupMouseout',
     'groupMouseover',
-    'groupDoubleClick'
 ];
 
 export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
@@ -917,6 +915,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
         edge.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
             if (this.mousedownEdgeKey === id) {
+                if (isGraphLayoutWithGroups(this.layout)) {
+                    const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
+                    if (Object.keys(groupsObject).includes(source) || Object.keys(groupsObject).includes(target)) {
+                        console.log('Edge between groups')
+                        return;
+                    }
+                }
                 this.emit('edgeClick', event, source, target);
             }
         });
@@ -991,6 +996,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         node.addListener('mousedown', (event: PIXI.FederatedMouseEvent) => {
+            console.log('NODE MOUSEDOWN')
             this.mousedownEdgeKey = null;
             this.mousedownNodeKey = id;
 
@@ -1001,20 +1007,33 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             this.nodeMousedownCenterPosition = node.nodeGfx.getGlobalPosition().clone();
             this.nodeMousedownPosition = event.global.clone();
         });
+
         node.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
+            console.log('NODE MOUSEUP')
             // If mouseup happened on the same node mousedown happened
             if (this.mousedownNodeKey === id && this.nodeMousedownPosition) {
                 const xOffset = Math.abs(this.nodeMousedownPosition.x - event.global.x);
                 const yOffset = Math.abs(this.nodeMousedownPosition.y - event.global.y);
 
+                console.log('A')
+
                 // only trigger click if the mousedown&mouseup happened very close to each other
                 if (xOffset <= 2 && yOffset <= 2) {
+                    if (isGraphLayoutWithGroups(this.layout)) {
+                        const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
+                        if (Object.keys(groupsObject).includes(id)) {
+                            console.log('Node is part of a group')
+                            return;
+                        }
+                    }
                     this.emit('nodeClick', event, id);
                 }
             }
 
+            console.log('mouseup', this.isCreatingEdge, this.mousedownNodeKey, id)
             // If mouseup happened on a different node
             if (this.isCreatingEdge && this.mousedownNodeKey && this.mousedownNodeKey !== id) {
+                console.log('mouseup2', this.graph.hasEdge(this.mousedownNodeKey, id))
                 // check if the edge doesn't already exist
                 if (!this.graph.hasEdge(this.mousedownNodeKey, id)) {
                     // emit event to create a real edge
@@ -1068,11 +1087,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 // resets mousedown position
                 this.mousedownNodeKey = null;
             }
-        });
-
-        groupContainer.addListener('dblclick', (event: PIXI.FederatedMouseEvent) => {
-            console.log('double click on group container', id)
-            this.emit('groupDoubleClick', event, id);
         });
 
         this.updateGroupContainerStyle(id, nodes);
@@ -1339,6 +1353,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             this.onEndDrag?.();
         }
         if (this.isCreatingEdge) {
+            console.log('creating edge mouse up')
             // remove the temp edge
             const tempEdge = this.edgeMap.get(TEMP_EDGE_SYMBOL);
             this.edgeLayer.removeChild(tempEdge.edgeGfx);
@@ -1391,6 +1406,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         target: string;
         undirected: boolean;
     }): void {
+        console.log('onGraphEdegeAdded')
         const sourceNodeAttrs = this.graph.getNodeAttributes(source);
         const targetNodeAttrs = this.graph.getNodeAttributes(target);
         this.createEdge(key, attributes, source, target, sourceNodeAttrs, targetNodeAttrs);
