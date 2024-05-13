@@ -278,17 +278,6 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
         [setFloatingRef, setMenuRef, dropdownRef]
     );
 
-    const toggleButtonProps = getToggleButtonProps({ disabled: props.disabled });
-    const { ref: buttonRef } = toggleButtonProps;
-
-    const mergedButtonRef = React.useCallback(
-        (node: HTMLButtonElement | null) => {
-            refs.setReference(node);
-            buttonRef(node);
-        },
-        [refs, buttonRef]
-    );
-
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
             <Wrapper
@@ -300,8 +289,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
             >
                 <SelectButtonPrimary
                     disabled={props.disabled}
-                    {...toggleButtonProps}
-                    ref={mergedButtonRef}
+                    {...getToggleButtonProps({ disabled: props.disabled, ref: refs.setReference })}
                     {...getReferenceProps()}
                     type="button"
                 >
