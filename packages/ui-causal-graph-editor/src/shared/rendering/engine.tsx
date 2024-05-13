@@ -404,8 +404,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Collapse all groups present in the graph
      */
     public collapseAllGroups(): void {
-        console.log('Collapse groups');
-
         if (isGraphLayoutWithGroups(this.layout)) {
             const layoutGroup = this.layout.group
             const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph)
@@ -505,7 +503,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Collapse all groups present in the graph
      */
     public expandAllGroups(): void {
-        console.log('EXPAND ALL GROUPS')
         // We only need to expand groups if the graph has at least one of the group nodes
         if (this.graph.nodes().some(node => this.graph.getNodeAttribute(node, 'variable_type') === 'groupNode')) {
             // cleanup the edges that were created between groups
@@ -1014,11 +1011,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         node.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
-            console.log('MOUSEUP')
 
             // If mouseup happened on the same node mousedown happened
             if (this.mousedownNodeKey === id && this.nodeMousedownPosition) {
-                console.log('IF 1')
 
                 const xOffset = Math.abs(this.nodeMousedownPosition.x - event.global.x);
                 const yOffset = Math.abs(this.nodeMousedownPosition.y - event.global.y);
@@ -1026,12 +1021,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                 // only trigger click if the mousedown&mouseup happened very close to each other
                 if (xOffset <= 2 && yOffset <= 2) {
-                    console.log('IF 2')
                     if (isGraphLayoutWithGroups(this.layout)) {
-                        console.log('IF 3')
                         const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
                         if (Object.keys(groupsObject).includes(id)) {
-                            console.log('IF 4')
                             return;
                         }
                     }
@@ -1041,11 +1033,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             // If mouseup happened on a different node
             if (this.isCreatingEdge && this.mousedownNodeKey && this.mousedownNodeKey !== id) {
-                console.log('TRIGGER IF')
 
                 // check if the edge doesn't already exist
                 if (!this.graph.hasEdge(this.mousedownNodeKey, id)) {
-                    console.log('TRIGGER CREATE EDGE')
                     // emit event to create a real edge
                     this.emit('createEdge', event, this.mousedownNodeKey, id);
                 }
