@@ -81,7 +81,7 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         nodeCircle.anchor.set(0.5);
         nodeGfx.addChild(nodeCircle);
 
-        //square
+        // square
         const nodeSquare = new PIXI.Sprite();
         nodeSquare.name = NODE_SQUARE;
         nodeSquare.anchor.set(0.5);
@@ -93,7 +93,7 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         nodeBorder.anchor.set(0.5);
         nodeGfx.addChild(nodeBorder);
 
-        //square border
+        // square border
         const nodeSquareBorder = new PIXI.Sprite();
         nodeSquareBorder.name = NODE_SQUARE_BORDER;
         nodeSquareBorder.anchor.set(0.5);

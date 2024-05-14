@@ -12,7 +12,7 @@ export function calculateSourceBoundPosition(centerX: number, centerY: number, r
     // Calculate half size of the square
     const halfSize = width / 2;
 
-    let x, y;
+    let x; let y;
 
     if (rotation >= 0 && rotation < Math.PI / 4) {
         // edge leaves from somewhere on the right top half side of the square
@@ -65,7 +65,7 @@ export function calculateTargetBoundPosition(centerX: number, centerY: number, r
     // Calculate half size of the square
     const halfSize = width / 2;
 
-    let x, y;
+    let x; let y;
 
     if (rotation >= 0 && rotation < Math.PI / 4) {
         // edge arrives from somewhere on the left bottom half side of the square

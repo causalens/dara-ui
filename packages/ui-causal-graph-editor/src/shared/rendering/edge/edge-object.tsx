@@ -332,14 +332,14 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         // Number symbols
         const edgeNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_NUMBER_SYMBOL);
         const numberSymbolTexture = textureCache.get(createKey(EDGE_NUMBER_SYMBOL, edgeStyle.collapsedEdges), () => {
-            if (edgeStyle.collapsedEdges === undefined) return new PIXI.Graphics();
+            if (edgeStyle.collapsedEdges === undefined) {return new PIXI.Graphics();}
 
-            let textStyle = new PIXI.TextStyle({
+            const textStyle = new PIXI.TextStyle({
                 fontFamily: 'Manrope',
                 fontSize: 18,
                 fill: colorToPixi(edgeStyle.color)
             });
-            let text = new PIXI.Text(edgeStyle.collapsedEdges, textStyle);
+            const text = new PIXI.Text(edgeStyle.collapsedEdges, textStyle);
             return text;
         });
 

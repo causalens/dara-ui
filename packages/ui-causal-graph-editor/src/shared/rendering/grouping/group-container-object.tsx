@@ -87,7 +87,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
      * @param textureCache texture cache instance
      */
     static updateContainerStyle(groupContainerGfx: PIXI.Container, nodes: SimulationNode[], textureCache: TextureCache): void {
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        let minX = Infinity; let maxX = -Infinity; let minY = Infinity; let maxY = -Infinity;
 
         nodes.forEach(node => {
             const radius = node['meta.rendering_properties.size'] ?? 100;
@@ -200,7 +200,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
  */
     updateStyle(nodes: SimulationNode[], textureCache: TextureCache): void {
 
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        let minX = Infinity; let maxX = -Infinity; let minY = Infinity; let maxY = -Infinity;
 
 
         nodes.forEach(node => {

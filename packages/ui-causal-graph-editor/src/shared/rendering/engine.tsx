@@ -562,7 +562,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             // redraw all group containers
             if (isGraphLayoutWithGroups(this.layout)) {
-                const group = this.layout.group;
+                const {group} = this.layout;
                 const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
                 Object.keys(groups).forEach((group) => {
                     const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
@@ -959,7 +959,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     private createGraph(): void {
         // Create group containers if these are set
         if (isGraphLayoutWithGroups(this.layout)) {
-            const group = this.layout.group;
+            const {group} = this.layout;
             const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
             Object.keys(groups).forEach((group) => {
                 const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
@@ -1787,7 +1787,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.graph.forEachEdge(this.updateEdgeStyle.bind(this));
 
         if (isGraphLayoutWithGroups(this.layout)) {
-            const group = this.layout.group
+            const {group} = this.layout
             const groupsObject = getNodeGroups(this.graph.nodes(), group, this.graph)
             Object.keys(groupsObject).forEach((group) => {
                 const nodesIngroup = groupsObject[group].map((node) => this.graph.getNodeAttributes(node))
