@@ -580,14 +580,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             });
 
             // redraw all group containers
-            if (isGraphLayoutWithGroups(this.layout)) {
-                const { group } = this.layout;
-                const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
-                Object.keys(groups).forEach((gr) => {
-                    const nodesIngroup = groups[gr].map((node) => this.graph.getNodeAttributes(node));
-                    this.createGroupContainer(gr, nodesIngroup);
-                });
-            }
+            this.createGroupContainers();
 
             this.requestRender();
         }
@@ -973,17 +966,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Creates edges and nodes based on current graph state.
      */
     private createGraph(): void {
-        // Create group containers if these are set
-        if (isGraphLayoutWithGroups(this.layout)) {
-            const { group } = this.layout;
-            const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
-            Object.keys(groups).forEach((gr) => {
-                const nodesIngroup = groups[gr].map((node) => this.graph.getNodeAttributes(node));
-                this.createGroupContainer(gr, nodesIngroup);
-            });
-        }
 
-        // Create nodes and edges
+        // Create nodes, edges and group containers if needed
+        this.createGroupContainers();
         this.graph.forEachNode(this.createNode.bind(this));
         this.graph.forEachEdge(this.createEdge.bind(this));
 
@@ -1115,6 +1100,17 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         this.updateGroupContainerStyle(id, nodes);
+    }
+
+    private createGroupContainers(): void {
+        if (isGraphLayoutWithGroups(this.layout)) {
+            const { group } = this.layout;
+            const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
+            Object.keys(groups).forEach((gr) => {
+                const nodesIngroup = groups[gr].map((node) => this.graph.getNodeAttributes(node));
+                this.createGroupContainer(gr, nodesIngroup);
+            });
+        }
     }
 
     /**
