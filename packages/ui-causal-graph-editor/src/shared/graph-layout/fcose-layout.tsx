@@ -31,7 +31,8 @@ import { GraphLayout, GraphLayoutBuilder } from './common';
 cytoscape.use(fcose);
 class FcoseLayoutBuilder
     extends GraphLayoutBuilder<FcoseLayout>
-    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder {
+    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder
+{
     _edgeElasticity = 0.45;
 
     _edgeLength = 3;
@@ -244,7 +245,7 @@ function getRelativeTieredArrayPlacement(
         const placement =
             orientation === 'horizontal' ?
                 { gap: tierSeparation, left: firstElement, right: nextTierFirstElement }
-                : { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
+            :   { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
         relativePlacements.push(placement);
     });
 
@@ -316,7 +317,6 @@ function assignParents(elements: cytoscape.ElementDefinition[], relationships: R
     }
 }
 
-
 export default class FcoseLayout extends GraphLayout {
     public edgeElasticity: number;
 
@@ -375,7 +375,7 @@ export default class FcoseLayout extends GraphLayout {
             const tiersPlacement =
                 this.tiers ?
                     getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation)
-                    : { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
+                :   { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
 
             const elements = [
                 ...graph.mapNodes<ElementDefinition>((id, attrs) => ({

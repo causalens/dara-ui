@@ -467,9 +467,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         let numberOfCollapsedEdges =
                             graphHasFinalEdge ?
                                 this.graph.getEdgeAttributes(finalSource, finalTarget)[
-                                'meta.rendering_properties.collapsedEdges'
+                                    'meta.rendering_properties.collapsedEdges'
                                 ]
-                                : 0;
+                            :   0;
 
                         // upddate the number of collapsed edges count if needed
                         if (graphHasFinalEdge && edgeHasChanged && group === finalSource) {
@@ -566,7 +566,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 } else {
                     this.dropNode(node);
                 }
-
             });
 
             // then we need to recreate all the edges that were collapsed
@@ -1036,7 +1035,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * Creates edges and nodes based on current graph state.
      */
     private createGraph(): void {
-
         // Create nodes, edges and group containers if needed
         this.createGroupContainers();
         this.graph.forEachNode(this.createNode.bind(this));

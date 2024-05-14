@@ -17,7 +17,6 @@
 import { Meta } from '@storybook/react';
 import * as React from 'react';
 
-
 import { SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import { PlanarLayout } from '../shared/graph-layout';
 import { LayeringAlgorithm } from '../shared/graph-layout/planar-layout';

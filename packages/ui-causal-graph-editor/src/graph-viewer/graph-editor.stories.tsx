@@ -20,19 +20,10 @@ import { useEffect, useState } from 'react';
 
 import { Accordion } from '@darajs/ui-components';
 
-import {
-    CircularLayout,
-    FcoseLayout,
-    PlanarLayout,
-    SpringLayout,
-} from '../shared/graph-layout';
+import { CircularLayout, FcoseLayout, PlanarLayout, SpringLayout } from '../shared/graph-layout';
 import { CausalGraph, EdgeType, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import {
-    Template,
-    causalGraph,
-    timeSeriesCausalGraph,
-} from './utils/stories-utils';
+import { Template, causalGraph, timeSeriesCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

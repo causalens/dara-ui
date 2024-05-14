@@ -82,7 +82,7 @@ interface UseRenderEngineApi {
      * Expand all groups
      */
     expandGroups: () => void;
-    /** 
+    /**
      * Get current canvas state as an image
      */
     extractImage: () => Promise<string | undefined>;

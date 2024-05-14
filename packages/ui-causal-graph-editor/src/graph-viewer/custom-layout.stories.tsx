@@ -18,15 +18,10 @@ import { Meta } from '@storybook/react';
 import deepCopy from 'lodash/cloneDeep';
 import set from 'lodash/set';
 
-
 import { SHIPPED_UNITS } from '../../tests/mocks/graphs';
-import {
-    CustomLayout,
-} from '../shared/graph-layout';
+import { CustomLayout } from '../shared/graph-layout';
 import { default as CausalGraphViewerComponent } from './causal-graph-editor';
-import {
-    Template,
-} from './utils/stories-utils';
+import { Template } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

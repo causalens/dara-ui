@@ -7,7 +7,12 @@
  * @param rotation goes from -pi to pi inclusive and represents the angle between the x axis going counterclockwise to the edge from the centre of source node
  * @param width of the square node
  */
-export function calculateSourceBoundPosition(centerX: number, centerY: number, rotation: number, width: number): { x: number; y: number } {
+export function calculateSourceBoundPosition(
+    centerX: number,
+    centerY: number,
+    rotation: number,
+    width: number
+): { x: number; y: number } {
     // Calculate half size of the square
     const halfSize = width / 2;
 
@@ -59,7 +64,12 @@ export function calculateSourceBoundPosition(centerX: number, centerY: number, r
  * @param rotation goes from -pi to pi inclusive and represents the angle between the x axis going counterclockwise to the edge from the centre of source node
  * @param width width of the square node
  */
-export function calculateTargetBoundPosition(centerX: number, centerY: number, rotation: number, width: number): { x: number; y: number } {
+export function calculateTargetBoundPosition(
+    centerX: number,
+    centerY: number,
+    rotation: number,
+    width: number
+): { x: number; y: number } {
     // Calculate half size of the square
     const halfSize = width / 2;
 
