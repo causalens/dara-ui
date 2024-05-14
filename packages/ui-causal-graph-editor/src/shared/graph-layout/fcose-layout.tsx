@@ -297,24 +297,20 @@ export function getTieredLayoutProperties(
  */
 function assignParents(elements: cytoscape.ElementDefinition[], relationships: Record<string, string[]>): void {
     // Iterate over each parent in the relationships object
-    for (const parent in relationships) {
-        if (relationships.hasOwnProperty(parent)) {
-            // Get the list of children for this parent
-            const children = relationships[parent];
+    for (const [parent, children] of Object.entries(relationships)) {
+        // Iterate over each child ID
+        children.forEach((childId) => {
+            // Find the node that matches this child ID
+            const node = elements.find((element) => element.data.id === childId);
 
-            // Iterate over each child ID
-            children.forEach((childId) => {
-                // Find the node that matches this child ID
-                const node = elements.find((element) => element.data.id === childId);
-
-                // If the node is found, set its 'parent' attribute
-                if (node) {
-                    node.data.parent = parent;
-                }
-            });
-        }
+            // If the node is found, set its 'parent' attribute
+            if (node) {
+                node.data.parent = parent;
+            }
+        });
     }
 }
+
 
 export default class FcoseLayout extends GraphLayout {
     public edgeElasticity: number;
