@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.3
 
 -   Fixed a downshift ref warning in `Select` and `DatepickerSelect` components.
 
