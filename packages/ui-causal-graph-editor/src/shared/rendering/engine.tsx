@@ -459,7 +459,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         const finalSourceAttributes = this.graph.getNodeAttributes(finalSource);
                         const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget);
                         const currentEdgeAttributes = this.graph.getEdgeAttributes(edgeKey);
-                        // let numberOfCollapsedEdges = currentEdgeAttributes['meta.rendering_properties.collapsedEdges'] ?? 1
                         let numberOfCollapsedEdges =
                             graphHasFinalEdge ?
                                 this.graph.getEdgeAttributes(finalSource, finalTarget)[
@@ -468,14 +467,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                                 : 0;
 
                         // upddate the number of collapsed edges count if needed
-                        // if we have got the final edge in the graph then we need to increment it
-                        // that is if the final edge is not the edge wee are currently looking at
-                        // if the edge is between two group nodes then the same edge is counted twice, so we only count it when current group is the source
                         if (graphHasFinalEdge && edgeHasChanged && group === finalSource) {
-                            // if the target has changed, and edge is not within the same group, we need to increment the number of collapsed edges for the target
-                            // if ((targetHasChanged && edgeIsWithinTheGroup) || (!targetHasChanged && !groupsArray.includes(finalTarget))) {
                             numberOfCollapsedEdges += 1;
-                            // }
                         }
 
                         const edgeAttributes = {
@@ -508,6 +501,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                                     finalSourceAttributes,
                                     finalTargetAttributes
                                 );
+                                // if the edge already exists we just need to update the count of collapsed edges
                             } else if (graphHasFinalEdge) {
                                 this.graph.setEdgeAttribute(
                                     finalSource,
@@ -520,7 +514,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     }
                 });
 
-                // for the group set all collapsed edges so that we can rebuild them later
+                // set all collapsed edges so that we can rebuild them later
                 this.collapsedEdgesMap.set(group, collapsedEdges);
             });
 
@@ -538,7 +532,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Collapse all groups present in the graph
+     * Expand all groups present in the graph
      */
     public expandAllGroups(): void {
         // We only need to expand groups if the graph has at least one of the group nodes
@@ -552,7 +546,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 const isTargetGroupNode = this.graph.getNodeAttribute(target, 'variable_type') === 'groupNode';
                 if (isSourceGroupNode || isTargetGroupNode) {
                     this.dropEdge(edgeKey);
-                    // reset the number of collapsed edges
+                    // reset the count of collapsed edges
                     this.graph.setEdgeAttribute(source, target, 'meta.rendering_properties.collapsedEdges', 0);
                 }
             });
@@ -1062,10 +1056,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Create a node
+     * Create a group container
      *
      * @param id node id
-     * @param attributes node attributes
+     * @param nodes a list of simulation nodes that are part of the group
      */
     private createGroupContainer(id: string, nodes: SimulationNode[]): void {
         const groupContainer = new GroupContainerObject();
@@ -1092,7 +1086,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             }
 
             // don't reset mousedownKey if we're dragging as this can prevent the drag
-            // from working correctly when dragging quickly outside of a node
+            // from working correctly when dragging quickly outside of a container
             if (!this.editable && !this.isMovingNode && !this.isCreatingEdge) {
                 // resets mousedown position
                 this.mousedownNodeKey = null;
@@ -1145,7 +1139,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Drop the node graphics from the renderer
+     * Drop the group container graphics from the renderer
      *
      * @param id node id
      */
@@ -1273,9 +1267,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Enable hover state for given edge
+     * Enable hover state for given group container
      *
      * @param id id of edge to hover
+     * @param nodes a list of simulation nodes that are part of the group
      */
     private hoverGroupContainer(id: string, nodes: SimulationNode[]): void {
         const groupContainer = this.groupContainerMap.get(id);
@@ -1549,9 +1544,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Disable hover state for given node
+     * Disable hover state for given group container
      *
      * @param id id of node to unhover
+     * @param nodes a list of simulation nodes that are part of the group
      */
     private unhoverGroupContainer(id: string, nodes: SimulationNode[]): void {
         const groupContainer = this.groupContainerMap.get(id);
@@ -1740,7 +1736,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Update style of given node
+     * Update style of given group container
      *
      * @param id id of node to update
      * @param attributes node attributes
