@@ -82,6 +82,10 @@ interface UseRenderEngineApi {
      * Expand all groups
      */
     expandGroups: () => void;
+    /** 
+     * Get current canvas state as an image
+     */
+    extractImage: () => Promise<string | undefined>;
     /**
      * Register a handler for a given engine event.
      *
@@ -225,6 +229,11 @@ export function useRenderEngine({
         expandGroups: () => {
             if (engine.current.initialized) {
                 engine.current.expandAllGroups();
+            }
+        },
+        extractImage: () => {
+            if (engine.current.initialized) {
+                return engine.current.extractImage();
             }
         },
         useEngineEvent,
