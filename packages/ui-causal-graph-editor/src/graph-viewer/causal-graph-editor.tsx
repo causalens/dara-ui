@@ -746,6 +746,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                             // if the user searches, we want to expand all groups to perform the search
                                             if (layoutHasGroup) {
                                                 expandGroups()
+                                                setShowCollapseAll(true)
                                             }
                                         }}
                                         onClose={() => setSelectedNode(null)}
