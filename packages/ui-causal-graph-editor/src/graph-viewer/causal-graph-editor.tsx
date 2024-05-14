@@ -30,9 +30,9 @@ import {
     AddNodeButton,
     CenterGraphButton,
     CollapseAllButton,
-    ExpandAllButton,
     DragModeButton,
     EdgeInfoContent,
+    ExpandAllButton,
     GraphLegendDefinition,
     Legend,
     NodeInfoContent,
@@ -43,6 +43,7 @@ import {
     useSearch,
 } from '@shared/editor-overlay';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
+import { GraphLayoutWithGrouping } from '@shared/graph-layout/common';
 import useGraphTooltip from '@shared/use-graph-tooltip';
 import { getNodeGroups, getTooltipContent, willCreateCycle } from '@shared/utils';
 
@@ -70,7 +71,6 @@ import useDragMode from '../shared/use-drag-mode';
 import { useEdgeConstraintEncoder } from '../shared/use-edge-encoder';
 import useIterateEdges from './utils/use-iterate-edges';
 import useIterateNodes from './utils/use-iterate-nodes';
-import { GraphLayoutWithGrouping } from '@shared/graph-layout/common';
 
 const NotificationWrapper = styled.div`
     position: relative;
@@ -180,9 +180,10 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setError(e);
     };
 
-    const layoutHasGroup = useMemo(() => (props.graphLayout as GraphLayoutWithGrouping).group !== undefined, [
-        props.graphLayout,
-    ]);
+    const layoutHasGroup = useMemo(
+        () => (props.graphLayout as GraphLayoutWithGrouping).group !== undefined,
+        [props.graphLayout]
+    );
 
     const {
         getCenterPosition,
@@ -353,9 +354,9 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
 
     function onAddEdge(edge: [string, string]): void {
         if (layoutHasGroup) {
-            const layoutGroup = (layout as GraphLayoutWithGrouping).group
-            const groupsObject = getNodeGroups(state.graph.nodes(), layoutGroup, state.graph)
-            const groups = Object.keys(groupsObject)
+            const layoutGroup = (layout as GraphLayoutWithGrouping).group;
+            const groupsObject = getNodeGroups(state.graph.nodes(), layoutGroup, state.graph);
+            const groups = Object.keys(groupsObject);
 
             if (groups.includes(edge[0]) && groups.includes(edge[1])) {
                 props.onNotify?.({
@@ -366,7 +367,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 });
                 return;
             }
-
         }
         // Skip if a cycle would be created
         // The check needs to happen before we commit an action
@@ -532,13 +532,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 width: 0,
             }) as DOMRect;
 
-        setTooltipContent(
-            getTooltipContent(
-                groupId,
-                '',
-                theme,
-            )
-        );
+        setTooltipContent(getTooltipContent(groupId, '', theme));
     });
 
     useEngineEvent('groupMouseout', () => {
@@ -742,11 +736,11 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                 <>
                                     <SearchBar
                                         onChange={(value) => {
-                                            onSearchBarChange(value)
+                                            onSearchBarChange(value);
                                             // if the user searches, we want to expand all groups to perform the search
                                             if (layoutHasGroup) {
-                                                expandGroups()
-                                                setShowCollapseAll(true)
+                                                expandGroups();
+                                                setShowCollapseAll(true);
                                             }
                                         }}
                                         onClose={() => setSelectedNode(null)}
@@ -755,16 +749,22 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                         selectedResult={currentSearchNode + 1}
                                         totalNumberOfResults={searchResults.length}
                                     />
-                                    {layoutHasGroup && showCollapseAll &&
-                                        <CollapseAllButton onCollapseAll={() => {
-                                            setShowCollapseAll(false)
-                                            collapseGroups()
-                                        }} />}
-                                    {layoutHasGroup && !showCollapseAll &&
-                                        <ExpandAllButton onExpandAll={() => {
-                                            setShowCollapseAll(true)
-                                            expandGroups()
-                                        }} />}
+                                    {layoutHasGroup && showCollapseAll && (
+                                        <CollapseAllButton
+                                            onCollapseAll={() => {
+                                                setShowCollapseAll(false);
+                                                collapseGroups();
+                                            }}
+                                        />
+                                    )}
+                                    {layoutHasGroup && !showCollapseAll && (
+                                        <ExpandAllButton
+                                            onExpandAll={() => {
+                                                setShowCollapseAll(true);
+                                                expandGroups();
+                                            }}
+                                        />
+                                    )}
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />

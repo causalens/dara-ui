@@ -33,7 +33,6 @@ const NODE_LABEL = 'NODE_LABEL';
 const NODE_SQUARE = 'NODE_SQUARE';
 const NODE_SQUARE_BORDER = 'NODE_SQUARE_BORDER';
 
-
 /**
  * Represents a drawn Node object
  */
@@ -145,8 +144,8 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         }
         const dropShadow = nodeGfx.filters[0] as DropShadowFilter;
 
-        const nodeTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE : NODE_CIRCLE
-        const nodeBorderTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE_BORDER : NODE_BORDER
+        const nodeTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE : NODE_CIRCLE;
+        const nodeBorderTextureKey = nodeStyle.isGroupNode ? NODE_SQUARE_BORDER : NODE_BORDER;
 
         // Get/create circle texture
         const nodeTexture = textureCache.get(createKey(nodeTextureKey, nodeStyle.size), () => {
@@ -155,13 +154,11 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
 
             if (nodeStyle.isGroupNode) {
                 graphics.drawRoundedRect(nodeStyle.size, nodeStyle.size, 2 * nodeStyle.size, 2 * nodeStyle.size, 8);
-
             } else {
                 graphics.drawCircle(nodeStyle.size, nodeStyle.size, nodeStyle.size);
             }
             return graphics;
         });
-
 
         // Set the node texture and adjust its styles
         const nodeBody = nodeGfx.getChildByName<PIXI.Sprite>(nodeTextureKey);
@@ -176,7 +173,6 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
                 graphics.lineStyle({ color: 0xffffff, width: borderWidth });
                 if (nodeStyle.isGroupNode) {
                     graphics.drawRoundedRect(outerRadius, outerRadius, 2 * nodeStyle.size, 2 * nodeStyle.size, 8);
-
                 } else {
                     graphics.drawCircle(outerRadius, outerRadius, nodeStyle.size);
                 }

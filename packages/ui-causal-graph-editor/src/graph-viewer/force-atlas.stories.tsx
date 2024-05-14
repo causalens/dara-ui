@@ -16,15 +16,10 @@
  */
 import { Meta } from '@storybook/react';
 
-
 import { FRAUD } from '../../tests/mocks/graphs';
-import {
-    ForceAtlasLayout,
-} from '../shared/graph-layout';
+import { ForceAtlasLayout } from '../shared/graph-layout';
 import { default as CausalGraphViewerComponent } from './causal-graph-editor';
-import {
-    Template,
-} from './utils/stories-utils';
+import { Template } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

@@ -18,12 +18,21 @@ import cytoscape, { ElementDefinition, NodeSingular } from 'cytoscape';
 import fcose, { FcoseLayoutOptions, FcoseRelativePlacementConstraint } from 'cytoscape-fcose';
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
-import { DirectionType, GraphTiers, SimulationGraph, TieredGraphLayoutBuilder, GroupingLayoutBuilder } from '../../types';
-import { getNodeOrder, getTiersArray, getNodeGroups } from '../utils';
+import {
+    DirectionType,
+    GraphTiers,
+    GroupingLayoutBuilder,
+    SimulationGraph,
+    TieredGraphLayoutBuilder,
+} from '../../types';
+import { getNodeGroups, getNodeOrder, getTiersArray } from '../utils';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
 cytoscape.use(fcose);
-class FcoseLayoutBuilder extends GraphLayoutBuilder<FcoseLayout> implements TieredGraphLayoutBuilder, GroupingLayoutBuilder {
+class FcoseLayoutBuilder
+    extends GraphLayoutBuilder<FcoseLayout>
+    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder
+{
     _edgeElasticity = 0.45;
 
     _edgeLength = 3;
@@ -236,7 +245,7 @@ function getRelativeTieredArrayPlacement(
         const placement =
             orientation === 'horizontal' ?
                 { gap: tierSeparation, left: firstElement, right: nextTierFirstElement }
-                : { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
+            :   { bottom: nextTierFirstElement, gap: tierSeparation, top: firstElement };
         relativePlacements.push(placement);
     });
 
@@ -281,10 +290,9 @@ export function getTieredLayoutProperties(
     };
 }
 
-
 /**
  * Updates elements object for each node child to append a parent prop containing the group they belong to
- * 
+ *
  * @param elements cytoscape elements, includes nodes and edges
  * @param relationships an object containing the group as a key and array of node ids as value
  */
@@ -296,9 +304,9 @@ function assignParents(elements: cytoscape.ElementDefinition[], relationships: R
             const children = relationships[parent];
 
             // Iterate over each child ID
-            children.forEach(childId => {
+            children.forEach((childId) => {
                 // Find the node that matches this child ID
-                const node = elements.find(element => element.data.id === childId);
+                const node = elements.find((element) => element.data.id === childId);
 
                 // If the node is found, set its 'parent' attribute
                 if (node) {
@@ -367,7 +375,7 @@ export default class FcoseLayout extends GraphLayout {
             const tiersPlacement =
                 this.tiers ?
                     getTieredLayoutProperties(graph, this.tiers, this.orientation, this.tierSeparation)
-                    : { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
+                :   { alignmentConstraint: undefined, relativePlacementConstraint: undefined };
 
             const elements = [
                 ...graph.mapNodes<ElementDefinition>((id, attrs) => ({
@@ -383,21 +391,19 @@ export default class FcoseLayout extends GraphLayout {
 
             // for grouping we are going to assign and utilise compound nodes
             if (this.group) {
-                const groupedNodes = getNodeGroups(graph.nodes(), this.group, graph)
+                const groupedNodes = getNodeGroups(graph.nodes(), this.group, graph);
 
                 // create a node element for each group
                 Object.keys(groupedNodes).forEach((groupLabel) => {
                     elements.push({
                         data: { id: groupLabel, height: size, width: size },
                         group: 'nodes',
-                    })
-                })
+                    });
+                });
 
                 // assign parents to nodes based on the group they belong to
-                assignParents(elements, groupedNodes)
+                assignParents(elements, groupedNodes);
             }
-
-
 
             cytoscape({
                 elements,
@@ -414,7 +420,6 @@ export default class FcoseLayout extends GraphLayout {
                     idealEdgeLength: size * this.edgeLength,
                     initialEnergyOnIncremental: this.energy,
                     name: 'fcose',
-
 
                     nodeRepulsion: this.nodeRepulsion,
 
@@ -451,13 +456,8 @@ export default class FcoseLayout extends GraphLayout {
                 ],
                 styleEnabled: true,
             });
-
-
-
-        })
+        });
     }
-
-
 
     static get Builder(): FcoseLayoutBuilder {
         return new FcoseLayoutBuilder();

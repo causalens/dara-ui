@@ -21,10 +21,10 @@ import * as PIXI from 'pixi.js';
 import { SimulationNode, ZoomState } from '@types';
 
 import { SHADOWS } from '../colors';
+import { NodeObject } from '../node';
 import { TextureCache } from '../texture-cache';
 import { MOUSE_EVENTS, colorToPixi, createKey } from '../utils';
 import { GroupContainerState } from './definitions';
-import { NodeObject } from '../node';
 
 const GROUP_RECTANGLE = 'GROUP_RECTANGLE';
 const GROUP_BORDER = 'GROUP_BORDER';
@@ -86,18 +86,23 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
      * @param nodeStyle current node style
      * @param textureCache texture cache instance
      */
-    static updateContainerStyle(groupContainerGfx: PIXI.Container, nodes: SimulationNode[], textureCache: TextureCache): void {
-        let minX = Infinity; let maxX = -Infinity; let minY = Infinity; let maxY = -Infinity;
+    static updateContainerStyle(
+        groupContainerGfx: PIXI.Container,
+        nodes: SimulationNode[],
+        textureCache: TextureCache
+    ): void {
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
 
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
             const radius = node['meta.rendering_properties.size'] ?? 100;
             minX = Math.min(minX, node.x - radius);
             maxX = Math.max(maxX, node.x + radius);
             minY = Math.min(minY, node.y - radius);
             maxY = Math.max(maxY, node.y + radius);
         });
-
-
 
         const borderWidth = 1;
 
@@ -107,12 +112,11 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         const width = maxX - minX;
 
         // Adjust hit area
-        (groupContainerGfx.hitArea as PIXI.Rectangle).x = - width / 2;
-        (groupContainerGfx.hitArea as PIXI.Rectangle).y = - height / 2;
+        (groupContainerGfx.hitArea as PIXI.Rectangle).x = -width / 2;
+        (groupContainerGfx.hitArea as PIXI.Rectangle).y = -height / 2;
 
         (groupContainerGfx.hitArea as PIXI.Rectangle).width = width;
         (groupContainerGfx.hitArea as PIXI.Rectangle).height = height;
-
 
         // // Create filter the first time
         // if (!groupContainerGfx.filters || groupContainerGfx.filters.length === 0) {
@@ -123,8 +127,8 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         // Get/create rectangle texture
         const rectangleTexture = textureCache.get(createKey(GROUP_RECTANGLE, minX, maxX, minY, maxY), () => {
             const graphics = new PIXI.Graphics();
-            graphics.lineStyle(2, 0x3796F6, 0.5);  // Half-transparent border
-            graphics.beginFill(0xECF2FD, 1);
+            graphics.lineStyle(2, 0x3796f6, 0.5); // Half-transparent border
+            graphics.beginFill(0xecf2fd, 1);
             graphics.drawRoundedRect(minX, minY, width, height, 8);
             graphics.endFill();
             return graphics;
@@ -193,17 +197,18 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
     }
 
     /**
- * Update styles of all node graphics
- *
- * @param nodeStyle current node style
- * @param textureCache texture cache instance
- */
+     * Update styles of all node graphics
+     *
+     * @param nodeStyle current node style
+     * @param textureCache texture cache instance
+     */
     updateStyle(nodes: SimulationNode[], textureCache: TextureCache): void {
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
 
-        let minX = Infinity; let maxX = -Infinity; let minY = Infinity; let maxY = -Infinity;
-
-
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
             const radius = node['meta.rendering_properties.size'] ?? 100;
             minX = Math.min(minX, node.x - radius);
             maxX = Math.max(maxX, node.x + radius);
@@ -214,10 +219,8 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         const centerX = minX + (maxX - minX) / 2;
         const centerY = minY + (maxY - minY) / 2;
 
-
         GroupContainerObject.updateContainerStyle(this.groupContainerGfx, nodes, textureCache);
         this.groupContainerGfx.position.copyFrom({ x: centerX, y: centerY });
-
     }
 
     /**

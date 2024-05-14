@@ -58,7 +58,6 @@ export interface EdgeRenderingMeta {
     collapsedEdges?: number;
 }
 
-
 export type FlatEdgeRenderingMeta = RenderingMetaKeys<EdgeRenderingMeta>;
 
 export interface NodeRenderingMeta {

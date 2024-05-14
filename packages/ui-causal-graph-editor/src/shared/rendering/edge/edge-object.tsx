@@ -28,7 +28,7 @@ import { MOUSE_EVENTS, colorToPixi, createKey } from '../utils';
 import { getCirclesAlongCurve, getCurvePoints, getPolygonFromCurve } from './curve';
 import { EdgeState, PixiEdgeStyle } from './definitions';
 import { createCenterSymbol, createSideSymbol, createStrengthSymbol } from './symbols';
-import { calculateTargetBoundPosition, calculateSourceBoundPosition } from './utils'
+import { calculateSourceBoundPosition, calculateTargetBoundPosition } from './utils';
 
 const EDGE_LINE_SPRITE = 'EDGE_LINE_SPRITE';
 const EDGE_LINE_GFX = 'EDGE_LINE_GFX';
@@ -332,12 +332,14 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         // Number symbols
         const edgeNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_NUMBER_SYMBOL);
         const numberSymbolTexture = textureCache.get(createKey(EDGE_NUMBER_SYMBOL, edgeStyle.collapsedEdges), () => {
-            if (edgeStyle.collapsedEdges === undefined) {return new PIXI.Graphics();}
+            if (edgeStyle.collapsedEdges === undefined) {
+                return new PIXI.Graphics();
+            }
 
             const textStyle = new PIXI.TextStyle({
                 fontFamily: 'Manrope',
                 fontSize: 18,
-                fill: colorToPixi(edgeStyle.color)
+                fill: colorToPixi(edgeStyle.color),
             });
             const text = new PIXI.Text(edgeStyle.collapsedEdges, textStyle);
             return text;
@@ -346,7 +348,13 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         edgeNumberSymbol.texture = numberSymbolTexture;
         edgeNumberSymbol.position.y = edgeTopSymbol.position.y - 30;
         // Depending on the edge rotation, we need to rotate the number symbol so that they appear upright to the user
-        edgeNumberSymbol.rotation = (edgeGfx.rotation <= Math.PI / 2 && edgeGfx.rotation > 0) || (edgeGfx.rotation >= - 3 * Math.PI / 2 && edgeGfx.rotation < - Math.PI) ? - Math.PI / 2 : Math.PI / 2;
+        edgeNumberSymbol.rotation =
+            (
+                (edgeGfx.rotation <= Math.PI / 2 && edgeGfx.rotation > 0) ||
+                (edgeGfx.rotation >= (-3 * Math.PI) / 2 && edgeGfx.rotation < -Math.PI)
+            ) ?
+                -Math.PI / 2
+            :   Math.PI / 2;
         [edgeStrengthSymbol.tint] = colorToPixi(edgeStyle.color);
         edgeNumberSymbol.alpha = 1;
 
@@ -427,13 +435,13 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         viewport: Viewport,
         textureCache: TextureCache,
         isSourceSquare?: boolean,
-        isTargetSquare?: boolean,
+        isTargetSquare?: boolean
     ): void {
         // Edge angle, this goes from -pi to pi inclusive
         // Math.atan2 is measured at the centre of the source node, and anticlockwise from the x-axis
         const rotation = Math.atan2(
             targetNodePosition.y - sourceNodePosition.y,
-            targetNodePosition.x - sourceNodePosition.x,
+            targetNodePosition.x - sourceNodePosition.x
         );
 
         const sourceRadius = (sourceSize - BORDER_PADDING) / 2;
@@ -442,9 +450,13 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         let targetBoundPosition;
         let sourceBoundPosition;
 
-
         if (isTargetSquare) {
-            targetBoundPosition = calculateTargetBoundPosition(targetNodePosition.x, targetNodePosition.y, rotation, targetSize - BORDER_PADDING)
+            targetBoundPosition = calculateTargetBoundPosition(
+                targetNodePosition.x,
+                targetNodePosition.y,
+                rotation,
+                targetSize - BORDER_PADDING
+            );
         } else {
             // we transform the x and y positions to be at the edge of the circumference of the node
             //  note that here is minus because the target node receives the line by a 180 degree rotation
@@ -455,7 +467,12 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
         }
 
         if (isSourceSquare) {
-            sourceBoundPosition = calculateSourceBoundPosition(sourceNodePosition.x, sourceNodePosition.y, rotation, sourceSize - BORDER_PADDING)
+            sourceBoundPosition = calculateSourceBoundPosition(
+                sourceNodePosition.x,
+                sourceNodePosition.y,
+                rotation,
+                sourceSize - BORDER_PADDING
+            );
         } else {
             // we transform the x and y positions to be at the edge of the circumference of the node
             sourceBoundPosition = {
@@ -482,7 +499,7 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
 
         // Put symbols in the center and align rotation to the line
         this.edgeSymbolsGfx.position.copyFrom(position);
-        this.edgeSymbolsGfx.rotation = rotation - Math.PI / 2
+        this.edgeSymbolsGfx.rotation = rotation - Math.PI / 2;
 
         // Default styles
         edgeStyle.color ??= edgeStyle.theme.colors.grey5;

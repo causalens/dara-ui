@@ -174,7 +174,7 @@ export function parseGraphNode(
     const isLatent =
         availableInputs && Array.isArray(availableInputs) ?
             !availableInputs.includes(nodeKey) && Object.keys(data.edges).includes(nodeKey)
-            : false;
+        :   false;
 
     const originalEntries = Object.entries(nodeData.meta?.rendering_properties ?? {}) as Entries<FlatNodeRenderingMeta>;
 

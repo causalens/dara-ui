@@ -22,19 +22,11 @@ import set from 'lodash/set';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-
 import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
-import {
-    FcoseLayout,
-} from '../shared/graph-layout';
+import { FcoseLayout } from '../shared/graph-layout';
 import { CausalGraph, EdgeType, EditorMode, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import {
-    Template,
-    nodeTiersCausalGraph,
-    pagCausalGraph,
-    timeSeriesCausalGraph,
-} from './utils/stories-utils';
+import { Template, nodeTiersCausalGraph, pagCausalGraph, timeSeriesCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

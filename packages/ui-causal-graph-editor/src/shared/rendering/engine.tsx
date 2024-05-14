@@ -42,11 +42,11 @@ import {
 import { GraphLayoutWithTiers } from '../graph-layout/common';
 import { Background } from './background';
 import { EDGE_STRENGTHS, EdgeObject, EdgeStrengthDefinition, PixiEdgeStyle } from './edge';
+import { GroupContainerObject } from './grouping/group-container-object';
 import { NodeObject, PixiNodeStyle, getNodeSize } from './node';
 import { FONT_FAMILY } from './text';
 import { TextureCache } from './texture-cache';
-import { colorToPixi, getZoomState, isGraphLayoutWithTiers, isGraphLayoutWithGroups, findKeyByValue } from './utils';
-import { GroupContainerObject } from './grouping/group-container-object';
+import { colorToPixi, findKeyByValue, getZoomState, isGraphLayoutWithGroups, isGraphLayoutWithTiers } from './utils';
 
 const WORLD_PADDING = 100;
 
@@ -67,7 +67,6 @@ export interface EngineEvents {
     nodeMouseover: (event: PIXI.FederatedMouseEvent, nodeKey: string) => void;
     groupMouseout: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
     groupMouseover: (event: PIXI.FederatedMouseEvent, groupKey: string) => void;
-
 }
 export const ENGINE_EVENTS: Array<keyof EngineEvents> = [
     'createEdge',
@@ -354,27 +353,28 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
         // if we have groups, we need to adjust the bounds so that the groups have a gap before the canvas border
         if (isGraphLayoutWithGroups(this.layout)) {
-            const nodes = this.graph.mapNodes(nodeKey => this.graph.getNodeAttributes(nodeKey));
-            const nodesInGroups = Object.values(getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)).flat();
+            const nodes = this.graph.mapNodes((nodeKey) => this.graph.getNodeAttributes(nodeKey));
+            const nodesInGroups = Object.values(
+                getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
+            ).flat();
 
-            const updateBoundary = (node: SimulationNode, delta: number,) => {
+            const updateBoundary = (node: SimulationNode, delta: number) => {
                 if (nodesInGroups.includes(node?.id)) {
                     return delta;
                 }
                 return 0;
             };
 
-            const nodeWithMinX = nodes.find(node => node.x === minX);
-            const nodeWithMaxX = nodes.find(node => node.x === maxX);
-            const nodeWithMinY = nodes.find(node => node.y === minY);
-            const nodeWithMaxY = nodes.find(node => node.y === maxY);
+            const nodeWithMinX = nodes.find((node) => node.x === minX);
+            const nodeWithMaxX = nodes.find((node) => node.x === maxX);
+            const nodeWithMinY = nodes.find((node) => node.y === minY);
+            const nodeWithMaxY = nodes.find((node) => node.y === maxY);
 
             minX += updateBoundary(nodeWithMinX, -20);
             maxX += updateBoundary(nodeWithMaxX, 20);
             minY += updateBoundary(nodeWithMinY, -20);
             maxY += updateBoundary(nodeWithMaxY, 20);
         }
-
 
         // compute graph size
         const graphWidth = Math.abs(maxX - minX);
@@ -405,73 +405,88 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      */
     public collapseAllGroups(): void {
         if (isGraphLayoutWithGroups(this.layout)) {
-            const layoutGroup = this.layout.group
-            const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph)
-            const groupsArray = Object.keys(groupsObject)
+            const layoutGroup = this.layout.group;
+            const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph);
+            const groupsArray = Object.keys(groupsObject);
 
             // first create all group nodes so that we have something to connect the edges to
             groupsArray.forEach((group) => {
-                const container = this.groupContainerMap.get(group).groupContainerGfx
-                const groupNodeAttributes = { id: group, originalMeta: {}, variable_type: 'groupNode', x: container.x, y: container.y }
+                const container = this.groupContainerMap.get(group).groupContainerGfx;
+                const groupNodeAttributes = {
+                    id: group,
+                    originalMeta: {},
+                    variable_type: 'groupNode',
+                    x: container.x,
+                    y: container.y,
+                };
                 // remove all group containers
-                this.dropGroupContainer(group)
+                this.dropGroupContainer(group);
                 // if the group node doesn't exist create it
                 if (!this.graph.hasNode(group)) {
-                    this.graph.addNode(group, groupNodeAttributes)
+                    this.graph.addNode(group, groupNodeAttributes);
                 }
                 // otherwise we just add them to the canvas
                 else {
                     this.createNode(group, groupNodeAttributes);
                 }
-            })
+            });
 
             // collapse edges
             groupsArray.forEach((group) => {
-                const nodesToHide = groupsObject[group]
-                const collapsedEdges: SimulationEdge[] = []
+                const nodesToHide = groupsObject[group];
+                const collapsedEdges: SimulationEdge[] = [];
 
                 this.graph.forEachEdge((edgeKey) => {
                     const initialSource = this.graph.source(edgeKey);
                     const initialTarget = this.graph.target(edgeKey);
 
-
                     // if the edge comes to or from the group we need to collapse it
-                    if (nodesToHide.includes(initialSource) || nodesToHide.includes(initialTarget) || groupsArray.includes(initialSource) || groupsArray.includes(initialTarget)) {
-                        const finalTarget = findKeyByValue(groupsObject, initialTarget)
-                        const finalSource = findKeyByValue(groupsObject, initialSource)
-
-
+                    if (
+                        nodesToHide.includes(initialSource) ||
+                        nodesToHide.includes(initialTarget) ||
+                        groupsArray.includes(initialSource) ||
+                        groupsArray.includes(initialTarget)
+                    ) {
+                        const finalTarget = findKeyByValue(groupsObject, initialTarget);
+                        const finalSource = findKeyByValue(groupsObject, initialSource);
 
                         // conditions
-                        const edgeHasChanged = !(initialSource === finalSource && initialTarget === finalTarget)
-                        const edgeIsNotWithinTheGroup = finalSource !== finalTarget
-                        const targetHasChanged = initialTarget !== finalTarget
-                        const graphHasFinalEdge = this.graph.hasEdge(finalSource, finalTarget)
+                        const edgeHasChanged = !(initialSource === finalSource && initialTarget === finalTarget);
+                        const edgeIsNotWithinTheGroup = finalSource !== finalTarget;
+                        const targetHasChanged = initialTarget !== finalTarget;
+                        const graphHasFinalEdge = this.graph.hasEdge(finalSource, finalTarget);
 
                         // attrbutes
-                        const finalSourceAttributes = this.graph.getNodeAttributes(finalSource)
-                        const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget)
-                        const currentEdgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+                        const finalSourceAttributes = this.graph.getNodeAttributes(finalSource);
+                        const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget);
+                        const currentEdgeAttributes = this.graph.getEdgeAttributes(edgeKey);
                         // let numberOfCollapsedEdges = currentEdgeAttributes['meta.rendering_properties.collapsedEdges'] ?? 1
-                        let numberOfCollapsedEdges = graphHasFinalEdge ? this.graph.getEdgeAttributes(finalSource, finalTarget)['meta.rendering_properties.collapsedEdges'] : 0
+                        let numberOfCollapsedEdges =
+                            graphHasFinalEdge ?
+                                this.graph.getEdgeAttributes(finalSource, finalTarget)[
+                                    'meta.rendering_properties.collapsedEdges'
+                                ]
+                            :   0;
 
                         // upddate the number of collapsed edges count if needed
                         // if we have got the final edge in the graph then we need to increment it
                         // that is if the final edge is not the edge wee are currently looking at
                         // if the edge is between two group nodes then the same edge is counted twice, so we only count it when current group is the source
                         if (graphHasFinalEdge && edgeHasChanged && group === finalSource) {
-
                             // if the target has changed, and edge is not within the same group, we need to increment the number of collapsed edges for the target
                             // if ((targetHasChanged && edgeIsWithinTheGroup) || (!targetHasChanged && !groupsArray.includes(finalTarget))) {
-                            numberOfCollapsedEdges += 1
+                            numberOfCollapsedEdges += 1;
                             // }
                         }
 
-                        const edgeAttributes = { ...currentEdgeAttributes, 'meta.rendering_properties.collapsedEdges': numberOfCollapsedEdges }
+                        const edgeAttributes = {
+                            ...currentEdgeAttributes,
+                            'meta.rendering_properties.collapsedEdges': numberOfCollapsedEdges,
+                        };
 
                         // if source or target changed, i.e. they are part of a group, we should drop the edge
-                        if ((initialSource !== finalSource || initialTarget !== finalTarget)) {
-                            collapsedEdges.push({ id: edgeKey, ...edgeAttributes })
+                        if (initialSource !== finalSource || initialTarget !== finalTarget) {
+                            collapsedEdges.push({ id: edgeKey, ...edgeAttributes });
                             this.dropEdge(edgeKey);
                         }
 
@@ -479,28 +494,36 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         if (edgeIsNotWithinTheGroup) {
                             // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
                             if (!graphHasFinalEdge && group === finalSource) {
-                                edgeAttributes['meta.rendering_properties.collapsedEdges'] = 1
+                                edgeAttributes['meta.rendering_properties.collapsedEdges'] = 1;
 
-                                this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
+                                this.graph.addEdge(finalSource, finalTarget, edgeAttributes);
 
                                 // on further collapses the condition to display the edge is whether it is in the edgeMap
                                 // whe should also only add edges that go to or from a group node
-
                             } else if (!this.edgeMap.has(edgeKey) && !edgeHasChanged) {
-
-                                this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
-                            }
-                            else if (graphHasFinalEdge) {
-                                this.graph.setEdgeAttribute(finalSource, finalTarget, 'meta.rendering_properties.collapsedEdges', numberOfCollapsedEdges);
+                                this.createEdge(
+                                    edgeKey,
+                                    edgeAttributes,
+                                    finalSource,
+                                    finalTarget,
+                                    finalSourceAttributes,
+                                    finalTargetAttributes
+                                );
+                            } else if (graphHasFinalEdge) {
+                                this.graph.setEdgeAttribute(
+                                    finalSource,
+                                    finalTarget,
+                                    'meta.rendering_properties.collapsedEdges',
+                                    numberOfCollapsedEdges
+                                );
                             }
                         }
-
                     }
                 });
 
                 // for the group set all collapsed edges so that we can rebuild them later
-                this.collapsedEdgesMap.set(group, collapsedEdges)
-            })
+                this.collapsedEdgesMap.set(group, collapsedEdges);
+            });
 
             // hide all the nodes within groups
             Object.values(groupsObject).forEach((nodes) => {
@@ -508,13 +531,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     if (this.nodeMap.has(node)) {
                         this.dropNode(node);
                     }
-                })
-            })
-
+                });
+            });
 
             this.requestRender();
         }
-
     }
 
     /**
@@ -522,7 +543,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      */
     public expandAllGroups(): void {
         // We only need to expand groups if the graph has at least one of the group nodes
-        if (this.graph.nodes().some(node => this.graph.getNodeAttribute(node, 'variable_type') === 'groupNode')) {
+        if (this.graph.nodes().some((node) => this.graph.getNodeAttribute(node, 'variable_type') === 'groupNode')) {
             // cleanup the edges that were created between groups
             this.graph.forEachEdge((edgeKey) => {
                 const source = this.graph.source(edgeKey);
@@ -531,48 +552,46 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 const isSourceGroupNode = this.graph.getNodeAttribute(source, 'variable_type') === 'groupNode';
                 const isTargetGroupNode = this.graph.getNodeAttribute(target, 'variable_type') === 'groupNode';
                 if (isSourceGroupNode || isTargetGroupNode) {
-                    this.dropEdge(edgeKey)
+                    this.dropEdge(edgeKey);
                     // reset the number of collapsed edges
                     this.graph.setEdgeAttribute(source, target, 'meta.rendering_properties.collapsedEdges', 0);
                 }
-            })
+            });
 
             // first we add all the nodes that were hidden
             this.graph.forEachNode((node, attributes) => {
                 if (this.graph.getNodeAttribute(node, 'variable_type') !== 'groupNode') {
-                    this.createNode(node, attributes)
+                    this.createNode(node, attributes);
+                } else {
+                    this.dropNode(node);
                 }
-                else {
-                    this.dropNode(node)
-                }
-            })
+            });
 
             // then we need to recreate all the edges that were collapsed
             this.collapsedEdgesMap.forEach((edges, group) => {
                 edges.forEach((edge) => {
                     if (!this.edgeMap.has(edge.id)) {
-                        const source = edge.extras?.source.identifier
-                        const target = edge.extras?.destination.identifier
-                        const sourceNodeAttributes = this.graph.getNodeAttributes(source)
-                        const targetNodeAttributes = this.graph.getNodeAttributes(target)
-                        this.createEdge(edge.id, edge, source, target, sourceNodeAttributes, targetNodeAttributes)
+                        const source = edge.extras?.source.identifier;
+                        const target = edge.extras?.destination.identifier;
+                        const sourceNodeAttributes = this.graph.getNodeAttributes(source);
+                        const targetNodeAttributes = this.graph.getNodeAttributes(target);
+                        this.createEdge(edge.id, edge, source, target, sourceNodeAttributes, targetNodeAttributes);
                     }
-                })
-            })
+                });
+            });
 
             // redraw all group containers
             if (isGraphLayoutWithGroups(this.layout)) {
-                const {group} = this.layout;
-                const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
+                const { group } = this.layout;
+                const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
                 Object.keys(groups).forEach((group) => {
-                    const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
-                    this.createGroupContainer(group, nodesIngroup)
-                })
+                    const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node));
+                    this.createGroupContainer(group, nodesIngroup);
+                });
             }
 
             this.requestRender();
         }
-
     }
 
     /**
@@ -784,7 +803,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.nodeLayer = new PIXI.Container();
         this.nodeLabelLayer = new PIXI.Container();
 
-
         this.viewport.addChild(this.groupContainerLayer);
 
         this.viewport.addChild(this.edgeLayer);
@@ -914,7 +932,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         sourceAttributes: SimulationNode,
         targetAttributes: SimulationNode
     ): void {
-
         const edge = new EdgeObject();
         this.edgeLayer.addChild(edge.edgeGfx);
         this.edgeSymbolsLayer.addChild(edge.edgeSymbolsGfx);
@@ -938,7 +955,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         edge.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
             if (this.mousedownEdgeKey === id) {
                 if (isGraphLayoutWithGroups(this.layout)) {
-                    const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
+                    const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph);
                     if (Object.keys(groupsObject).includes(source) || Object.keys(groupsObject).includes(target)) {
                         return;
                     }
@@ -959,12 +976,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     private createGraph(): void {
         // Create group containers if these are set
         if (isGraphLayoutWithGroups(this.layout)) {
-            const {group} = this.layout;
-            const groups = getNodeGroups(this.graph.nodes(), group, this.graph)
+            const { group } = this.layout;
+            const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
             Object.keys(groups).forEach((group) => {
-                const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node))
-                this.createGroupContainer(group, nodesIngroup)
-            })
+                const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node));
+                this.createGroupContainer(group, nodesIngroup);
+            });
         }
 
         // Create nodes and edges
@@ -986,9 +1003,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.nodeLabelLayer.addChild(node.nodeLabelGfx);
         this.nodeMap.set(id, node);
 
-
         node.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
-
             // Always show hover state
             this.hoverNode(id);
 
@@ -1000,7 +1015,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         node.addListener('mouseout', (event: PIXI.FederatedMouseEvent) => {
             const local = node.nodeGfx.toLocal(event.global);
             const isInNode = node.nodeGfx.hitArea.contains(local.x, local.y);
-
 
             // only trigger mouseout if it's actually outside the node (could be within label)
             if (!isInNode) {
@@ -1029,18 +1043,15 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         });
 
         node.addListener('mouseup', (event: PIXI.FederatedMouseEvent) => {
-
             // If mouseup happened on the same node mousedown happened
             if (this.mousedownNodeKey === id && this.nodeMousedownPosition) {
-
                 const xOffset = Math.abs(this.nodeMousedownPosition.x - event.global.x);
                 const yOffset = Math.abs(this.nodeMousedownPosition.y - event.global.y);
-
 
                 // only trigger click if the mousedown&mouseup happened very close to each other
                 if (xOffset <= 2 && yOffset <= 2) {
                     if (isGraphLayoutWithGroups(this.layout)) {
-                        const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
+                        const groupsObject = getNodeGroups(this.graph.nodes(), this.layout.group, this.graph);
                         if (Object.keys(groupsObject).includes(id)) {
                             return;
                         }
@@ -1051,7 +1062,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             // If mouseup happened on a different node
             if (this.isCreatingEdge && this.mousedownNodeKey && this.mousedownNodeKey !== id) {
-
                 // check if the edge doesn't already exist
                 if (!this.graph.hasEdge(this.mousedownNodeKey, id)) {
                     // emit event to create a real edge
@@ -1068,19 +1078,17 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-   * Create a node
-   *
-   * @param id node id
-   * @param attributes node attributes
-   */
+     * Create a node
+     *
+     * @param id node id
+     * @param attributes node attributes
+     */
     private createGroupContainer(id: string, nodes: SimulationNode[]): void {
         const groupContainer = new GroupContainerObject();
         this.groupContainerLayer.addChild(groupContainer.groupContainerGfx);
         this.groupContainerMap.set(id, groupContainer);
 
-
         groupContainer.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
-
             // Always show hover state
             this.hoverGroupContainer(id, nodes);
 
@@ -1142,10 +1150,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-    * Drop the node graphics from the renderer
-    *
-    * @param id node id
-    */
+     * Drop the node graphics from the renderer
+     *
+     * @param id node id
+     */
     private dropGroupContainer(id: string): void {
         const container = this.groupContainerMap.get(id);
 
@@ -1217,7 +1225,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             theme: this.theme,
             thickness: attributes['meta.rendering_properties.thickness'],
             type: attributes.edge_type,
-            collapsedEdges: attributes['meta.rendering_properties.collapsedEdges']
+            collapsedEdges: attributes['meta.rendering_properties.collapsedEdges'],
         };
         if (this.processEdgeStyle) {
             return this.processEdgeStyle(edgeStyle, attributes);
@@ -1248,7 +1256,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 getNodeSize(attributes['meta.rendering_properties.size'] ?? this.layout.nodeSize, group),
             state: node.state,
             theme: this.theme,
-            isGroupNode: attributes.variable_type === "groupNode"
+            isGroupNode: attributes.variable_type === 'groupNode',
         };
     }
 
@@ -1586,8 +1594,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             const sourceNode = this.nodeMap.get(source);
             const targetNode = this.nodeMap.get(target);
 
-            const isSourceGroupNode = sourceNodeAttributes.variable_type === 'groupNode'
-            const isTargetGroupNode = targetNodeAttributes.variable_type === 'groupNode'
+            const isSourceGroupNode = sourceNodeAttributes.variable_type === 'groupNode';
+            const isTargetGroupNode = targetNodeAttributes.variable_type === 'groupNode';
 
             // Recompute edge position
             const sourceNodePosition = { x: sourceNodeAttributes.x, y: sourceNodeAttributes.y };
@@ -1737,11 +1745,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
- * Update style of given node
- *
- * @param id id of node to update
- * @param attributes node attributes
- */
+     * Update style of given node
+     *
+     * @param id id of node to update
+     * @param attributes node attributes
+     */
     private updateGroupContainerStyle(id: string, nodes: SimulationNode[]): void {
         const groupContainer = this.groupContainerMap.get(id);
 
@@ -1787,12 +1795,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.graph.forEachEdge(this.updateEdgeStyle.bind(this));
 
         if (isGraphLayoutWithGroups(this.layout)) {
-            const {group} = this.layout
-            const groupsObject = getNodeGroups(this.graph.nodes(), group, this.graph)
+            const { group } = this.layout;
+            const groupsObject = getNodeGroups(this.graph.nodes(), group, this.graph);
             Object.keys(groupsObject).forEach((group) => {
-                const nodesIngroup = groupsObject[group].map((node) => this.graph.getNodeAttributes(node))
-                this.updateGroupContainerStyle(group, nodesIngroup)
-            })
+                const nodesIngroup = groupsObject[group].map((node) => this.graph.getNodeAttributes(node));
+                this.updateGroupContainerStyle(group, nodesIngroup);
+            });
         }
     }
 }

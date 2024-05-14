@@ -32,12 +32,12 @@ export function willCreateCycle(graphOriginal: SimulationGraph, edge: [string, s
     try {
         graph.dropEdge(edge);
         // eslint-disable-next-line no-empty
-    } catch { }
+    } catch {}
 
     try {
         graph.dropEdge([edge[1], edge[0]]);
         // eslint-disable-next-line no-empty
-    } catch { }
+    } catch {}
 
     // Add the edge in the direction we want to check
     graph.addEdge(edge[0], edge[1], { edge_type: EdgeType.DIRECTED_EDGE, originalMeta: {} });

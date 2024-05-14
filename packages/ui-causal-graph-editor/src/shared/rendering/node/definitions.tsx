@@ -47,7 +47,7 @@ export interface PixiNodeStyle {
     /** Current theme object */
     theme: DefaultTheme;
     /** Whether the node should show as a group node or not */
-    isGroupNode?: boolean
+    isGroupNode?: boolean;
 }
 
 /**

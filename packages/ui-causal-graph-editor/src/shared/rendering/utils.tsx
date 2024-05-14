@@ -18,7 +18,7 @@ import * as PIXI from 'pixi.js';
 
 import { ZoomState, ZoomThresholds } from '@types';
 
-import { GraphLayout, GraphLayoutWithTiers, GraphLayoutWithGrouping } from '../graph-layout/common';
+import { GraphLayout, GraphLayoutWithGrouping, GraphLayoutWithTiers } from '../graph-layout/common';
 
 export const MOUSE_EVENTS = ['mousemove', 'mouseover', 'mouseout', 'mousedown', 'mouseup'] as const;
 
@@ -86,13 +86,13 @@ export function isGraphLayoutWithGroups(layout: GraphLayout): layout is GraphLay
 
 export function findKeyByValue(obj: Record<string, string[]>, searchValue: string) {
     if (Object.values(obj).flat().includes(searchValue)) {
-        let returnKey: string
+        let returnKey: string;
         Object.keys(obj).forEach((key) => {
             if (obj[key].includes(searchValue)) {
-                returnKey = key
+                returnKey = key;
             }
-        })
-        return returnKey
+        });
+        return returnKey;
     }
     return searchValue;
 }

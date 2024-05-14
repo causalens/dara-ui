@@ -17,7 +17,7 @@
 import { useContext } from 'react';
 
 import { Tooltip } from '@darajs/ui-components';
-import { DownLeftAndUpRightToCenter } from '@darajs/ui-icons'
+import { DownLeftAndUpRightToCenter } from '@darajs/ui-icons';
 
 import PointerContext from '../../pointer-context';
 import { FloatingButton } from '../floating-elements';
