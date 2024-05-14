@@ -14,14 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DropShadowFilter } from '@pixi/filter-drop-shadow';
-import { SmoothGraphics } from '@pixi/graphics-smooth';
 import * as PIXI from 'pixi.js';
 
-import { SimulationNode, ZoomState } from '@types';
+import { SimulationNode } from '@types';
 
-import { SHADOWS } from '../colors';
-import { NodeObject } from '../node';
 import { TextureCache } from '../texture-cache';
 import { MOUSE_EVENTS, colorToPixi, createKey } from '../utils';
 import { GroupContainerState } from './definitions';
@@ -30,7 +26,7 @@ const GROUP_RECTANGLE = 'GROUP_RECTANGLE';
 const GROUP_BORDER = 'GROUP_BORDER';
 
 /**
- * Represents a drawn Node object
+ * Represents a drawn Group Container object
  */
 export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[number]> {
     groupContainerGfx: PIXI.Container;
@@ -80,10 +76,10 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
     }
 
     /**
-     * Update node style of a given nodeGfx container
+     * Update container style of a given groupContainerGfx container
      *
-     * @param groupContainerGfx node graphics container
-     * @param nodeStyle current node style
+     * @param groupContainerGfx group container graphics pixi container
+     * @param nodes list of simulation nodes
      * @param textureCache texture cache instance
      */
     static updateContainerStyle(
@@ -104,10 +100,6 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
             maxY = Math.max(maxY, node.y + radius);
         });
 
-        const borderWidth = 1;
-
-        // const outerRadius = nodeStyle.size + borderWidth;
-
         const height = maxY - minY;
         const width = maxX - minX;
 
@@ -117,12 +109,6 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
 
         (groupContainerGfx.hitArea as PIXI.Rectangle).width = width;
         (groupContainerGfx.hitArea as PIXI.Rectangle).height = height;
-
-        // // Create filter the first time
-        // if (!groupContainerGfx.filters || groupContainerGfx.filters.length === 0) {
-        //     groupContainerGfx.filters = [new DropShadowFilter({ offset: { x: 0, y: 0 } })];
-        // }
-        // const dropShadow = groupContainerGfx.filters[0] as DropShadowFilter;
 
         // Get/create rectangle texture
         const rectangleTexture = textureCache.get(createKey(GROUP_RECTANGLE, minX, maxX, minY, maxY), () => {
@@ -138,53 +124,6 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         const rectangle = groupContainerGfx.getChildByName<PIXI.Sprite>(GROUP_RECTANGLE);
         rectangle.texture = rectangleTexture;
         [rectangle.tint, rectangle.alpha] = colorToPixi('#ECF2FD');
-
-        // // Get/create border texture
-        // const borderTexture = textureCache.get(
-        //     createKey(GROUP_BORDER, outerRadius, borderWidth, nodeStyle.size),
-        //     () => {
-        //         const graphics = new SmoothGraphics();
-        //         graphics.lineStyle({ color: 0xffffff, width: borderWidth });
-        //         graphics.drawCircle(outerRadius, outerRadius, nodeStyle.size);
-        //         return graphics;
-        //     },
-        //     BORDER_PADDING
-        // );
-
-        // // Set the border texture and adjust its styles
-        // const border = groupContainerGfx.getChildByName<PIXI.Sprite>(GROUP_BORDER);
-        // border.texture = borderTexture;
-        // [border.tint, border.alpha] = colorToPixi(nodeStyle.highlight_color);
-
-        // // Adjust the filter style based on state
-        // const themeShadows = SHADOWS[nodeStyle.theme.themeType];
-        // let shadowColor = themeShadows.shadowNormal;
-        // let blur = 2;
-
-        // if (nodeStyle.state.selected) {
-        //     shadowColor = nodeStyle.highlight_color;
-        //     blur = 4;
-        // if (nodeStyle.state.hover) {
-        //     shadowColor = themeShadows.shadowHover;
-        //     blur = 4;
-        // }
-
-        // [dropShadow.color, dropShadow.alpha] = colorToPixi(shadowColor);
-        // dropShadow.blur = blur;
-        // dropShadow.padding = 10;
-    }
-
-    /**
-     * Update visibility of node elements based on zoomstep
-     *
-     * @param nodeGfx node graphics container
-     * @param zoomStep zoom step
-     */
-    static updateNodeVisibility(nodeGfx: PIXI.Container, zoomState: ZoomState, state: GroupContainerState): void {
-        const shadow = nodeGfx.filters[0] as DropShadowFilter;
-
-        // keep shadow if node is selected
-        shadow.enabled = zoomState.shadow;
     }
 
     /**
@@ -197,7 +136,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
     }
 
     /**
-     * Update styles of all node graphics
+     * Update styles of all group container graphics
      *
      * @param nodeStyle current node style
      * @param textureCache texture cache instance
@@ -221,14 +160,5 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
 
         GroupContainerObject.updateContainerStyle(this.groupContainerGfx, nodes, textureCache);
         this.groupContainerGfx.position.copyFrom({ x: centerX, y: centerY });
-    }
-
-    /**
-     * Update visibility of node graphics
-     *
-     * @param zoomStep current zoom step
-     */
-    updateVisibility(zoomState: ZoomState): void {
-        GroupContainerObject.updateNodeVisibility(this.groupContainerGfx, zoomState, this.state);
     }
 }

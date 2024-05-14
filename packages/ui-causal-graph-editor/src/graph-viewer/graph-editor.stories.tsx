@@ -15,35 +15,22 @@
  * limitations under the License.
  */
 import { Meta } from '@storybook/react';
-import Graph from 'graphology';
-import clusters from 'graphology-generators/random/clusters';
-import deepCopy from 'lodash/cloneDeep';
-import set from 'lodash/set';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { Accordion } from '@darajs/ui-components';
 
-import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import {
     CircularLayout,
-    CustomLayout,
     FcoseLayout,
-    ForceAtlasLayout,
-    MarketingLayout,
     PlanarLayout,
     SpringLayout,
 } from '../shared/graph-layout';
-import { LayeringAlgorithm } from '../shared/graph-layout/planar-layout';
-import { CausalGraph, EdgeConstraintType, EdgeType, EditorMode, VariableType } from '../types';
+import { CausalGraph, EdgeType, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
 import {
     Template,
     causalGraph,
-    nodeTiersCausalGraph,
-    nodeTiersList,
-    pagCausalGraph,
-    planarLayoutCausalGraph,
     timeSeriesCausalGraph,
 } from './utils/stories-utils';
 
@@ -196,32 +183,6 @@ Circular.args = {
     graphData: causalGraph,
     graphLayout: CircularLayout.Builder.build(),
 };
-
-function graphToCausalGraph(graph: Graph): CausalGraph {
-    return {
-        edges: graph.reduceEdges((acc, edge, attrs, source, target) => {
-            if (!(source in acc)) {
-                acc[source] = {};
-            }
-
-            acc[source][target] = {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {},
-            };
-
-            return acc;
-        }, {}),
-        nodes: graph.reduceNodes((acc, nodeKey) => {
-            acc[nodeKey] = {
-                meta: {},
-                variable_type: VariableType.UNSPECIFIED,
-            };
-
-            return acc;
-        }, {}),
-        version: '2.0',
-    };
-}
 
 const singleLetterGraph: CausalGraph = {
     edges: {

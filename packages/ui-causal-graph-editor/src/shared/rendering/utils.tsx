@@ -84,7 +84,7 @@ export function isGraphLayoutWithGroups(layout: GraphLayout): layout is GraphLay
     return (layout as GraphLayoutWithGrouping).group !== undefined;
 }
 
-export function findKeyByValue(obj: Record<string, string[]>, searchValue: string) {
+export function findKeyByValue(obj: Record<string, string[]>, searchValue: string): string {
     if (Object.values(obj).flat().includes(searchValue)) {
         let returnKey: string;
         Object.keys(obj).forEach((key) => {

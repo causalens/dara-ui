@@ -15,18 +15,11 @@
  * limitations under the License.
  */
 import { Meta } from '@storybook/react';
-import Graph from 'graphology';
-import clusters from 'graphology-generators/random/clusters';
-import deepCopy from 'lodash/cloneDeep';
-import set from 'lodash/set';
-import * as React from 'react';
-import { useEffect, useState } from 'react';
 
-import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import { FcoseLayout } from '../shared/graph-layout';
 import { CausalGraph, EdgeType, EditorMode, VariableType } from '../types';
-import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, pagCausalGraph, timeSeriesCausalGraph } from './utils/stories-utils';
+import { default as CausalGraphViewerComponent } from './causal-graph-editor';
+import { Template, pagCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

@@ -358,7 +358,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 getNodeGroups(this.graph.nodes(), this.layout.group, this.graph)
             ).flat();
 
-            const updateBoundary = (node: SimulationNode, delta: number) => {
+            const updateBoundary = (node: SimulationNode, delta: number): number => {
                 if (nodesInGroups.includes(node?.id)) {
                     return delta;
                 }
@@ -453,7 +453,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         // conditions
                         const edgeHasChanged = !(initialSource === finalSource && initialTarget === finalTarget);
                         const edgeIsNotWithinTheGroup = finalSource !== finalTarget;
-                        const targetHasChanged = initialTarget !== finalTarget;
                         const graphHasFinalEdge = this.graph.hasEdge(finalSource, finalTarget);
 
                         // attrbutes
@@ -464,9 +463,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         let numberOfCollapsedEdges =
                             graphHasFinalEdge ?
                                 this.graph.getEdgeAttributes(finalSource, finalTarget)[
-                                    'meta.rendering_properties.collapsedEdges'
+                                'meta.rendering_properties.collapsedEdges'
                                 ]
-                            :   0;
+                                : 0;
 
                         // upddate the number of collapsed edges count if needed
                         // if we have got the final edge in the graph then we need to increment it
@@ -568,7 +567,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             });
 
             // then we need to recreate all the edges that were collapsed
-            this.collapsedEdgesMap.forEach((edges, group) => {
+            this.collapsedEdgesMap.forEach((edges) => {
                 edges.forEach((edge) => {
                     if (!this.edgeMap.has(edge.id)) {
                         const source = edge.extras?.source.identifier;
@@ -584,9 +583,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             if (isGraphLayoutWithGroups(this.layout)) {
                 const { group } = this.layout;
                 const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
-                Object.keys(groups).forEach((group) => {
-                    const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node));
-                    this.createGroupContainer(group, nodesIngroup);
+                Object.keys(groups).forEach((gr) => {
+                    const nodesIngroup = groups[gr].map((node) => this.graph.getNodeAttributes(node));
+                    this.createGroupContainer(gr, nodesIngroup);
                 });
             }
 
@@ -978,9 +977,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         if (isGraphLayoutWithGroups(this.layout)) {
             const { group } = this.layout;
             const groups = getNodeGroups(this.graph.nodes(), group, this.graph);
-            Object.keys(groups).forEach((group) => {
-                const nodesIngroup = groups[group].map((node) => this.graph.getNodeAttributes(node));
-                this.createGroupContainer(group, nodesIngroup);
+            Object.keys(groups).forEach((gr) => {
+                const nodesIngroup = groups[gr].map((node) => this.graph.getNodeAttributes(node));
+                this.createGroupContainer(gr, nodesIngroup);
             });
         }
 
@@ -1797,9 +1796,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         if (isGraphLayoutWithGroups(this.layout)) {
             const { group } = this.layout;
             const groupsObject = getNodeGroups(this.graph.nodes(), group, this.graph);
-            Object.keys(groupsObject).forEach((group) => {
-                const nodesIngroup = groupsObject[group].map((node) => this.graph.getNodeAttributes(node));
-                this.updateGroupContainerStyle(group, nodesIngroup);
+            Object.keys(groupsObject).forEach((gr) => {
+                const nodesIngroup = groupsObject[gr].map((node) => this.graph.getNodeAttributes(node));
+                this.updateGroupContainerStyle(gr, nodesIngroup);
             });
         }
     }

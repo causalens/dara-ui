@@ -24,9 +24,9 @@ import { useEffect, useState } from 'react';
 
 import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import { FcoseLayout } from '../shared/graph-layout';
-import { CausalGraph, EdgeType, EditorMode, VariableType } from '../types';
+import { CausalGraph, EdgeType, VariableType } from '../types';
 import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, nodeTiersCausalGraph, pagCausalGraph, timeSeriesCausalGraph } from './utils/stories-utils';
+import { Template, nodeTiersCausalGraph } from './utils/stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

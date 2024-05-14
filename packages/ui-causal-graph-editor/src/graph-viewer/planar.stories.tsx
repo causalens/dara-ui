@@ -16,15 +16,12 @@
  */
 import { Meta } from '@storybook/react';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 
-import { Accordion } from '@darajs/ui-components';
 
 import { SHIPPED_UNITS } from '../../tests/mocks/graphs';
 import { PlanarLayout } from '../shared/graph-layout';
 import { LayeringAlgorithm } from '../shared/graph-layout/planar-layout';
-import { CausalGraph, EdgeType, VariableType } from '../types';
-import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
+import { default as CausalGraphViewerComponent } from './causal-graph-editor';
 import { Template, causalGraph, nodeTiersCausalGraph, planarLayoutCausalGraph } from './utils/stories-utils';
 
 export default {
