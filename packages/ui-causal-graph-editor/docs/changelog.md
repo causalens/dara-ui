@@ -6,6 +6,7 @@ title: Changelog
 
 -   Fixed an issue where if parent hugged content `NodeHierarchyBuilder` would always scroll.
 -   Fixed an issue where a graph `Legend` node and edge could not have the same label.
+-   Added support for grouping layout in `Fcose` layouts. It allows for nodes to be placed on groups which can be collapsed and expanded in order to simplify graph visual structure to the user.
 
 ## 1.9.1
 
