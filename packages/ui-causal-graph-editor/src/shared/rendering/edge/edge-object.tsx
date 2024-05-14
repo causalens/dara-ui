@@ -339,7 +339,7 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
                 fontSize: 18,
                 fill: colorToPixi(edgeStyle.color)
             });
-            let text = new PIXI.Text(edgeStyle.collapsedEdges / 2, textStyle);
+            let text = new PIXI.Text(edgeStyle.collapsedEdges, textStyle);
             return text;
         });
 

@@ -405,6 +405,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      */
     public collapseAllGroups(): void {
         if (isGraphLayoutWithGroups(this.layout)) {
+            console.log('COLLAPSE ALL')
             const layoutGroup = this.layout.group
             const groupsObject = getNodeGroups(this.graph.nodes(), layoutGroup, this.graph)
             const groupsArray = Object.keys(groupsObject)
@@ -434,50 +435,62 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                     const initialSource = this.graph.source(edgeKey);
                     const initialTarget = this.graph.target(edgeKey);
 
+
                     // if the edge comes to or from the group we need to collapse it
                     if (nodesToHide.includes(initialSource) || nodesToHide.includes(initialTarget) || groupsArray.includes(initialSource) || groupsArray.includes(initialTarget)) {
                         const finalTarget = findKeyByValue(groupsObject, initialTarget)
                         const finalSource = findKeyByValue(groupsObject, initialSource)
+
+                        // conditions
+                        const edgeHasChanged = !(initialSource === finalSource && initialTarget === finalTarget)
+                        const edgeIsWithinTheGroup = finalSource !== finalTarget
+                        const targetHasChanged = initialTarget !== finalTarget
+                        const graphHasFinalEdge = this.graph.hasEdge(finalSource, finalTarget)
+
+                        // attrbutes
                         const finalSourceAttributes = this.graph.getNodeAttributes(finalSource)
                         const finalTargetAttributes = this.graph.getNodeAttributes(finalTarget)
                         const currentEdgeAttributes = this.graph.getEdgeAttributes(edgeKey)
+                        // let numberOfCollapsedEdges = currentEdgeAttributes['meta.rendering_properties.collapsedEdges'] ?? 1
+                        let numberOfCollapsedEdges = graphHasFinalEdge ? this.graph.getEdgeAttributes(finalSource, finalTarget)['meta.rendering_properties.collapsedEdges'] : 1
 
-                        let numberOfCollapsedEdges = currentEdgeAttributes['meta.rendering_properties.collapsedEdges'] ?? 1
-
-                        if (this.graph.hasEdge(finalSource, finalTarget)) {
-                            const attributes = this.graph.getEdgeAttributes(finalSource, finalTarget)
-
-                            numberOfCollapsedEdges = attributes['meta.rendering_properties.collapsedEdges']
+                        // upddate the number of collapsed edges count if needed
+                        // if we have got the final edge in the graph then we need to increment it
+                        // that is if the final edge is not the edge wee are currently looking at
+                        // if the edge is between two group nodes then the same edge is counted twice, so we only count it when current group is the source
+                        if (graphHasFinalEdge && edgeHasChanged && group === finalSource) {
+                            console.log('A')
 
                             // if the target has changed, and edge is not within the same group, we need to increment the number of collapsed edges for the target
-                            if (initialTarget !== finalTarget && finalSource !== finalTarget) {
-                                numberOfCollapsedEdges += 1
-                            }
+                            // if ((targetHasChanged && edgeIsWithinTheGroup) || (!targetHasChanged && !groupsArray.includes(finalTarget))) {
+                            console.log('B')
+                            numberOfCollapsedEdges += 1
+                            // }
                         }
+
                         const edgeAttributes = { ...currentEdgeAttributes, 'meta.rendering_properties.collapsedEdges': numberOfCollapsedEdges }
 
                         // if source or target changed, i.e. they are part of a group, we should drop the edge
-                        if (initialSource !== finalSource || initialTarget !== finalTarget) {
+                        if ((initialSource !== finalSource || initialTarget !== finalTarget)) {
                             collapsedEdges.push({ id: edgeKey, ...edgeAttributes })
                             this.dropEdge(edgeKey);
-
                         }
 
                         // if the edge is within the same group we don't need to add them
-                        if (finalSource !== finalTarget) {
+                        if (edgeIsWithinTheGroup) {
                             // check if this edge already exists on the graph, as more than one might resolve to the same when collapsing groups
-                            if (!this.graph.hasEdge(finalSource, finalTarget)) {
+                            if (!graphHasFinalEdge) {
                                 this.graph.addEdge(finalSource, finalTarget, edgeAttributes)
 
                                 // on further collapses the condition to display the edge is whether it is in the edgeMap
                                 // whe should also only add edges that go to or from a group node
-                            } else if (!this.edgeMap.has(edgeKey) && (initialSource === finalSource || initialTarget === finalTarget)) {
+
+                            } else if (!this.edgeMap.has(edgeKey) && !edgeHasChanged) {
                                 this.createEdge(edgeKey, edgeAttributes, finalSource, finalTarget, finalSourceAttributes, finalTargetAttributes)
                             }
                             else {
+                                console.log('SET EDGE ATTRIBUTE', finalSource, finalTarget, numberOfCollapsedEdges)
                                 this.graph.setEdgeAttribute(finalSource, finalTarget, 'meta.rendering_properties.collapsedEdges', numberOfCollapsedEdges);
-
-                                // this.graph.setEdgeAttribute(edgeAttributes,)
                             }
                         }
 
@@ -486,13 +499,17 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
                 // for the group set all collapsed edges so that we can rebuild them later
                 this.collapsedEdgesMap.set(group, collapsedEdges)
-
-                // hide all the nodes within the group
-                nodesToHide.forEach((node) => {
-                    this.dropNode(node);
-                })
-
             })
+
+            // hide all the nodes within groups
+            Object.values(groupsObject).forEach((nodes) => {
+                nodes.forEach((node) => {
+                    if (this.nodeMap.has(node)) {
+                        this.dropNode(node);
+                    }
+                })
+            })
+
 
             this.requestRender();
         }
@@ -514,8 +531,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 const isTargetGroupNode = this.graph.getNodeAttribute(target, 'variable_type') === 'groupNode';
                 if (isSourceGroupNode || isTargetGroupNode) {
                     this.dropEdge(edgeKey)
-
-
+                    // reset the number of collapsed edges
+                    this.graph.setEdgeAttribute(source, target, 'meta.rendering_properties.collapsedEdges', 0);
                 }
             })
 
@@ -1575,6 +1592,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             const sourceNodePosition = { x: sourceNodeAttributes.x, y: sourceNodeAttributes.y };
             const targetNodePosition = { x: targetNodeAttributes.x, y: targetNodeAttributes.y };
             const edgeStyle = this.getEdgeStyle(edge, attributes, this.getConstraint(source, target));
+            // console.log({ source, target })
             edge.updatePosition(
                 edgeStyle,
                 sourceNodePosition,

@@ -360,7 +360,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
             if (groups.includes(edge[0]) && groups.includes(edge[1])) {
                 props.onNotify?.({
                     key: 'create-edge-group',
-                    message: 'Could not create an edge between a group node as it is not supported',
+                    message: 'Adding edge between groups is not allowed',
                     status: Status.WARNING,
                     title: 'Group edge detected',
                 });
