@@ -554,10 +554,14 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             // first we add all the nodes that were hidden
             this.graph.forEachNode((node, attributes) => {
                 if (this.graph.getNodeAttribute(node, 'variable_type') !== 'groupNode') {
-                    this.createNode(node, attributes);
+                    // only create the node if it doesn't exist
+                    if (!this.nodeMap.has(node)) {
+                        this.createNode(node, attributes);
+                    }
                 } else {
                     this.dropNode(node);
                 }
+
             });
 
             // then we need to recreate all the edges that were collapsed
