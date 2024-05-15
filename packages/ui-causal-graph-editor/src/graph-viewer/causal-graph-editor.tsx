@@ -29,10 +29,9 @@ import { ConfirmationModal } from '@darajs/ui-widgets';
 import {
     AddNodeButton,
     CenterGraphButton,
-    CollapseAllButton,
+    CollapseExpandButton,
     DragModeButton,
     EdgeInfoContent,
-    ExpandAllButton,
     GraphLegendDefinition,
     Legend,
     NodeInfoContent,
@@ -182,8 +181,8 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     };
 
     const layoutHasGroup = useMemo(
-        () => (props.graphLayout as GraphLayoutWithGrouping).group !== undefined,
-        [props.graphLayout]
+        () => (layout as GraphLayoutWithGrouping).group !== undefined,
+        [layout]
     );
 
     const {
@@ -523,7 +522,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     });
 
     useEngineEvent('groupMouseover', (event, groupId) => {
-        // const nodeAttributes = state.graph.getNodeAttributes(nodeId);
         tooltipRef.current = () =>
             ({
                 bottom: event.clientY,
@@ -764,20 +762,17 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                                         selectedResult={currentSearchNode + 1}
                                         totalNumberOfResults={searchResults.length}
                                     />
-                                    {layoutHasGroup && showCollapseAll && (
-                                        <CollapseAllButton
+                                    {layoutHasGroup && (
+                                        <CollapseExpandButton
                                             onCollapseAll={() => {
                                                 setShowCollapseAll(false);
                                                 collapseGroups();
                                             }}
-                                        />
-                                    )}
-                                    {layoutHasGroup && !showCollapseAll && (
-                                        <ExpandAllButton
                                             onExpandAll={() => {
-                                                setShowCollapseAll(true);
                                                 expandGroups();
+                                                setShowCollapseAll(true);
                                             }}
+                                            showExpandAll={showCollapseAll}
                                         />
                                     )}
                                     <CenterGraphButton onResetZoom={resetViewport} />

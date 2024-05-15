@@ -16,10 +16,10 @@
  */
 import { Meta } from '@storybook/react';
 
-import { FcoseLayout } from '../shared/graph-layout';
-import { CausalGraph, EdgeType, EditorMode, VariableType } from '../types';
-import { default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, pagCausalGraph } from './utils/stories-utils';
+import { FcoseLayout } from '../../shared/graph-layout';
+import { CausalGraph, EdgeType, EditorMode, VariableType } from '../../types';
+import { default as CausalGraphViewerComponent } from '../causal-graph-editor';
+import { Template, pagCausalGraph } from './stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

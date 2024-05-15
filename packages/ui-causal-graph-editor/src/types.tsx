@@ -55,7 +55,7 @@ export interface EdgeRenderingMeta {
     forced?: boolean;
     thickness?: number;
     tooltip?: string | Record<string, string>;
-    collapsedEdges?: number;
+    collapsedEdgesCount?: number;
 }
 
 export type FlatEdgeRenderingMeta = RenderingMetaKeys<EdgeRenderingMeta>;

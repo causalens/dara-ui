@@ -15,76 +15,18 @@
  * limitations under the License.
  */
 import { Meta } from '@storybook/react';
-import Graph from 'graphology';
-import clusters from 'graphology-generators/random/clusters';
 import deepCopy from 'lodash/cloneDeep';
 import set from 'lodash/set';
-import * as React from 'react';
-import { useEffect, useState } from 'react';
 
-import { FRAUD, SHIPPED_UNITS } from '../../tests/mocks/graphs';
-import { FcoseLayout } from '../shared/graph-layout';
-import { CausalGraph, EdgeType, VariableType } from '../types';
-import { CausalGraphEditorProps, default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, nodeTiersCausalGraph } from './utils/stories-utils';
+import { SHIPPED_UNITS } from '../../../tests/mocks/graphs';
+import { CustomLayout } from '../../shared/graph-layout';
+import { default as CausalGraphViewerComponent } from '../causal-graph-editor';
+import { Template } from './stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,
-    title: 'CausalGraphEditor/GraphEditor/Fcose',
+    title: 'CausalGraphEditor/GraphEditor/CustomLayout',
 } as Meta;
-
-// Real world example graph to test layouts
-export const Fcose = Template.bind({});
-Fcose.args = {
-    editable: true,
-    graphData: SHIPPED_UNITS,
-    // graphData: FRAUD,
-    graphLayout: FcoseLayout.Builder.build(),
-};
-
-export const FcoseTiers = Template.bind({});
-
-const layout = FcoseLayout.Builder.build();
-layout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
-layout.tierSeparation = 300;
-layout.nodeRepulsion = 10000000;
-
-layout.orientation = 'vertical';
-
-// FcoseGrouping.args = {
-//     editable: true,
-//     graphData: FRAUD,
-//     graphLayout: layout,
-// };
-// export const FcoseGrouping = Template.bind({});
-
-// const layout = FcoseLayout.Builder.build();
-// layout.tiers = { group: 'meta.group', rank: ['a', 'b', 'c', 'd', 'e'] };
-// layout.tierSeparation = 300;
-// layout.nodeRepulsion = 10000000;
-
-// layout.orientation = 'vertical';
-
-FcoseTiers.args = {
-    editable: true,
-    graphData: FRAUD,
-    graphLayout: layout,
-};
-
-export const FcoseGrouping = Template.bind({});
-
-const groupingLayout = FcoseLayout.Builder.build();
-// groupingLayout.group = 'meta.group';
-groupingLayout.group = 'meta.test';
-
-// groupingLayout.nodeRepulsion = 10000000;
-
-FcoseGrouping.args = {
-    // graphData: FRAUD,
-    graphData: nodeTiersCausalGraph,
-    graphLayout: groupingLayout,
-    editable: true,
-};
 
 const PredefinedGraph = deepCopy(SHIPPED_UNITS);
 // layout stored inline, as layouts are async and we can't run async on top-level in storybook yet
@@ -201,69 +143,17 @@ Object.entries(predefinedLayout.layout).forEach(([nodeKey, position]) => {
     set(PredefinedGraph.nodes[nodeKey], 'meta.rendering_properties.y', position.y);
 });
 
-export const PredefinedPositions = Template.bind({});
-PredefinedPositions.args = {
+export const CustomPositions = Template.bind({});
+CustomPositions.args = {
     editable: true,
     graphData: PredefinedGraph,
-    graphLayout: FcoseLayout.Builder.build(),
+    graphLayout: CustomLayout.Builder.build(),
 };
 
-function graphToCausalGraph(graph: Graph): CausalGraph {
-    return {
-        edges: graph.reduceEdges((acc, edge, attrs, source, target) => {
-            if (!(source in acc)) {
-                acc[source] = {};
-            }
-
-            acc[source][target] = {
-                edge_type: EdgeType.DIRECTED_EDGE,
-                meta: {},
-            };
-
-            return acc;
-        }, {}),
-        nodes: graph.reduceNodes((acc, nodeKey) => {
-            acc[nodeKey] = {
-                meta: {},
-                variable_type: VariableType.UNSPECIFIED,
-            };
-
-            return acc;
-        }, {}),
-        version: '2.0',
-    };
-}
-
-export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
-    const [numClusters, setNumClusters] = useState(2);
-    const [numEdges, setNumEdges] = useState(1600);
-    const [numNodes, setNumNodes] = useState(800);
-    const [parsedData, setParsedData] = useState<CausalGraph>();
-
-    useEffect(() => {
-        const newGraph = clusters(Graph, {
-            clusters: numClusters,
-            order: numNodes,
-            size: numEdges,
-        });
-        setParsedData(graphToCausalGraph(newGraph));
-    }, [numClusters, numEdges, numNodes]);
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div>
-                <span>Numer of Clusters</span>
-                <input defaultValue={numClusters} onChange={(e) => setNumClusters(e.target.valueAsNumber)} />
-                <span>Numer of Edges</span>
-                <input defaultValue={numEdges} onChange={(e) => setNumEdges(e.target.valueAsNumber)} />
-                <span>Numer of Nodes</span>
-                <input defaultValue={numNodes} onChange={(e) => setNumNodes(e.target.valueAsNumber)} />
-            </div>
-            {parsedData && <CausalGraphViewerComponent {...args} graphData={parsedData} style={{ margin: 0 }} />}
-        </div>
-    );
-};
-RandomClusters.args = {
+// User provided custom layout but no initial positions -> falls back to default
+export const CustomLayoutNoPositions = Template.bind({});
+CustomLayoutNoPositions.args = {
     editable: true,
-    graphLayout: FcoseLayout.Builder.nodeRepulsion(100_000_000).nodeSeparation(20).build(),
+    graphData: SHIPPED_UNITS,
+    graphLayout: CustomLayout.Builder.build(),
 };

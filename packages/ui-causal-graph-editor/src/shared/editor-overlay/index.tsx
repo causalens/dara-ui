@@ -20,8 +20,7 @@ export {
     AddNodeButton,
     DragModeButton,
     CenterGraphButton,
-    CollapseAllButton,
-    ExpandAllButton,
+    CollapseExpandButton,
 } from './buttons';
 export { SearchBar, useSearch } from './search-bar';
 export { Legend, GraphLegendDefinition, getLegendData } from './legend';

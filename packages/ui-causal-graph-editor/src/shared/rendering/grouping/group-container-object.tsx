@@ -93,7 +93,8 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         let maxY = -Infinity;
 
         nodes.forEach((node) => {
-            const radius = node['meta.rendering_properties.size'] ?? 100;
+            let radius = node['meta.rendering_properties.size'] ?? 80; // 80 is 64*1.25 which is the default size for a target node
+            radius += 20; // Add padding
             minX = Math.min(minX, node.x - radius);
             maxX = Math.max(maxX, node.x + radius);
             minY = Math.min(minY, node.y - radius);
@@ -148,7 +149,9 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         let maxY = -Infinity;
 
         nodes.forEach((node) => {
-            const radius = node['meta.rendering_properties.size'] ?? 100;
+            let radius = node['meta.rendering_properties.size'] ?? 80; // 80 is 64*1.25 which is the default size for a target node
+            radius += 20; // Add padding
+
             minX = Math.min(minX, node.x - radius);
             maxX = Math.max(maxX, node.x + radius);
             minY = Math.min(minY, node.y - radius);

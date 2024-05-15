@@ -16,10 +16,10 @@
  */
 import { Meta } from '@storybook/react';
 
-import { FRAUD } from '../../tests/mocks/graphs';
-import { SpringLayout } from '../shared/graph-layout';
-import { default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template, causalGraph, nodeTiersCausalGraph, nodeTiersList } from './utils/stories-utils';
+import { FRAUD } from '../../../tests/mocks/graphs';
+import { SpringLayout } from '../../shared/graph-layout';
+import { default as CausalGraphViewerComponent } from '../causal-graph-editor';
+import { Template, causalGraph, nodeTiersCausalGraph, nodeTiersList } from './stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

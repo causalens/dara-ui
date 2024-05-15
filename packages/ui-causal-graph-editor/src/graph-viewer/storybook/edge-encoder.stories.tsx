@@ -16,10 +16,10 @@
  */
 import { Meta } from '@storybook/react';
 
-import { SpringLayout } from '../shared/graph-layout';
-import { EdgeConstraintType, EditorMode } from '../types';
-import { default as CausalGraphViewerComponent } from './causal-graph-editor';
-import { Template } from './utils/stories-utils';
+import { SpringLayout } from '../../shared/graph-layout';
+import { EdgeConstraintType, EditorMode } from '../../types';
+import { default as CausalGraphViewerComponent } from '../causal-graph-editor';
+import { Template } from './stories-utils';
 
 export default {
     component: CausalGraphViewerComponent,

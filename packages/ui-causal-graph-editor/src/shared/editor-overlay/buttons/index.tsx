@@ -19,6 +19,5 @@ export { default as CenterGraphButton } from './center-graph-button';
 export { default as DragModeButton } from './drag-mode-button';
 export { default as RecalculateLayoutButton } from './recalculate-layout-button';
 export { default as SoftEdgeArrowButton } from './soft-edge-arrow-button';
-export { default as CollapseAllButton } from './collapse-all-button';
-export { default as ExpandAllButton } from './expand-all-button';
+export { default as CollapseExpandButton } from './collapse-expand-button';
 export { default as SaveImageButton } from './save-image-button';
