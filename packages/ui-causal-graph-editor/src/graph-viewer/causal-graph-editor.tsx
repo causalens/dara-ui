@@ -650,7 +650,8 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         panelTitle = 'Node';
     }
 
-    if (Object.keys(props.graphData?.nodes).length === 0) {
+    // if the graph is not editable and there are no nodes, there's nothing to display so show a message
+    if (!props.editable && Object.keys(props.graphData?.nodes).length === 0) {
         return (
             <Wrapper style={props.style}>
                 <Center style={{ height: 300 }}>The CausalGraph structure is empty.</Center>
