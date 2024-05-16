@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.4
 
 -   Fixed an issue where the GraphEditor would error if the graph was empty in some cases
 
