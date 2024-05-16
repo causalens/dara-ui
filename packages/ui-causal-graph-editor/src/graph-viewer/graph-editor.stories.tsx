@@ -52,6 +52,17 @@ export default {
     title: 'CausalGraphEditor/GraphEditor',
 } as Meta;
 
+export const Empty = Template.bind({});
+Empty.args = {
+    editable: false,
+    graphData: {
+        edges: {},
+        nodes: {},
+        version: '2.0',
+    },
+    graphLayout: FcoseLayout.Builder.build(),
+};
+
 export const Interactive = (args: CausalGraphEditorProps): JSX.Element => {
     const [nodeNumber, setNodeNumber] = useState(3);
     const [useStrenghts, setUseStrengths] = useState(false);

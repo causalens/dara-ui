@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where the GraphEditor would error if the graph was empty in some cases
+
 ## 1.9.3
 
 -   Added a new 'Save as Image' button to the graph viewer UI to download the currently displayed graph pane as a high-resolution PNG image.
