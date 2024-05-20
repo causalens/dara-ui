@@ -16,7 +16,7 @@
  */
 import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
@@ -331,17 +331,14 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
-    const setFloatingRef = refs.setFloating;
-
-    const mergedRefs = useCallback(
-        (node: HTMLElement | null) => {
-            setFloatingRef(node);
-            setMenuRef(node);
-        },
-        [setFloatingRef, setMenuRef]
+    const menuProps = useMemo(() => getMenuProps({ ref: refs.setFloating }), [getMenuProps, refs.setFloating]);
+    const toggleProps = useMemo(() => getToggleButtonProps(), [getToggleButtonProps]);
+    const inputProps = useMemo(
+        () => getInputProps(getDropdownProps({ preventKeyAction: isOpen })),
+        [getInputProps, getDropdownProps, isOpen]
     );
+    const floatingProps = useMemo(() => getFloatingProps(), [getFloatingProps]);
+    const referenceProps = useMemo(() => getReferenceProps(), [getReferenceProps]);
 
     return (
         <Wrapper
@@ -373,15 +370,15 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             </Tag>
                         ))}
                         <Input
-                            {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
-                            {...getReferenceProps()}
+                            {...inputProps}
+                            {...referenceProps}
                             disabled={props.disabled}
                             placeholder={props.placeholder}
                             size={props.size}
                             style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
-                    <ChevronButton {...getToggleButtonProps()}>
+                    <ChevronButton {...toggleProps}>
                         <Chevron disabled={props.disabled} isOpen={isOpen} />
                     </ChevronButton>
                 </InputWrapper>
@@ -389,8 +386,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             {ReactDOM.createPortal(
                 <DropdownList
                     {...menuProps}
-                    {...getFloatingProps()}
-                    ref={mergedRefs}
+                    {...floatingProps}
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
