@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-  Fixed an issue where select components would sometimes error out with "Maximum update depth..." React error
+
 ## 1.9.3
 
 -   Fixed a downshift ref warning in `Select` and `DatepickerSelect` components.
@@ -23,7 +27,7 @@ title: Changelog
 
 -   `Chat` component now displays its messages content as `Markdown`.
 -   `Chat` component now displays next line breaks.
--   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter. 
+-   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter.
 -   Added a new `Markdown` component.
 -   **Breaking** `Chat` now takes a `active_user` prop, and display user info in each message.
 -   **Breaking** `Chat` component now only allows users that wrote a message to edit it.

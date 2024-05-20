@@ -331,17 +331,8 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
-    const setFloatingRef = refs.setFloating;
-
-    const mergedRefs = useCallback(
-        (node: HTMLElement | null) => {
-            setFloatingRef(node);
-            setMenuRef(node);
-        },
-        [setFloatingRef, setMenuRef]
-    );
+    const menuProps = useMemo(() => getMenuProps({ ref: refs.setFloating }), [getMenuProps, refs.setFloating]);
+    const toggleProps = useMemo(() => getToggleButtonProps(), [getToggleButtonProps]);
 
     return (
         <Wrapper
@@ -381,7 +372,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
-                    <ChevronButton {...getToggleButtonProps()}>
+                    <ChevronButton {...toggleProps}>
                         <Chevron disabled={props.disabled} isOpen={isOpen} />
                     </ChevronButton>
                 </InputWrapper>
@@ -390,7 +381,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 <DropdownList
                     {...menuProps}
                     {...getFloatingProps()}
-                    ref={mergedRefs}
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
