@@ -333,12 +333,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     const menuProps = useMemo(() => getMenuProps({ ref: refs.setFloating }), [getMenuProps, refs.setFloating]);
     const toggleProps = useMemo(() => getToggleButtonProps(), [getToggleButtonProps]);
-    const inputProps = useMemo(
-        () => getInputProps(getDropdownProps({ preventKeyAction: isOpen })),
-        [getInputProps, getDropdownProps, isOpen]
-    );
-    const floatingProps = useMemo(() => getFloatingProps(), [getFloatingProps]);
-    const referenceProps = useMemo(() => getReferenceProps(), [getReferenceProps]);
 
     return (
         <Wrapper
@@ -370,8 +364,8 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             </Tag>
                         ))}
                         <Input
-                            {...inputProps}
-                            {...referenceProps}
+                            {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+                            {...getReferenceProps()}
                             disabled={props.disabled}
                             placeholder={props.placeholder}
                             size={props.size}
@@ -386,7 +380,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
             {ReactDOM.createPortal(
                 <DropdownList
                     {...menuProps}
-                    {...floatingProps}
+                    {...getFloatingProps()}
                     isOpen={isOpen}
                     style={{
                         ...floatingStyles,
