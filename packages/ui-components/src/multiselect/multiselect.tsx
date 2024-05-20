@@ -16,7 +16,7 @@
  */
 import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseMultipleSelectionStateChange, useCombobox, useMultipleSelection } from 'downshift';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';

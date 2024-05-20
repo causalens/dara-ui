@@ -16,7 +16,7 @@
  */
 import { autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxReturnValue, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
