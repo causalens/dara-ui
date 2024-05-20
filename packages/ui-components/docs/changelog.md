@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.9.5
 
 -  Fixed an issue where select components would sometimes error out with "Maximum update depth..." React error
 
