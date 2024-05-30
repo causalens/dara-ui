@@ -263,7 +263,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 }
             },
             // Only set the selectedItems key if it has been explicitly set in props
-            ...('selectedItems' in props && { selectedItems: props.selectedItems }),
+            ...('selectedItems' in props && { selectedItems: props.selectedItems ?? [] }),
         });
 
     const onTermChange = useCallback(

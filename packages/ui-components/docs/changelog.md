@@ -2,9 +2,13 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed a crash when `null` was passed to `MultiSelect`'s `selectedItems` prop.
+
 ## 1.9.5
 
--  Fixed an issue where select components would sometimes error out with "Maximum update depth..." React error
+-   Fixed an issue where select components would sometimes error out with "Maximum update depth..." React error
 
 ## 1.9.3
 
