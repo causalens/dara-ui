@@ -63,4 +63,4 @@ const Chevron = React.forwardRef<any, ChevronProps>((props, ref) => (
     />
 ));
 
-export default Chevron;
+export default React.memo(Chevron);
