@@ -112,20 +112,20 @@ export interface SectionedListProps extends InteractiveComponentProps<Item> {
     style?: React.CSSProperties;
 }
 
-type ListItemRendererProps = {
+type SectionedListItemProps = {
     item: ListItem;
     index: number;
     getItemProps: (options: { index: number; item: Item }) => any;
     isSelected: boolean;
 };
 
-const ListItemRenderer = React.memo((
+const SectionedListItem = React.memo((
     {
         item,
         index,
         getItemProps,
         isSelected
-    }: ListItemRendererProps
+    }: SectionedListItemProps
 ): JSX.Element => {
     const theme = useTheme();
     return (
@@ -317,7 +317,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     }), [floatingStyles]);
 
     const renderListItem = useCallback((item: ListItem, index: number) => (
-        <ListItemRenderer
+        <SectionedListItem
             item={item}
             index={index}
             getItemProps={getItemProps}

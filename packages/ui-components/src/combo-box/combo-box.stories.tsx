@@ -56,18 +56,13 @@ const simpleItems: Item[] = [
     },
 ];
 
-const thousandElements = Array.from({ length: 10000 }, (_, i) => ({
-    label: `Item ${i}`,
-    value: i,
-}));
-
 export const ComboBox = (props: ComboBoxProps): JSX.Element => (
     <div style={{ width: '12.5em' }}>
-        <ComboBoxComponent style={{marginTop: 2000, marginBottom: 2000}} {...props} />
+        <ComboBoxComponent {...props} />
     </div>
 );
 ComboBox.args = {
-    items: thousandElements,
+    items: simpleItems,
     placeholder: 'Select an item',
     size: 1,
 };

@@ -56,18 +56,13 @@ const simpleItems: Item[] = [
     },
 ];
 
-const tenThousandItems = Array.from({ length: 10 }, (_, i) => ({
-    label: `item ${i}`,
-    value: i,
-}));
-
 export const Select = (props: SelectProps): JSX.Element => (
     <div style={{ width: '12.5em' }}>
-        <SelectComponent  style={{marginTop: 2000, marginBottom: 2000}} {...props} />
+        <SelectComponent {...props} />
     </div>
 );
 Select.args = {
-    items: tenThousandItems,
+    items: simpleItems,
     placeholder: 'Select an item',
     size: 1,
 };

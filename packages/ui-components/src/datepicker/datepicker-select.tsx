@@ -123,12 +123,12 @@ const SelectButtonPrimary = styled(SelectButton)`
     }
 `;
 
-interface DatepickerListItemProps {
+interface DatepickerListItemStyleProps {
     isSelected?: boolean;
     size?: number;
 }
 
-const DatepickerListItem = styled(ListItem) <DatepickerListItemProps>`
+const StyledDatepickerListItem = styled(ListItem) <DatepickerListItemStyleProps>`
     display: flex;
     align-items: center;
 
@@ -149,7 +149,7 @@ const DatepickerListItem = styled(ListItem) <DatepickerListItemProps>`
     }
 `;
 
-type DatepickerListItemRendererProps = {
+type DatepickerListItemProps = {
     item: Item;
     index: number;
     getItemProps: (options: any) => any;
@@ -157,15 +157,15 @@ type DatepickerListItemRendererProps = {
     size?: number;
 }
 
-const DatepickerListItemRenderer = React.memo(({
+const DatepickerListItem = React.memo(({
     item,
     index,
     getItemProps,
     isSelected,
     size,
-}: DatepickerListItemRendererProps
+}: DatepickerListItemProps
 ) => (
-    <DatepickerListItem
+    <StyledDatepickerListItem
         getItemProps={getItemProps}
         isSelected={isSelected}
         key={`item-${index}`}
@@ -175,7 +175,7 @@ const DatepickerListItemRenderer = React.memo(({
         size={size}
     >
         {item.label}
-    </DatepickerListItem>
+    </StyledDatepickerListItem>
 
 ))
 
@@ -309,7 +309,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
     const menuProps = React.useMemo(() => getMenuProps({ ref: mergedDropdownRef }), [mergedDropdownRef, getMenuProps]);
 
     const renderListItem = React.useCallback((item: Item, index: number) => (
-        <DatepickerListItemRenderer
+        <DatepickerListItem
             item={item}
             index={index}
             getItemProps={getItemProps}

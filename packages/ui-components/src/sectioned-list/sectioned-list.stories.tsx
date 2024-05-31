@@ -23,10 +23,9 @@ export default {
     title: 'UI Components/Sectioned List',
 } as Meta;
 
-
 export const SectionedList = (args: SectionedListProps): JSX.Element => (
     <div style={{ width: '50%' }}>
-        <SectionedListComponent style={{marginTop: 2000, marginBottom: 2000}} {...args} />
+        <SectionedListComponent {...args} />
     </div>
 );
 
@@ -54,15 +53,6 @@ const sampleListSections = [
     { items: sampleListItems('3'), label: 'Section 3' },
 ];
 
-const tenGroups = Array.from({ length: 10 }, (_, i) => ({
-    items: Array.from({ length: 100 }, (_, i) => ({
-        label: `item ${i}`,
-        value: `value ${i}`,
-        heading: false,
-    })),
-    label: `Section ${i}`,
-}));
-
 SectionedList.args = {
-    items: tenGroups,
+    items: sampleListSections,
 };
