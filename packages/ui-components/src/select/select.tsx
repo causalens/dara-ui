@@ -21,10 +21,10 @@ import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
 
+import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron, matchWidthToReference } from '../utils';
-import DropdownList from '../shared/dropdown-list';
 
 interface SelectedItemProps {
     size?: number;
@@ -161,19 +161,18 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  */
 function Select(props: SelectProps): JSX.Element {
     const { applySameWidthModifier = true } = props;
-    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps } =
-        useSelect<Item>({
-            initialIsOpen: props.initialIsOpen,
-            initialSelectedItem: props.initialValue,
-            itemToString: (item) => item.label,
-            items: props.items,
-            onSelectedItemChange: (changes) => {
-                const selected = changes.selectedItem;
-                props.onSelect?.(selected);
-            },
-            // Only set the selectedItem key if it has been explicitly set in props
-            ...('selectedItem' in props && { selectedItem: props.selectedItem }),
-        });
+    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps } = useSelect<Item>({
+        initialIsOpen: props.initialIsOpen,
+        initialSelectedItem: props.initialValue,
+        itemToString: (item) => item.label,
+        items: props.items,
+        onSelectedItemChange: (changes) => {
+            const selected = changes.selectedItem;
+            props.onSelect?.(selected);
+        },
+        // Only set the selectedItem key if it has been explicitly set in props
+        ...('selectedItem' in props && { selectedItem: props.selectedItem }),
+    });
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
@@ -202,9 +201,13 @@ function Select(props: SelectProps): JSX.Element {
         [props.disabled, refs.setReference, getToggleButtonProps]
     );
 
-    const dropdownStyle = React.useMemo(() => ({
-        ...floatingStyles, marginLeft: -1
-    }), [floatingStyles]);
+    const dropdownStyle = React.useMemo(
+        () => ({
+            ...floatingStyles,
+            marginLeft: -1,
+        }),
+        [floatingStyles]
+    );
 
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -240,7 +243,7 @@ function Select(props: SelectProps): JSX.Element {
                         getMenuProps={getMenuProps}
                         size={props.size}
                         ref={refs.setFloating}
-                        className={`${(menuProps?.className) ?? ''} ${props.itemClass}`}
+                        className={`${menuProps?.className ?? ''} ${props.itemClass}`}
                         itemClass={props.itemClass}
                         maxItems={props.maxItems}
                     />,

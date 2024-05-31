@@ -59,7 +59,8 @@ const Chevron = React.forwardRef<any, ChevronProps>((props, ref) => (
         isOpen={props.isOpen}
         onClick={props.onClick}
         ref={ref}
-        style={props.style} />
+        style={props.style}
+    />
 ));
 
 export default Chevron;

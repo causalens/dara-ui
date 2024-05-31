@@ -22,10 +22,10 @@ import ReactDOM from 'react-dom';
 import styled from '@darajs/styled-components';
 
 import ChevronButton from '../shared/chevron-button';
+import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
-import DropdownList from '../shared/dropdown-list';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -74,7 +74,7 @@ interface InputWrapperProps {
     isOpen: boolean;
 }
 
-export const InputWrapper = React.memo(styled.div<InputWrapperProps>`
+export const InputWrapper = styled.div<InputWrapperProps>`
     display: flex;
     flex: 1 1 auto;
     align-items: center;
@@ -97,8 +97,7 @@ export const InputWrapper = React.memo(styled.div<InputWrapperProps>`
     svg {
         height: 0.8rem;
     }
-`);
-InputWrapper.displayName = 'InputWrapper';
+`;
 
 export const Input = styled.input`
     overflow: hidden;
@@ -124,7 +123,6 @@ export const Input = styled.input`
         color: ${(props) => props.theme.colors.grey2};
     }
 `;
-
 
 export interface ComboBoxProps extends InteractiveComponentProps<Item> {
     /** Whether to open the select dropdown on load or not, defaults to false */
@@ -153,9 +151,13 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
     const [inputValue, setInputValue] = useState(props.initialValue?.label ?? props.selectedItem?.label ?? '');
     const [pendingHighlight, setPendingHighlight] = useState(null);
 
-    const filteredItems = useMemo(() => props.items.filter((item) =>
-        inputValue ? item.label?.toLowerCase().includes(inputValue?.toLowerCase()) : true
-    ), [inputValue, props.items]);
+    const filteredItems = useMemo(
+        () =>
+            props.items.filter((item) =>
+                inputValue ? item.label?.toLowerCase().includes(inputValue?.toLowerCase()) : true
+            ),
+        [inputValue, props.items]
+    );
 
     const {
         selectedItem,
@@ -242,9 +244,13 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
-    const dropdownStyle = useMemo(() => ({
-        ...floatingStyles, marginLeft: -1
-    }), [floatingStyles]);
+    const dropdownStyle = useMemo(
+        () => ({
+            ...floatingStyles,
+            marginLeft: -1,
+        }),
+        [floatingStyles]
+    );
 
     const role = useRole(context, { role: 'combobox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
@@ -269,7 +275,11 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                         }
                         size={props.size}
                     />
-                    <ChevronButton disabled={props.disabled} isOpen={isOpen} getToggleButtonProps={getToggleButtonProps} />
+                    <ChevronButton
+                        disabled={props.disabled}
+                        isOpen={isOpen}
+                        getToggleButtonProps={getToggleButtonProps}
+                    />
                 </InputWrapper>
                 {ReactDOM.createPortal(
                     <DropdownList

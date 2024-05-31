@@ -18,21 +18,14 @@ import { flip, offset, shift, useFloating, useInteractions, useRole } from '@flo
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
-
 import { Key } from '../constants';
 import DropdownList from '../shared/dropdown-list';
 import { Item } from '../types';
-
 
 export interface MenuAction {
     action: () => void;
     label: string;
 }
-
-// const DropdownList = styled(List)`
-//     overflow-y: auto;
-//     box-shadow: ${(props) => props.theme.shadow.light};
-// `;
 
 export interface ContextMenuProps<T> {
     /** An array of actions to show in the context menu */
@@ -128,27 +121,35 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             setShowMenu(true);
         };
 
-        const onAction = React.useCallback((action: MenuAction): void => {
-            if (canClose) {
-                setShowMenu(false);
-                action.action();
-            }
-        }, [canClose]);
+        const onAction = React.useCallback(
+            (action: MenuAction): void => {
+                if (canClose) {
+                    setShowMenu(false);
+                    action.action();
+                }
+            },
+            [canClose]
+        );
 
         const role = useRole(context, { role: 'menu' });
         const { getFloatingProps } = useInteractions([role]);
 
-        const dropdownStyle = React.useMemo(() => ({
-            ...floatingStyles, "overflow-y": 'auto', minWidth: 150, borderRadius: '0.25rem'
-        }), [floatingStyles]);
+        const dropdownStyle = React.useMemo(
+            () => ({
+                ...floatingStyles,
+                'overflow-y': 'auto',
+                minWidth: 150,
+                borderRadius: '0.25rem',
+            }),
+            [floatingStyles]
+        );
 
         const getItemProps = React.useCallback(
-            ({ item }: {
-                item: Item;
-            }) => ({
-                onMouseUp: () => onAction(item as unknown as MenuAction)
+            ({ item }: { item: Item }) => ({
+                onMouseUp: () => onAction(item as unknown as MenuAction),
             }),
-            [onAction])
+            [onAction]
+        );
 
         return (
             <>

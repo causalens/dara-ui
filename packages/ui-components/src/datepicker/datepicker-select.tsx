@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 import { Placement, autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { GetPropsCommonOptions, useSelect, UseSelectGetToggleButtonPropsOptions } from 'downshift';
+import { GetPropsCommonOptions, UseSelectGetToggleButtonPropsOptions, useSelect } from 'downshift';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
 
+import DropdownList from '../shared/dropdown-list';
+import ListItem from '../shared/list-item';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron } from '../utils';
-
-import DropdownList from '../shared/dropdown-list';
-import ListItem from '../shared/list-item';
 
 const { stateChangeTypes } = useSelect;
 
@@ -128,7 +127,7 @@ interface DatepickerListItemStyleProps {
     size?: number;
 }
 
-const StyledDatepickerListItem = styled(ListItem) <DatepickerListItemStyleProps>`
+const StyledDatepickerListItem = styled(ListItem)<DatepickerListItemStyleProps>`
     display: flex;
     align-items: center;
 
@@ -155,16 +154,9 @@ type DatepickerListItemProps = {
     getItemProps: (options: any) => any;
     isSelected: boolean;
     size?: number;
-}
+};
 
-const DatepickerListItem = React.memo(({
-    item,
-    index,
-    getItemProps,
-    isSelected,
-    size,
-}: DatepickerListItemProps
-) => (
+const DatepickerListItem = React.memo(({ item, index, getItemProps, isSelected, size }: DatepickerListItemProps) => (
     <StyledDatepickerListItem
         getItemProps={getItemProps}
         isSelected={isSelected}
@@ -176,14 +168,13 @@ const DatepickerListItem = React.memo(({
     >
         {item.label}
     </StyledDatepickerListItem>
-
-))
+));
 
 interface DropdownListProps {
     displacement: number;
 }
 
-const StyledDropdownList = React.memo(styled(DropdownList) <DropdownListProps>`
+const StyledDropdownList = React.memo(styled(DropdownList)<DropdownListProps>`
     overflow-y: auto;
     display: ${(props) => (props.isOpen ? 'flex' : 'none')};
     flex-direction: column;
@@ -197,27 +188,38 @@ const StyledDropdownList = React.memo(styled(DropdownList) <DropdownListProps>`
     border: none;
 `);
 
-
-const DatepickerSelectButtonPrimary = React.memo(({ disabled, getToggleButtonProps, setReference, getReferenceProps, size, isOpen, selectedItem }: {
-    disabled: boolean;
-    size: number;
-    isOpen: boolean;
-    selectedItem: Item;
-    getToggleButtonProps: (
-        options?: UseSelectGetToggleButtonPropsOptions,
-        otherOptions?: GetPropsCommonOptions,
-    ) => Record<string, unknown>;
-    setReference: (node: any) => void;
-    getReferenceProps: (userProps?: React.HTMLProps<Element>) => Record<string, unknown>
-}): JSX.Element => <SelectButtonPrimary
-    disabled={disabled}
-    {...getToggleButtonProps({ disabled, ref: setReference })}
-    {...getReferenceProps()}
-    type="button"
->
-        <SelectedItem size={size}>{selectedItem ? selectedItem.label : 'Select'}</SelectedItem>
-        <Chevron disabled={disabled} isOpen={isOpen} />
-    </SelectButtonPrimary>)
+const DatepickerSelectButtonPrimary = React.memo(
+    ({
+        disabled,
+        getToggleButtonProps,
+        setReference,
+        getReferenceProps,
+        size,
+        isOpen,
+        selectedItem,
+    }: {
+        disabled: boolean;
+        size: number;
+        isOpen: boolean;
+        selectedItem: Item;
+        getToggleButtonProps: (
+            options?: UseSelectGetToggleButtonPropsOptions,
+            otherOptions?: GetPropsCommonOptions
+        ) => Record<string, unknown>;
+        setReference: (node: any) => void;
+        getReferenceProps: (userProps?: React.HTMLProps<Element>) => Record<string, unknown>;
+    }): JSX.Element => (
+        <SelectButtonPrimary
+            disabled={disabled}
+            {...getToggleButtonProps({ disabled, ref: setReference })}
+            {...getReferenceProps()}
+            type="button"
+        >
+            <SelectedItem size={size}>{selectedItem ? selectedItem.label : 'Select'}</SelectedItem>
+            <Chevron disabled={disabled} isOpen={isOpen} />
+        </SelectButtonPrimary>
+    )
+);
 
 export interface SelectProps extends InteractiveComponentProps<Item> {
     /** The left displacement from dropdown the items should show */
@@ -249,36 +251,30 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
 function DatepickerSelect(props: SelectProps): JSX.Element {
     const [pendingHighlight, setPendingHighlight] = useState(null);
 
-    const {
-        isOpen,
-        selectedItem,
-        getToggleButtonProps,
-        getMenuProps,
-        getItemProps,
-        setHighlightedIndex,
-    } = useSelect<Item>({
-        initialSelectedItem: props.initialValue,
-        itemToString: (item) => item.label,
-        items: props.items,
-        onSelectedItemChange: (changes) => {
-            const selected = changes.selectedItem;
-            if (props.onSelect) {
-                props.onSelect(selected);
-            }
-        },
-        stateReducer: (state, { changes, type }) => {
-            // hack to force highlight to update again in the next render
-            if (type === stateChangeTypes.ToggleButtonClick) {
-                setPendingHighlight(
-                    changes.selectedItem ? props.items.findIndex((i) => i.value === changes.selectedItem.value) : 0
-                );
-            }
+    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps, setHighlightedIndex } =
+        useSelect<Item>({
+            initialSelectedItem: props.initialValue,
+            itemToString: (item) => item.label,
+            items: props.items,
+            onSelectedItemChange: (changes) => {
+                const selected = changes.selectedItem;
+                if (props.onSelect) {
+                    props.onSelect(selected);
+                }
+            },
+            stateReducer: (state, { changes, type }) => {
+                // hack to force highlight to update again in the next render
+                if (type === stateChangeTypes.ToggleButtonClick) {
+                    setPendingHighlight(
+                        changes.selectedItem ? props.items.findIndex((i) => i.value === changes.selectedItem.value) : 0
+                    );
+                }
 
-            return changes;
-        },
-        // Only set the selectedItem key if it has been explicitly set in props
-        ...(props.selectedItem && { selectedItem: props.selectedItem }),
-    });
+                return changes;
+            },
+            // Only set the selectedItem key if it has been explicitly set in props
+            ...(props.selectedItem && { selectedItem: props.selectedItem }),
+        });
 
     useEffect(() => {
         if (isOpen && pendingHighlight !== null) {
@@ -308,13 +304,15 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
     );
     const menuProps = React.useMemo(() => getMenuProps({ ref: mergedDropdownRef }), [mergedDropdownRef, getMenuProps]);
 
-    const renderListItem = React.useCallback((item: Item, index: number) => (
-        <DatepickerListItem
-            item={item}
-            index={index}
-            getItemProps={getItemProps}
-            isSelected={selectedItem?.value === item.value} />
-    ),
+    const renderListItem = React.useCallback(
+        (item: Item, index: number) => (
+            <DatepickerListItem
+                item={item}
+                index={index}
+                getItemProps={getItemProps}
+                isSelected={selectedItem?.value === item.value}
+            />
+        ),
         [getItemProps, selectedItem]
     );
 
@@ -359,6 +357,5 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
         </Tooltip>
     );
 }
-
 
 export default DatepickerSelect;

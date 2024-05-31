@@ -23,11 +23,11 @@ import styled, { DefaultTheme, useTheme } from '@darajs/styled-components';
 
 import Badge from '../badge/badge';
 import { Input, InputWrapper, Wrapper } from '../combo-box/combo-box';
+import ChevronButton from '../shared/chevron-button';
+import DropdownList from '../shared/dropdown-list';
+import ListItem from '../shared/list-item';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
-import ListItem from '../shared/list-item';
-import DropdownList from '../shared/dropdown-list';
-import ChevronButton from '../shared/chevron-button';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -47,7 +47,7 @@ const getTextColor = (heading: boolean, isSelected: boolean, theme: DefaultTheme
     return theme.colors.text;
 };
 
-const ListItemSpan = React.memo(styled(ListItem) <ListSpanProps>`
+const ListItemSpan = React.memo(styled(ListItem)<ListSpanProps>`
     cursor: ${(props) => (props?.heading ? 'text' : 'pointer')};
     user-select: ${(props) => (props?.heading ? 'text' : 'none')};
 
@@ -119,37 +119,27 @@ type SectionedListItemProps = {
     isSelected: boolean;
 };
 
-const SectionedListItem = React.memo((
-    {
-        item,
-        index,
-        getItemProps,
-        isSelected
-    }: SectionedListItemProps
-): JSX.Element => {
-    const theme = useTheme();
-    return (
-        <ListItemSpan
-            getItemProps={getItemProps}
-            excludeOnClick
-            heading={item.heading}
-            key={`item-${index}`}
-            section={item.section}
-            isSelected={isSelected}
-            title={item.label}
-            item={item}
-            index={index}
-        >
-            {item.label || item.section}
-            {item.badge && (
-                <Badge color={item.badge.color || theme.colors.primary}>
-                    {item.badge.label}
-                </Badge>
-            )}
-        </ListItemSpan>
-    );
-});
-
+const SectionedListItem = React.memo(
+    ({ item, index, getItemProps, isSelected }: SectionedListItemProps): JSX.Element => {
+        const theme = useTheme();
+        return (
+            <ListItemSpan
+                getItemProps={getItemProps}
+                excludeOnClick
+                heading={item.heading}
+                key={`item-${index}`}
+                section={item.section}
+                isSelected={isSelected}
+                title={item.label}
+                item={item}
+                index={index}
+            >
+                {item.label || item.section}
+                {item.badge && <Badge color={item.badge.color || theme.colors.primary}>{item.badge.label}</Badge>}
+            </ListItemSpan>
+        );
+    }
+);
 
 /**
  * A component for rendering lists, sectioned and non-sectioned. Takes an array of unpacked  ListItem objects and
@@ -244,7 +234,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                 setPendingHighlight(
                     changes.selectedItem ?
                         props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
-                        : 0
+                    :   0
                 );
                 return {
                     ...changes,
@@ -312,18 +302,23 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const dropdownStyle = React.useMemo(() => ({
-        ...floatingStyles, marginLeft: -1
-    }), [floatingStyles]);
+    const dropdownStyle = React.useMemo(
+        () => ({
+            ...floatingStyles,
+            marginLeft: -1,
+        }),
+        [floatingStyles]
+    );
 
-    const renderListItem = useCallback((item: ListItem, index: number) => (
-        <SectionedListItem
-            item={item}
-            index={index}
-            getItemProps={getItemProps}
-            isSelected={selectedItem?.value === item.value}
-        />
-    ),
+    const renderListItem = useCallback(
+        (item: ListItem, index: number) => (
+            <SectionedListItem
+                item={item}
+                index={index}
+                getItemProps={getItemProps}
+                isSelected={selectedItem?.value === item.value}
+            />
+        ),
         [getItemProps, selectedItem]
     );
 

@@ -22,12 +22,11 @@ import ReactDOM from 'react-dom';
 import styled from '@darajs/styled-components';
 import { Cross } from '@darajs/ui-icons';
 
+import ChevronButton from '../shared/chevron-button';
+import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
-import DropdownList from '../shared/dropdown-list';
-import ChevronButton  from '../shared/chevron-button';
-
 
 const { stateChangeTypes } = useCombobox;
 
@@ -252,46 +251,45 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     // If there is a term change function passed in then don't filter locally
     const filteredItems = useMemo(
-        () => props.onTermChange ?
-            props.items
-            : props.items.filter(
-                (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
-            ),
+        () =>
+            props.onTermChange ?
+                props.items
+            :   props.items.filter(
+                    (item) =>
+                        !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
+                ),
         [props.onTermChange, props.items, selectedItems, inputValue]
     );
 
-    const { isOpen, getMenuProps, getInputProps, getItemProps, getToggleButtonProps } =
-        useCombobox<Item>({
-            defaultHighlightedIndex: -1,
-            initialIsOpen: props.initialIsOpen,
-            inputValue,
-            itemToString: (item) => item?.label || '',
-            items: filteredItems,
-            onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
-                if (type === stateChangeTypes.InputChange) {
-                    onTermChange(internalInputVal);
+    const { isOpen, getMenuProps, getInputProps, getItemProps, getToggleButtonProps } = useCombobox<Item>({
+        defaultHighlightedIndex: -1,
+        initialIsOpen: props.initialIsOpen,
+        inputValue,
+        itemToString: (item) => item?.label || '',
+        items: filteredItems,
+        onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
+            if (type === stateChangeTypes.InputChange) {
+                onTermChange(internalInputVal);
+            }
+            if (
+                [stateChangeTypes.InputKeyDownEnter, stateChangeTypes.ItemClick, stateChangeTypes.InputBlur].includes(
+                    type
+                )
+            ) {
+                if (selectedItem) {
+                    onTermChange('');
+                    addSelectedItem(selectedItem);
                 }
-                if (
-                    [
-                        stateChangeTypes.InputKeyDownEnter,
-                        stateChangeTypes.ItemClick,
-                        stateChangeTypes.InputBlur,
-                    ].includes(type)
-                ) {
-                    if (selectedItem) {
-                        onTermChange('');
-                        addSelectedItem(selectedItem);
-                    }
-                }
-            },
-            selectedItem: null,
-            stateReducer: (state, { changes, type }) => {
-                if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
-                    return { ...changes, isOpen: true };
-                }
-                return changes;
-            },
-        });
+            }
+        },
+        selectedItem: null,
+        stateReducer: (state, { changes, type }) => {
+            if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
+                return { ...changes, isOpen: true };
+            }
+            return changes;
+        },
+    });
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
@@ -340,7 +338,11 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
-                    <ChevronButton disabled={props.disabled} isOpen={isOpen} getToggleButtonProps={getToggleButtonProps}/>
+                    <ChevronButton
+                        disabled={props.disabled}
+                        isOpen={isOpen}
+                        getToggleButtonProps={getToggleButtonProps}
+                    />
                 </InputWrapper>
             </Tooltip>
             {ReactDOM.createPortal(
