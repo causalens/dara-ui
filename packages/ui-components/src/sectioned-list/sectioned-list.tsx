@@ -124,7 +124,7 @@ const SectionedListItem = ({ item, index, getItemProps, isSelected }: SectionedL
     return (
         <ListItemSpan
             getItemProps={getItemProps}
-            excludeOnClick
+            excludeOnClick={item.heading}
             heading={item.heading}
             key={`item-${index}`}
             section={item.section}
