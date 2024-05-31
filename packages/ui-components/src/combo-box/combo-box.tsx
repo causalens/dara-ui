@@ -280,7 +280,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                         isOpen={isOpen}
                         getMenuProps={getMenuProps}
                         size={props.size}
-                        setFloating={refs.setFloating}
+                        ref={refs.setFloating}
                     />,
                     document.body
                 )}

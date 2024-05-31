@@ -24,7 +24,7 @@ import { Cross } from '@darajs/ui-icons';
 
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, matchWidthToReference } from '../utils';
+import { matchWidthToReference } from '../utils';
 import DropdownList from '../shared/dropdown-list';
 import ChevronButton  from '../shared/chevron-button';
 
@@ -355,7 +355,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                     isOpen={isOpen}
                     getMenuProps={getMenuProps}
                     size={props.size}
-                    setFloating={refs.setFloating}
+                    ref={refs.setFloating}
                 />,
                 document.body
             )}

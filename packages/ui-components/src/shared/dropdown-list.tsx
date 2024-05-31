@@ -20,7 +20,6 @@ type Props = {
     style: React.CSSProperties;
     isOpen: boolean;
     size?: number;
-    setFloating: (node: HTMLElement | null) => void;
     getMenuProps?: (
         options?: UseComboboxGetMenuPropsOptions,
         otherOptions?: GetPropsCommonOptions,
@@ -31,21 +30,23 @@ type Props = {
     children?: (item: Item, index: number) => React.ReactNode;
 }
 
-const DropdownList = ({
-    items,
-    getItemProps,
-    getFloatingProps,
-    isOpen,
-    getMenuProps,
-    size,
-    setFloating,
-    style,
-    maxItems,
-    itemClass,
-    className,
-    children
-}: Props): JSX.Element => <StyledDropdownList
-    {...(getMenuProps ? getMenuProps({ ref: setFloating }) : { ref: setFloating })}
+const DropdownList = React.forwardRef<any, Props>((
+    {
+        items,
+        getItemProps,
+        getFloatingProps,
+        isOpen,
+        getMenuProps,
+        size,
+        style,
+        maxItems,
+        itemClass,
+        className,
+        children
+    },
+    ref
+): JSX.Element => <StyledDropdownList
+    {...(getMenuProps ? getMenuProps({ ref }) : { ref })} // Merge the refs conditionally
     {...getFloatingProps()}
     isOpen={isOpen}
     maxItems={maxItems}
@@ -66,7 +67,7 @@ const DropdownList = ({
         >
             {item.label}
         </ListItem>) : <NoItemsLabel>No Items</NoItemsLabel>}
-    </StyledDropdownList>
+    </StyledDropdownList>)
 DropdownList.displayName = 'DropdownList';
 
 export default React.memo(DropdownList);

@@ -4,6 +4,7 @@ import styled from '@darajs/styled-components';
 import Button from '../button/button';
 import { Chevron } from '../utils';
 import React from 'react';
+import { GetPropsCommonOptions, UseSelectGetToggleButtonPropsOptions } from 'downshift';
 
 const StyledChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling: 'ghost' }))`
     min-width: 0;
@@ -15,7 +16,10 @@ const StyledChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling
 `;
 
 type Props = {
-    getToggleButtonProps: () => Record<string, unknown>;
+    getToggleButtonProps: (
+        options?: UseSelectGetToggleButtonPropsOptions,
+        otherOptions?: GetPropsCommonOptions,
+      ) => Record<string, unknown>;
     disabled: boolean;
     isOpen: boolean;
 }

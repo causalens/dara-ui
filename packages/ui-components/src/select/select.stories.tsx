@@ -56,7 +56,7 @@ const simpleItems: Item[] = [
     },
 ];
 
-const tenThousandItems = Array.from({ length: 10000 }, (_, i) => ({
+const tenThousandItems = Array.from({ length: 10 }, (_, i) => ({
     label: `item ${i}`,
     value: i,
 }));

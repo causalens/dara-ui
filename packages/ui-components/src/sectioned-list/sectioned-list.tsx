@@ -22,26 +22,26 @@ import ReactDOM from 'react-dom';
 import styled, { DefaultTheme, useTheme } from '@darajs/styled-components';
 
 import Badge from '../badge/badge';
-import {  Input, InputWrapper, Wrapper } from '../combo-box/combo-box';
+import { Input, InputWrapper, Wrapper } from '../combo-box/combo-box';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
 import ListItem from '../shared/list-item';
 import DropdownList from '../shared/dropdown-list';
-import ChevronButton  from '../shared/chevron-button';
+import ChevronButton from '../shared/chevron-button';
 
 const { stateChangeTypes } = useCombobox;
 
 interface ListSpanProps {
     heading?: boolean;
     section?: string;
-    selected?: boolean;
+    isSelected?: boolean;
 }
 
-const getTextColor = (heading: boolean, selected: boolean, theme: DefaultTheme): string => {
+const getTextColor = (heading: boolean, isSelected: boolean, theme: DefaultTheme): string => {
     if (heading) {
         return theme.colors.text;
     }
-    if (selected) {
+    if (isSelected) {
         return theme.colors.primary;
     }
     return theme.colors.text;
@@ -59,7 +59,7 @@ const ListItemSpan = React.memo(styled(ListItem) <ListSpanProps>`
     padding-right: 0.7rem;
 
     font-weight: ${(props) => (props?.heading ? 'bold' : 'normal')};
-    color: ${(props) => getTextColor(props?.heading, props.selected, props.theme)};
+    color: ${(props) => getTextColor(props?.heading, props.isSelected, props.theme)};
 
     ${(props) => {
         if (props.heading) {
@@ -119,12 +119,14 @@ type ListItemRendererProps = {
     isSelected: boolean;
 };
 
-const ListItemRenderer: React.FC<ListItemRendererProps> = ({
-    item,
-    index,
-    getItemProps,
-    isSelected,
-}) => {
+const ListItemRenderer = React.memo((
+    {
+        item,
+        index,
+        getItemProps,
+        isSelected
+    }: ListItemRendererProps
+): JSX.Element => {
     const theme = useTheme();
     return (
         <ListItemSpan
@@ -133,7 +135,7 @@ const ListItemRenderer: React.FC<ListItemRendererProps> = ({
             heading={item.heading}
             key={`item-${index}`}
             section={item.section}
-            selected={isSelected}
+            isSelected={isSelected}
             title={item.label}
             item={item}
             index={index}
@@ -146,9 +148,7 @@ const ListItemRenderer: React.FC<ListItemRendererProps> = ({
             )}
         </ListItemSpan>
     );
-};
-
-const ListItemRendererMemo = React.memo(ListItemRenderer);
+});
 
 
 /**
@@ -317,7 +317,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     }), [floatingStyles]);
 
     const renderListItem = useCallback((item: ListItem, index: number) => (
-        <ListItemRendererMemo
+        <ListItemRenderer
             item={item}
             index={index}
             getItemProps={getItemProps}
@@ -337,7 +337,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         >
             <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
                 <Input {...getInputProps({ value: inputValue })} {...getReferenceProps()} />
-                <ChevronButton disabled={props.disabled} isOpen={isOpen} getToggleButtonProps={getToggleButtonProps}/>
+                <ChevronButton disabled={props.disabled} isOpen={isOpen} getToggleButtonProps={getToggleButtonProps} />
             </InputWrapper>
             {ReactDOM.createPortal(
                 <DropdownList
@@ -347,7 +347,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                     style={dropdownStyle}
                     isOpen={isOpen}
                     getMenuProps={getMenuProps}
-                    setFloating={refs.setFloating}
+                    ref={refs.setFloating}
                 >
                     {renderListItem}
                 </DropdownList>,

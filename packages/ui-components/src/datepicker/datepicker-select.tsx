@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Placement, autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { useSelect } from 'downshift';
+import { GetPropsCommonOptions, useSelect, UseSelectGetToggleButtonPropsOptions } from 'downshift';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
@@ -25,6 +25,9 @@ import styled from '@darajs/styled-components';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron } from '../utils';
+
+import DropdownList from '../shared/dropdown-list';
+import ListItem from '../shared/list-item';
 
 const { stateChangeTypes } = useSelect;
 
@@ -121,35 +124,22 @@ const SelectButtonPrimary = styled(SelectButton)`
 `;
 
 interface DatepickerListItemProps {
-    hovered?: boolean;
     isSelected?: boolean;
     size?: number;
 }
 
-const DatepickerListItem = styled.span<DatepickerListItemProps>`
-    cursor: pointer;
-    user-select: none;
-
-    overflow: hidden;
+const DatepickerListItem = styled(ListItem) <DatepickerListItemProps>`
     display: flex;
     align-items: center;
 
-    width: 100%;
-    min-height: 2rem;
     padding: 0.25rem 1.5rem;
 
     font-size: ${(props) => (props.size ? `${props.size}rem` : props.theme.font.size)};
-    font-weight: 300;
     color: ${(props) => (props.isSelected ? '#FFF' : props.theme.colors.text)};
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
     background-color: ${(props) => {
         if (props.isSelected) {
             return props.theme.colors.primary;
-        }
-        if (props.hovered) {
-            return props.theme.colors.grey2;
         }
         return props.theme.colors.grey1;
     }};
@@ -157,31 +147,77 @@ const DatepickerListItem = styled.span<DatepickerListItemProps>`
     :active {
         background-color: ${(props) => props.theme.colors.grey1};
     }
-
-    &:last-child {
-        border-bottom: none;
-    }
 `;
+
+type DatepickerListItemRendererProps = {
+    item: Item;
+    index: number;
+    getItemProps: (options: any) => any;
+    isSelected: boolean;
+    size?: number;
+}
+
+const DatepickerListItemRenderer = React.memo(({
+    item,
+    index,
+    getItemProps,
+    isSelected,
+    size,
+}: DatepickerListItemRendererProps
+) => (
+    <DatepickerListItem
+        getItemProps={getItemProps}
+        isSelected={isSelected}
+        key={`item-${index}`}
+        title={item.label}
+        item={item}
+        index={index}
+        size={size}
+    >
+        {item.label}
+    </DatepickerListItem>
+
+))
 
 interface DropdownListProps {
     displacement: number;
-    isOpen: boolean;
-    maxItems?: number;
 }
 
-const DropdownList = styled.div<DropdownListProps>`
+const StyledDropdownList = React.memo(styled(DropdownList) <DropdownListProps>`
     overflow-y: auto;
     display: ${(props) => (props.isOpen ? 'flex' : 'none')};
     flex-direction: column;
     gap: 0.125rem;
 
+    width: 16.25rem;
     max-height: calc(${(props) => (props.maxItems || 5) * 2}em + 2px);
     margin-left: ${(props) => props.displacement}rem;
 
     background-color: ${(props) => props.theme.colors.grey1};
     border: none;
-    outline: 0;
-`;
+`);
+
+
+const DatepickerSelectButtonPrimary = React.memo(({ disabled, getToggleButtonProps, setReference, getReferenceProps, size, isOpen, selectedItem }: {
+    disabled: boolean;
+    size: number;
+    isOpen: boolean;
+    selectedItem: Item;
+    getToggleButtonProps: (
+        options?: UseSelectGetToggleButtonPropsOptions,
+        otherOptions?: GetPropsCommonOptions,
+    ) => Record<string, unknown>;
+    setReference: (node: any) => void;
+    getReferenceProps: (userProps?: React.HTMLProps<Element>) => Record<string, unknown>
+}): JSX.Element => <SelectButtonPrimary
+    disabled={disabled}
+    {...getToggleButtonProps({ disabled, ref: setReference })}
+    {...getReferenceProps()}
+    type="button"
+>
+        <SelectedItem size={size}>{selectedItem ? selectedItem.label : 'Select'}</SelectedItem>
+        <Chevron disabled={disabled} isOpen={isOpen} />
+    </SelectButtonPrimary>)
 
 export interface SelectProps extends InteractiveComponentProps<Item> {
     /** The left displacement from dropdown the items should show */
@@ -192,8 +228,6 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
     itemClass?: string;
     /** The items to pick from the list. Each should have a label and a value */
     items: Array<Item>;
-    /** The maximum number of items to display, defaults to 5 */
-    maxItems?: number;
     /** onClick event. */
     onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void | Promise<void>;
     /** An optional onSelect handler for listening to changes in the selected item */
@@ -220,7 +254,6 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
         selectedItem,
         getToggleButtonProps,
         getMenuProps,
-        highlightedIndex,
         getItemProps,
         setHighlightedIndex,
     } = useSelect<Item>({
@@ -264,18 +297,25 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
     const setFloatingRef = refs.setFloating;
     const { dropdownRef } = props;
-
     const mergedDropdownRef = React.useCallback(
         (node: HTMLElement | null) => {
             setFloatingRef(node);
-            setMenuRef(node);
             dropdownRef?.(node);
         },
-        [setFloatingRef, setMenuRef, dropdownRef]
+        [setFloatingRef, dropdownRef]
+    );
+    const menuProps = React.useMemo(() => getMenuProps({ ref: mergedDropdownRef }), [mergedDropdownRef, getMenuProps]);
+
+    const renderListItem = React.useCallback((item: Item, index: number) => (
+        <DatepickerListItemRenderer
+            item={item}
+            index={index}
+            getItemProps={getItemProps}
+            isSelected={selectedItem?.value === item.value} />
+    ),
+        [getItemProps, selectedItem]
     );
 
     return (
@@ -287,54 +327,38 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                 onClick={props.onClick}
                 style={props.style}
             >
-                <SelectButtonPrimary
+                <DatepickerSelectButtonPrimary
                     disabled={props.disabled}
-                    {...getToggleButtonProps({ disabled: props.disabled, ref: refs.setReference })}
-                    {...getReferenceProps()}
-                    type="button"
-                >
-                    <SelectedItem size={props.size}>{selectedItem ? selectedItem.label : 'Select'}</SelectedItem>
-                    <Chevron disabled={props.disabled} isOpen={isOpen} />
-                </SelectButtonPrimary>
+                    getToggleButtonProps={getToggleButtonProps}
+                    setReference={refs.setReference}
+                    getReferenceProps={getReferenceProps}
+                    size={props.size}
+                    isOpen={isOpen}
+                    selectedItem={selectedItem}
+                />
                 {ReactDOM.createPortal(
-                    <DropdownList
-                        {...menuProps}
-                        {...getFloatingProps()}
-                        ref={mergedDropdownRef}
-                        className={`${menuProps?.className ?? ''} ${props.itemClass}`}
-                        displacement={props.displacement}
+                    <StyledDropdownList
+                        items={props.items}
+                        getItemProps={getItemProps}
+                        getFloatingProps={getFloatingProps}
+                        style={floatingStyles}
                         isOpen={isOpen}
+                        getMenuProps={getMenuProps}
+                        size={props.size}
+                        className={`${menuProps?.className ?? ''} ${props.itemClass}`}
+                        itemClass={props.itemClass}
+                        displacement={props.displacement}
                         maxItems={7}
-                        style={{
-                            ...floatingStyles,
-                            width: '16.25rem', // Does not use floatingStyles.width as it expands to the width of the whole Datepicker
-                            zIndex: 9999,
-                        }}
+                        ref={mergedDropdownRef}
                     >
-                        {props.items.map((item, index) => {
-                            const { itemClassName, ...itemProps } = getItemProps({ index, item });
-
-                            return (
-                                <DatepickerListItem
-                                    {...itemProps}
-                                    aria-selected={selectedItem.label === item.label}
-                                    className={`${itemClassName as string} ${props.itemClass}`}
-                                    hovered={index === highlightedIndex}
-                                    isSelected={selectedItem.label === item.label}
-                                    key={`item-${index}`}
-                                    size={props.size}
-                                    title={item.label}
-                                >
-                                    {item.label}
-                                </DatepickerListItem>
-                            );
-                        })}
-                    </DropdownList>,
+                        {renderListItem}
+                    </StyledDropdownList>,
                     document.body
                 )}
             </Wrapper>
         </Tooltip>
     );
 }
+
 
 export default DatepickerSelect;

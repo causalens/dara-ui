@@ -163,7 +163,7 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
                         getFloatingProps={getFloatingProps}
                         style={dropdownStyle}
                         isOpen={showMenu}
-                        setFloating={refs.setFloating}
+                        ref={refs.setFloating}
                     />,
                     document.body
                 )}

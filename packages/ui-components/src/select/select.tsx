@@ -232,18 +232,18 @@ function Select(props: SelectProps): JSX.Element {
                 </SelectButton>
                 {ReactDOM.createPortal(
                     <DropdownList
-                    items={props.items}
-                    getItemProps={getItemProps}
-                    getFloatingProps={getFloatingProps}
-                    style={dropdownStyle}
-                    isOpen={isOpen}
-                    getMenuProps={getMenuProps}
-                    size={props.size}
-                    setFloating={refs.setFloating}
-                    className={`${(menuProps?.className as string) ?? ''} ${props.itemClass}`}
-                    itemClass={props.itemClass}
-                    maxItems={props.maxItems}
-                />,
+                        items={props.items}
+                        getItemProps={getItemProps}
+                        getFloatingProps={getFloatingProps}
+                        style={dropdownStyle}
+                        isOpen={isOpen}
+                        getMenuProps={getMenuProps}
+                        size={props.size}
+                        ref={refs.setFloating}
+                        className={`${(menuProps?.className) ?? ''} ${props.itemClass}`}
+                        itemClass={props.itemClass}
+                        maxItems={props.maxItems}
+                    />,
                     document.body
                 )}
             </Wrapper>
