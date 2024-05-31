@@ -71,7 +71,7 @@ const tenThousandItems = Array.from({ length: 10000 }, (_, i) => ({
     value: i,
 }));
 
-export const MultiSelect = (args: MultiSelectProps): JSX.Element => <div ><MultiSelectComponent style={{marginTop: 2000, marginBottom: 2000}} {...args} /></div>;
+export const MultiSelect = (args: MultiSelectProps): JSX.Element => <div ><MultiSelectComponent {...args} /></div>;
 
 MultiSelect.args = {
     items: tenThousandItems,

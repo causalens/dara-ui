@@ -43,16 +43,29 @@ export const StyledListItem = styled.span<ListItemProps>`
 
 
 type Props = {
+    /** Optional font size for the list item */
     size?: number;
+    /** Title of the list item */
     title: string;
+    /** Item data */
     item: Item;
+    /** Index of the item in the list */
     index: number;
+    /** Function to get props for the item */
     getItemProps: (options: UseComboboxGetItemPropsOptions<Item>) => any;
-    itemClass?: string
+    /** Optional CSS classname for the list item */
+    itemClass?: string;
+    /** Flag to exclude the onClick handler */
     excludeOnClick?: boolean;
+    /** Children nodes to be rendered inside the list item */
     children?: React.ReactNode;
-}
-
+  };
+  
+  /**
+   * ListItem component for rendering a single item in a dropdown list.
+   * 
+   * @param {Props} props - The props for the component
+   * */
 const ListItem = ({ size, title, item, index, getItemProps, itemClass, excludeOnClick, children }: Props): JSX.Element => {
     const { itemClassName, ...itemProps } = getItemProps({ index, item });
     if (excludeOnClick) {

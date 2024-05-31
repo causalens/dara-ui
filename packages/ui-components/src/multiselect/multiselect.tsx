@@ -252,14 +252,11 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     // If there is a term change function passed in then don't filter locally
     const filteredItems = useMemo(
-        () => {
-            console.log('filteredItems render',)
-            return props.onTermChange ?
-                props.items
-                : props.items.filter(
-                    (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
-                );
-        },
+        () => props.onTermChange ?
+            props.items
+            : props.items.filter(
+                (item) => !selectedItems.includes(item) && item.label?.toLowerCase().includes(inputValue.toLowerCase())
+            ),
         [props.onTermChange, props.items, selectedItems, inputValue]
     );
 

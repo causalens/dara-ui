@@ -16,22 +16,26 @@ const StyledChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling
 `;
 
 type Props = {
+    /** Function to get props for the toggle button */
     getToggleButtonProps: (
-        options?: UseSelectGetToggleButtonPropsOptions,
-        otherOptions?: GetPropsCommonOptions,
-      ) => Record<string, unknown>;
+      options?: UseSelectGetToggleButtonPropsOptions,
+      otherOptions?: GetPropsCommonOptions,
+    ) => Record<string, unknown>;
+    /** Boolean to indicate if the button is disabled */
     disabled: boolean;
+    /** Boolean to indicate if the dropdown is open */
     isOpen: boolean;
-}
+  };
 
-const ChevronButton = ({getToggleButtonProps, disabled, isOpen, ...props}: Props): JSX.Element => {
-    const toggleButtonProps =  {...getToggleButtonProps()}
-    return (
-
-        <StyledChevronButton {...toggleButtonProps} {...props} >
-            <Chevron disabled={disabled} isOpen={isOpen} />
-        </StyledChevronButton>
-    );
-};
+/**
+ * ChevronButton component for rendering a button with a chevron icon.
+ *
+ * @param {Props} props - The props for the component
+ */
+const ChevronButton = ({getToggleButtonProps, disabled, isOpen, ...props}: Props): JSX.Element => (
+    <StyledChevronButton {...getToggleButtonProps()} {...props}>
+        <Chevron disabled={disabled} isOpen={isOpen} />
+    </StyledChevronButton>
+);
 
 export default React.memo(ChevronButton);

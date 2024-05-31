@@ -24,7 +24,7 @@ import styled from '@darajs/styled-components';
 import ChevronButton from '../shared/chevron-button';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, matchWidthToReference } from '../utils';
+import { matchWidthToReference } from '../utils';
 import DropdownList from '../shared/dropdown-list';
 
 const { stateChangeTypes } = useCombobox;

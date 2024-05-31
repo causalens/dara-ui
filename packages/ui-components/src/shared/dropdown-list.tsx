@@ -14,22 +14,38 @@ const StyledDropdownList = styled(List)`
 `;
 
 type Props = {
+    /** Array of items to display in the dropdown */
     items: Item[];
-    getItemProps: (options: UseComboboxGetItemPropsOptions<Item>) => any
+    /** Function to get props for an item */
+    getItemProps: (options: UseComboboxGetItemPropsOptions<Item>) => any;
+    /** Function to get props for the floating element */
     getFloatingProps: (userProps?: React.HTMLProps<HTMLElement>) => Record<string, unknown>;
+    /** Style object to customize the dropdown list */
     style: React.CSSProperties;
+    /** Boolean to indicate if the dropdown is open */
     isOpen: boolean;
+    /** Optional size for the list items */
     size?: number;
+    /** Function to get props for the menu. */
     getMenuProps?: (
         options?: UseComboboxGetMenuPropsOptions,
         otherOptions?: GetPropsCommonOptions,
     ) => any;
+    /** Maximum number of items to display in the dropdown */
     maxItems?: number;
+    /** CSS classname for individual items */
     itemClass?: string;
+    /** CSS classname for the dropdown list */
     className?: string;
+    /** Optional function to render custom children. By default, it renders the ListItem with the item label */
     children?: (item: Item, index: number) => React.ReactNode;
 }
 
+/**
+ * DropdownList component to display a list of items in a dropdown.
+ * 
+ * @param {Props} props - The props for the component
+ */
 const DropdownList = React.forwardRef<any, Props>((
     {
         items,

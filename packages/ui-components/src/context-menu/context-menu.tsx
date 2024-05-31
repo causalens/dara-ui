@@ -112,7 +112,6 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             e.preventDefault();
             e.stopPropagation();
 
-            console.log(e.clientX, e.clientY)
             refs.setReference({
                 getBoundingClientRect: () => ({
                     x: e.clientX,
