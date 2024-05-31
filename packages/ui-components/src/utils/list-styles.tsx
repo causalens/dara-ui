@@ -33,38 +33,18 @@ const List = styled.div<ListProps>`
     border: 1px solid ${(props) => props.theme.colors.grey3};
 `;
 
-interface ListItemProps {
-    hovered?: boolean;
-    size?: number;
-}
+const NoItemsLabel = styled.span`
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
 
-const ListItem = styled.span<ListItemProps>`
-    cursor: pointer;
-    user-select: none;
+    height: 2rem;
 
-    overflow: hidden;
-
-    width: 100%;
-    min-height: 2rem;
-    padding: 0.25rem 1rem;
-
-    font-size: ${(props) => (props.size ? `${props.size}rem` : '1rem')};
-    font-weight: 300;
+    font-size: 1rem;
     color: ${(props) => props.theme.colors.text};
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
-    background-color: ${(props) => (props.hovered ? props.theme.colors.grey2 : props.theme.colors.blue1)};
-    border-bottom: 1px solid ${(props) => props.theme.colors.grey3};
-
-    :active {
-        color: ${(props) => props.theme.colors.blue1};
-        background-color: ${(props) => props.theme.colors.primary};
-    }
-
-    &:last-child {
-        border-bottom: none;
-    }
+    background-color: ${(props) => props.theme.colors.blue1};
 `;
 
-export { List, ListItem };
+export { List, NoItemsLabel };

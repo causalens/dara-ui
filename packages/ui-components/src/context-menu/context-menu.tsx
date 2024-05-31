@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 import { flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
-import styled from '@darajs/styled-components';
 
 import { Key } from '../constants';
-import { List, ListItem } from '../utils';
+import DropdownList from '../shared/dropdown-list';
+import { Item } from '../types';
+
 
 export interface MenuAction {
     action: () => void;
     label: string;
 }
 
-const DropdownList = styled(List)`
-    overflow-y: auto;
-    box-shadow: ${(props) => props.theme.shadow.light};
-`;
+// const DropdownList = styled(List)`
+//     overflow-y: auto;
+//     box-shadow: ${(props) => props.theme.shadow.light};
+// `;
 
 export interface ContextMenuProps<T> {
     /** An array of actions to show in the context menu */
@@ -53,7 +54,6 @@ export interface ContextMenuProps<T> {
 function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: ContextMenuProps<T>) => JSX.Element {
     function WrappedContextMenu(props: ContextMenuProps<T>): JSX.Element {
         const [showMenu, setShowMenu] = useState(false);
-        const [hoveredItem, setHoveredItem] = useState(-1);
 
         // Handle clicking outside the menu or hitting escape and make sure the menu closes.
         useEffect(() => {
@@ -112,6 +112,7 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             e.preventDefault();
             e.stopPropagation();
 
+            console.log(e.clientX, e.clientY)
             refs.setReference({
                 getBoundingClientRect: () => ({
                     x: e.clientX,
@@ -128,15 +129,27 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
             setShowMenu(true);
         };
 
-        const onAction = (action: MenuAction): void => {
+        const onAction = React.useCallback((action: MenuAction): void => {
             if (canClose) {
                 setShowMenu(false);
                 action.action();
             }
-        };
+        }, [canClose]);
 
         const role = useRole(context, { role: 'menu' });
         const { getFloatingProps } = useInteractions([role]);
+
+        const dropdownStyle = React.useMemo(() => ({
+            ...floatingStyles, "overflow-y": 'auto', minWidth: 150, borderRadius: '0.25rem'
+        }), [floatingStyles]);
+
+        const getItemProps = React.useCallback(
+            ({ item }: {
+                item: Item;
+            }) => ({
+                onMouseUp: () => onAction(item as unknown as MenuAction)
+            }),
+            [onAction])
 
         return (
             <>
@@ -145,24 +158,13 @@ function ContextMenu<T>(Component: React.ComponentType<T> | string): (props: Con
                 </Component>
                 {ReactDOM.createPortal(
                     <DropdownList
-                        {...getFloatingProps()}
-                        ref={refs.setFloating}
+                        items={props.actions as unknown as Item[]}
+                        getItemProps={getItemProps}
+                        getFloatingProps={getFloatingProps}
+                        style={dropdownStyle}
                         isOpen={showMenu}
-                        style={{ ...floatingStyles, minWidth: 150, zIndex: 9999 }}
-                    >
-                        {props.actions.map((action, index) => (
-                            <ListItem
-                                hovered={hoveredItem === index}
-                                key={`item-${index}`}
-                                onMouseEnter={() => setHoveredItem(index)}
-                                onMouseLeave={() => setHoveredItem(-1)}
-                                onMouseUp={() => onAction(action)}
-                                title={action.label}
-                            >
-                                {action.label}
-                            </ListItem>
-                        ))}
-                    </DropdownList>,
+                        setFloating={refs.setFloating}
+                    />,
                     document.body
                 )}
             </>

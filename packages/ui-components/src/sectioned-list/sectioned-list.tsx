@@ -16,27 +16,23 @@
  */
 import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxState, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled, { DefaultTheme, useTheme } from '@darajs/styled-components';
 
 import Badge from '../badge/badge';
-import { ChevronButton, Input, InputWrapper, NoItemsLabel, Wrapper } from '../combo-box/combo-box';
+import {  Input, InputWrapper, Wrapper } from '../combo-box/combo-box';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import { matchWidthToReference } from '../utils';
+import ListItem from '../shared/list-item';
+import DropdownList from '../shared/dropdown-list';
+import ChevronButton  from '../shared/chevron-button';
 
 const { stateChangeTypes } = useCombobox;
 
-const ListWrapper = styled(List)`
-    margin-left: -1px;
-    border-radius: 0 0 0.25rem 0.25rem;
-    box-shadow: ${(props) => props.theme.shadow.light};
-`;
-
 interface ListSpanProps {
     heading?: boolean;
-    hovered?: boolean;
     section?: string;
     selected?: boolean;
 }
@@ -51,7 +47,7 @@ const getTextColor = (heading: boolean, selected: boolean, theme: DefaultTheme):
     return theme.colors.text;
 };
 
-const ListItemSpan = styled(ListItem)<ListSpanProps>`
+const ListItemSpan = React.memo(styled(ListItem) <ListSpanProps>`
     cursor: ${(props) => (props?.heading ? 'text' : 'pointer')};
     user-select: ${(props) => (props?.heading ? 'text' : 'none')};
 
@@ -75,7 +71,7 @@ const ListItemSpan = styled(ListItem)<ListSpanProps>`
             `;
         }
     }}
-`;
+`);
 
 function instanceOfSectionItem(item: Item | ListSection): item is ListSection {
     return 'items' in item;
@@ -116,6 +112,45 @@ export interface SectionedListProps extends InteractiveComponentProps<Item> {
     style?: React.CSSProperties;
 }
 
+type ListItemRendererProps = {
+    item: ListItem;
+    index: number;
+    getItemProps: (options: { index: number; item: Item }) => any;
+    isSelected: boolean;
+};
+
+const ListItemRenderer: React.FC<ListItemRendererProps> = ({
+    item,
+    index,
+    getItemProps,
+    isSelected,
+}) => {
+    const theme = useTheme();
+    return (
+        <ListItemSpan
+            getItemProps={getItemProps}
+            excludeOnClick
+            heading={item.heading}
+            key={`item-${index}`}
+            section={item.section}
+            selected={isSelected}
+            title={item.label}
+            item={item}
+            index={index}
+        >
+            {item.label || item.section}
+            {item.badge && (
+                <Badge color={item.badge.color || theme.colors.primary}>
+                    {item.badge.label}
+                </Badge>
+            )}
+        </ListItemSpan>
+    );
+};
+
+const ListItemRendererMemo = React.memo(ListItemRenderer);
+
+
 /**
  * A component for rendering lists, sectioned and non-sectioned. Takes an array of unpacked  ListItem objects and
  * renders a searchable list.
@@ -123,8 +158,6 @@ export interface SectionedListProps extends InteractiveComponentProps<Item> {
  * @param {SectionedListProps} props - the component props
  */
 function SectionedList(props: SectionedListProps): JSX.Element {
-    const theme = useTheme();
-
     const unpackedItems = useMemo(() => unpackSectionedList(props.items), [props.items]);
 
     const [pendingHighlight, setPendingHighlight] = useState(null);
@@ -137,7 +170,6 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         getMenuProps,
         getInputProps,
         getToggleButtonProps,
-        highlightedIndex,
         getItemProps,
         setHighlightedIndex,
     } = useCombobox<Item>({
@@ -212,7 +244,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                 setPendingHighlight(
                     changes.selectedItem ?
                         props.items.findIndex((i: ListItem) => i.value === changes.selectedItem.value)
-                    :   0
+                        : 0
                 );
                 return {
                     ...changes,
@@ -280,16 +312,19 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
-    const setFloatingRef = refs.setFloating;
+    const dropdownStyle = React.useMemo(() => ({
+        ...floatingStyles, marginLeft: -1
+    }), [floatingStyles]);
 
-    const mergedRefs = useCallback(
-        (node: HTMLElement | null) => {
-            setFloatingRef(node);
-            setMenuRef(node);
-        },
-        [setFloatingRef, setMenuRef]
+    const renderListItem = useCallback((item: ListItem, index: number) => (
+        <ListItemRendererMemo
+            item={item}
+            index={index}
+            getItemProps={getItemProps}
+            isSelected={selectedItem?.value === item.value}
+        />
+    ),
+        [getItemProps, selectedItem]
     );
 
     return (
@@ -302,48 +337,20 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         >
             <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
                 <Input {...getInputProps({ value: inputValue })} {...getReferenceProps()} />
-                <ChevronButton {...getToggleButtonProps()}>
-                    <Chevron disabled={props.disabled} isOpen={isOpen} />
-                </ChevronButton>
+                <ChevronButton disabled={props.disabled} isOpen={isOpen} getToggleButtonProps={getToggleButtonProps}/>
             </InputWrapper>
             {ReactDOM.createPortal(
-                <ListWrapper
-                    {...menuProps}
-                    {...getFloatingProps()}
-                    ref={mergedRefs}
+                <DropdownList
+                    items={items}
+                    getItemProps={getItemProps}
+                    getFloatingProps={getFloatingProps}
+                    style={dropdownStyle}
                     isOpen={isOpen}
-                    style={{
-                        ...floatingStyles,
-                        zIndex: 9999,
-                    }}
+                    getMenuProps={getMenuProps}
+                    setFloating={refs.setFloating}
                 >
-                    {items.length > 0 &&
-                        items.map((item: ListItem, index: number) => {
-                            const itemProps = getItemProps({ index, item });
-                            if (item.heading) {
-                                delete itemProps.onClick;
-                            }
-                            return (
-                                <ListItemSpan
-                                    {...itemProps}
-                                    heading={item.heading}
-                                    hovered={index === highlightedIndex}
-                                    key={`item-${index}`}
-                                    section={item.section}
-                                    selected={item.value === selectedItem?.value}
-                                    title={item.label}
-                                >
-                                    {item.label || item.section}
-                                    {item.badge && (
-                                        <Badge color={item.badge.color || theme.colors.primary}>
-                                            {item.badge.label}
-                                        </Badge>
-                                    )}
-                                </ListItemSpan>
-                            );
-                        })}
-                    {items.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
-                </ListWrapper>,
+                    {renderListItem}
+                </DropdownList>,
                 document.body
             )}
         </Wrapper>

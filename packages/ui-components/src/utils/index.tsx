@@ -16,6 +16,6 @@
  */
 export { default as Chevron } from './chevron';
 export { default as SubtleLabel } from './label';
-export { List, ListItem } from './list-styles';
+export { List, NoItemsLabel } from './list-styles';
 export { default as useInfiniteLoader, InfiniteLoader } from './use-infinite-loader';
 export { default as matchWidthToReference } from './match-width-to-reference';
