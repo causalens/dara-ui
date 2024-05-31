@@ -47,7 +47,7 @@ const getTextColor = (heading: boolean, isSelected: boolean, theme: DefaultTheme
     return theme.colors.text;
 };
 
-const ListItemSpan = React.memo(styled(ListItem)<ListSpanProps>`
+const ListItemSpan = styled(ListItem)<ListSpanProps>`
     cursor: ${(props) => (props?.heading ? 'text' : 'pointer')};
     user-select: ${(props) => (props?.heading ? 'text' : 'none')};
 
@@ -71,7 +71,7 @@ const ListItemSpan = React.memo(styled(ListItem)<ListSpanProps>`
             `;
         }
     }}
-`);
+`;
 
 function instanceOfSectionItem(item: Item | ListSection): item is ListSection {
     return 'items' in item;
@@ -119,27 +119,25 @@ type SectionedListItemProps = {
     isSelected: boolean;
 };
 
-const SectionedListItem = React.memo(
-    ({ item, index, getItemProps, isSelected }: SectionedListItemProps): JSX.Element => {
-        const theme = useTheme();
-        return (
-            <ListItemSpan
-                getItemProps={getItemProps}
-                excludeOnClick
-                heading={item.heading}
-                key={`item-${index}`}
-                section={item.section}
-                isSelected={isSelected}
-                title={item.label}
-                item={item}
-                index={index}
-            >
-                {item.label || item.section}
-                {item.badge && <Badge color={item.badge.color || theme.colors.primary}>{item.badge.label}</Badge>}
-            </ListItemSpan>
-        );
-    }
-);
+const SectionedListItem = ({ item, index, getItemProps, isSelected }: SectionedListItemProps): JSX.Element => {
+    const theme = useTheme();
+    return (
+        <ListItemSpan
+            getItemProps={getItemProps}
+            excludeOnClick
+            heading={item.heading}
+            key={`item-${index}`}
+            section={item.section}
+            isSelected={isSelected}
+            title={item.label}
+            item={item}
+            index={index}
+        >
+            {item.label || item.section}
+            {item.badge && <Badge color={item.badge.color || theme.colors.primary}>{item.badge.label}</Badge>}
+        </ListItemSpan>
+    );
+};
 
 /**
  * A component for rendering lists, sectioned and non-sectioned. Takes an array of unpacked  ListItem objects and
