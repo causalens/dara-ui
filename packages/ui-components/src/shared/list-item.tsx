@@ -90,7 +90,6 @@ const ListItem = ({
             size={size}
             item={item}
         >
-            {' '}
             {children}
         </StyledListItem>
     );
