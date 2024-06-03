@@ -16,9 +16,8 @@
  */
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
-import { DEFAULT_NODE_SIZE } from '@shared/utils';
-
 import { DirectionType, GraphTiers, SimulationGraph } from '../../types';
+import { DEFAULT_NODE_SIZE } from '../utils';
 
 export abstract class GraphLayoutBuilder<T> {
     _nodeSize = DEFAULT_NODE_SIZE;
