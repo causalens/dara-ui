@@ -16,7 +16,8 @@
  */
 import { DefaultTheme } from '@darajs/styled-components';
 
-import { TARGET_NODE_MULTIPLIER } from '../utils';
+import { TARGET_NODE_MULTIPLIER } from '@shared/utils';
+
 import { PixiNodeStyle } from './definitions';
 
 /**
