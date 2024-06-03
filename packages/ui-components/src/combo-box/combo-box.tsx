@@ -26,6 +26,7 @@ import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -158,6 +159,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
             ),
         [inputValue, props.items]
     );
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
 
     const {
         selectedItem,
@@ -185,6 +187,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 }
             }
         },
+        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
         stateReducer: (state, { changes, type }) => {
             // This resets the input when the dropdown is opened
             if (
@@ -291,6 +294,8 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                         getMenuProps={getMenuProps}
                         size={props.size}
                         ref={refs.setFloating}
+                        selectedItem={selectedItem}
+                        kbdHighlightIdx={kbdHighlightIdx}
                     />,
                     document.body
                 )}

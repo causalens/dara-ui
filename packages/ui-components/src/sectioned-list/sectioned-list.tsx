@@ -25,9 +25,10 @@ import Badge from '../badge/badge';
 import { Input, InputWrapper, Wrapper } from '../combo-box/combo-box';
 import ChevronButton from '../shared/chevron-button';
 import DropdownList from '../shared/dropdown-list';
-import ListItem from '../shared/list-item';
+import ListItem, { StyledListItem } from '../shared/list-item';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -47,7 +48,7 @@ const getTextColor = (heading: boolean, isSelected: boolean, theme: DefaultTheme
     return theme.colors.text;
 };
 
-const ListItemSpan = styled(ListItem)<ListSpanProps>`
+const ListItemSpan = styled(StyledListItem)<ListSpanProps>`
     cursor: ${(props) => (props?.heading ? 'text' : 'pointer')};
     user-select: ${(props) => (props?.heading ? 'text' : 'none')};
 
@@ -117,21 +118,32 @@ type SectionedListItemProps = {
     index: number;
     getItemProps: (options: { index: number; item: Item }) => any;
     isSelected: boolean;
+    isHighlighted?: boolean;
 };
 
-const SectionedListItem = ({ item, index, getItemProps, isSelected }: SectionedListItemProps): JSX.Element => {
+const SectionedListItem = ({
+    item,
+    index,
+    getItemProps,
+    isSelected,
+    isHighlighted,
+}: SectionedListItemProps): JSX.Element => {
     const theme = useTheme();
+    const { itemClassName, ...itemProps } = getItemProps({ index, item });
+    if (item.heading) {
+        delete itemProps.onClick;
+    }
+
     return (
         <ListItemSpan
-            getItemProps={getItemProps}
-            excludeOnClick={item.heading}
+            {...itemProps}
             heading={item.heading}
-            key={`item-${index}`}
             section={item.section}
             isSelected={isSelected}
             title={item.label}
             item={item}
             index={index}
+            isHighlighted={isHighlighted}
         >
             {item.label || item.section}
             {item.badge && <Badge color={item.badge.color || theme.colors.primary}>{item.badge.label}</Badge>}
@@ -152,6 +164,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const [items, setItems] = useState(unpackedItems);
     const [inputValue, setInputValue] = useState(props.selectedItem?.label ?? '');
 
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
     const {
         selectedItem,
         isOpen,
@@ -214,6 +227,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                 }
             }
         },
+        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
         stateReducer: (state, { changes, type }): Partial<UseComboboxState<Item>> => {
             // When props is forcefully updated then clear the input as well
             if (type === stateChangeTypes.ControlledPropUpdatedSelectedItem) {
@@ -311,13 +325,15 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const renderListItem = useCallback(
         (item: ListItem, index: number) => (
             <SectionedListItem
+                key={`item-${index}-${isOpen && selectedItem?.label === item.label}`}
                 item={item}
                 index={index}
                 getItemProps={getItemProps}
                 isSelected={selectedItem?.value === item.value}
+                isHighlighted={isOpen && kbdHighlightIdx !== undefined && kbdHighlightIdx === index}
             />
         ),
-        [getItemProps, selectedItem]
+        [getItemProps, selectedItem, isOpen, kbdHighlightIdx]
     );
 
     return (
@@ -341,6 +357,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                     isOpen={isOpen}
                     getMenuProps={getMenuProps}
                     ref={refs.setFloating}
+                    kbdHighlightIdx={kbdHighlightIdx}
                 >
                     {renderListItem}
                 </DropdownList>,

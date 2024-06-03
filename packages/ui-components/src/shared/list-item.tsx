@@ -6,7 +6,7 @@ import styled from '@darajs/styled-components';
 import { Item } from '../types';
 
 interface ListItemProps {
-    hovered?: boolean;
+    isHighlighted?: boolean;
     size?: number;
 }
 
@@ -26,7 +26,7 @@ export const StyledListItem = styled.span<ListItemProps>`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    background-color: ${(props) => props.theme.colors.blue1};
+    background-color: ${(props) => (props.isHighlighted ? props.theme.colors.grey2 : props.theme.colors.blue1)};
     border-bottom: 1px solid ${(props) => props.theme.colors.grey3};
 
     :hover {
@@ -52,12 +52,12 @@ type Props = {
     item: Item;
     /** Index of the item in the list */
     index: number;
+    /** Whether the item is highlighted. For example when using keyboard navigation */
+    isHighlighted?: boolean;
     /** Function to get props for the item */
     getItemProps: (options: UseComboboxGetItemPropsOptions<Item>) => any;
     /** Optional CSS classname for the list item */
     itemClass?: string;
-    /** Flag to exclude the onClick handler */
-    excludeOnClick?: boolean;
     /** Children nodes to be rendered inside the list item */
     children?: React.ReactNode;
 };
@@ -74,13 +74,10 @@ const ListItem = ({
     index,
     getItemProps,
     itemClass,
-    excludeOnClick,
     children,
+    isHighlighted,
 }: Props): JSX.Element => {
     const { itemClassName, ...itemProps } = getItemProps({ index, item });
-    if (excludeOnClick) {
-        delete itemProps.onClick;
-    }
 
     return (
         <StyledListItem
@@ -89,6 +86,7 @@ const ListItem = ({
             title={title}
             size={size}
             item={item}
+            isHighlighted={isHighlighted}
         >
             {children}
         </StyledListItem>

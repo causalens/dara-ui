@@ -16,17 +16,16 @@
  */
 import { Placement, autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { GetPropsCommonOptions, UseSelectGetToggleButtonPropsOptions, useSelect } from 'downshift';
-import { useEffect, useState } from 'react';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
 
 import DropdownList from '../shared/dropdown-list';
-import ListItem from '../shared/list-item';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useSelect;
 
@@ -124,27 +123,48 @@ const SelectButtonPrimary = styled(SelectButton)`
 
 interface DatepickerListItemStyleProps {
     isSelected?: boolean;
+    isHighlighted?: boolean;
     size?: number;
 }
 
-const StyledDatepickerListItem = styled(ListItem)<DatepickerListItemStyleProps>`
+const StyledDatepickerListItem = styled.span<DatepickerListItemStyleProps>`
+    cursor: pointer;
+    user-select: none;
+
+    overflow: hidden;
     display: flex;
     align-items: center;
 
+    width: 100%;
+    min-height: 2rem;
     padding: 0.25rem 1.5rem;
 
     font-size: ${(props) => (props.size ? `${props.size}rem` : props.theme.font.size)};
+    font-weight: 300;
     color: ${(props) => (props.isSelected ? '#FFF' : props.theme.colors.text)};
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     background-color: ${(props) => {
         if (props.isSelected) {
             return props.theme.colors.primary;
         }
+        if (props.isHighlighted) {
+            return props.theme.colors.grey2;
+        }
         return props.theme.colors.grey1;
     }};
 
+    :hover {
+        background-color: ${(props) => (props.isSelected ? props.theme.colors.primary : props.theme.colors.grey2)};
+    }
+
     :active {
         background-color: ${(props) => props.theme.colors.grey1};
+    }
+
+    &:last-child {
+        border-bottom: none;
     }
 `;
 
@@ -153,22 +173,29 @@ type DatepickerListItemProps = {
     index: number;
     getItemProps: (options: any) => any;
     isSelected: boolean;
+    isHighlighted?: boolean;
     size?: number;
 };
 
-const DatepickerListItem = React.memo(({ item, index, getItemProps, isSelected, size }: DatepickerListItemProps) => (
-    <StyledDatepickerListItem
-        getItemProps={getItemProps}
-        isSelected={isSelected}
-        key={`item-${index}`}
-        title={item.label}
-        item={item}
-        index={index}
-        size={size}
-    >
-        {item.label}
-    </StyledDatepickerListItem>
-));
+const DatepickerListItem = React.memo(
+    ({ item, index, getItemProps, isSelected, size, isHighlighted }: DatepickerListItemProps) => {
+        const { itemClassName, ...itemProps } = getItemProps({ index, item });
+
+        return (
+            <StyledDatepickerListItem
+                {...itemProps}
+                isSelected={isSelected}
+                title={item.label}
+                item={item}
+                index={index}
+                size={size}
+                isHighlighted={isHighlighted}
+            >
+                {item.label}
+            </StyledDatepickerListItem>
+        );
+    }
+);
 
 interface DropdownListProps {
     displacement: number;
@@ -249,39 +276,33 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  * @param {SelectProps} props - the props of the component
  */
 function DatepickerSelect(props: SelectProps): JSX.Element {
-    const [pendingHighlight, setPendingHighlight] = useState(null);
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
+    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps } = useSelect<Item>({
+        initialSelectedItem: props.initialValue,
+        itemToString: (item) => item.label,
+        items: props.items,
+        onSelectedItemChange: (changes) => {
+            const selected = changes.selectedItem;
+            if (props.onSelect) {
+                props.onSelect(selected);
+            }
+        },
+        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
+        stateReducer: (state, { changes, type }) => {
+            // Hack to scroll to the selected item when the menu is opened
+            // https://github.com/downshift-js/downshift/issues/645
+            if (type === stateChangeTypes.ToggleButtonClick && changes?.isOpen && props.selectedItem) {
+                return {
+                    ...changes,
+                    highlightedIndex: props.items.findIndex((i) => i.value === changes.selectedItem.value),
+                };
+            }
 
-    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps, setHighlightedIndex } =
-        useSelect<Item>({
-            initialSelectedItem: props.initialValue,
-            itemToString: (item) => item.label,
-            items: props.items,
-            onSelectedItemChange: (changes) => {
-                const selected = changes.selectedItem;
-                if (props.onSelect) {
-                    props.onSelect(selected);
-                }
-            },
-            stateReducer: (state, { changes, type }) => {
-                // hack to force highlight to update again in the next render
-                if (type === stateChangeTypes.ToggleButtonClick) {
-                    setPendingHighlight(
-                        changes.selectedItem ? props.items.findIndex((i) => i.value === changes.selectedItem.value) : 0
-                    );
-                }
-
-                return changes;
-            },
-            // Only set the selectedItem key if it has been explicitly set in props
-            ...(props.selectedItem && { selectedItem: props.selectedItem }),
-        });
-
-    useEffect(() => {
-        if (isOpen && pendingHighlight !== null) {
-            setHighlightedIndex(pendingHighlight);
-            setPendingHighlight(null);
-        }
-    }, [isOpen, pendingHighlight, setHighlightedIndex]);
+            return changes;
+        },
+        // Only set the selectedItem key if it has been explicitly set in props
+        ...(props.selectedItem && { selectedItem: props.selectedItem }),
+    });
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
@@ -307,13 +328,15 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
     const renderListItem = React.useCallback(
         (item: Item, index: number) => (
             <DatepickerListItem
+                key={`item-${index}-${isOpen && selectedItem?.label === item.label}`}
                 item={item}
                 index={index}
                 getItemProps={getItemProps}
-                isSelected={selectedItem?.value === item.value}
+                isSelected={selectedItem?.label === item.label}
+                isHighlighted={isOpen && kbdHighlightIdx !== undefined && kbdHighlightIdx === index}
             />
         ),
-        [getItemProps, selectedItem]
+        [getItemProps, selectedItem, isOpen, kbdHighlightIdx]
     );
 
     return (
@@ -348,6 +371,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                         displacement={props.displacement}
                         maxItems={7}
                         ref={mergedDropdownRef}
+                        kbdHighlightIdx={kbdHighlightIdx}
                     >
                         {renderListItem}
                     </StyledDropdownList>,

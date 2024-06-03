@@ -27,6 +27,7 @@ import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -261,6 +262,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         [props.onTermChange, props.items, selectedItems, inputValue]
     );
 
+    const [kbdHighlightIdx, setKbdHighlightIdx] = useState<number | undefined>();
     const { isOpen, getMenuProps, getInputProps, getItemProps, getToggleButtonProps } = useCombobox<Item>({
         defaultHighlightedIndex: -1,
         initialIsOpen: props.initialIsOpen,
@@ -282,6 +284,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 }
             }
         },
+        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
         selectedItem: null,
         stateReducer: (state, { changes, type }) => {
             if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
@@ -355,6 +358,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                     getMenuProps={getMenuProps}
                     size={props.size}
                     ref={refs.setFloating}
+                    kbdHighlightIdx={kbdHighlightIdx}
                 />,
                 document.body
             )}

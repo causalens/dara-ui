@@ -37,6 +37,10 @@ type Props = {
     className?: string;
     /** Optional function to render custom children. By default, it renders the ListItem with the item label */
     children?: (item: Item, index: number) => React.ReactNode;
+    /** The item to scroll into view when the menu is opened */
+    selectedItem?: Item;
+    /** The item to highlight when keyboard is used. Otherwise CSS :hover is used. */
+    kbdHighlightIdx?: number;
 };
 
 /**
@@ -58,6 +62,8 @@ const DropdownList = React.forwardRef<any, Props>(
             itemClass,
             className,
             children,
+            selectedItem,
+            kbdHighlightIdx,
         },
         ref
     ): JSX.Element => (
@@ -78,12 +84,16 @@ const DropdownList = React.forwardRef<any, Props>(
                         children(item, index)
                     :   <ListItem
                             getItemProps={getItemProps}
-                            key={`item-${index}`}
+                            // Hack to force a scroll-in-to-view when the menu is opened
+                            // Only the selected item is rerendered
+                            // Downshift.js does not scroll if the item is memoized
+                            key={`item-${index}-${isOpen && selectedItem?.label === item.label}`}
                             size={size}
                             title={item.label}
                             item={item}
                             index={index}
                             itemClass={itemClass}
+                            isHighlighted={isOpen && kbdHighlightIdx !== undefined && kbdHighlightIdx === index}
                         >
                             {item.label}
                         </ListItem>

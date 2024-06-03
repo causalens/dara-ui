@@ -25,6 +25,7 @@ import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
 import { Chevron, matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 interface SelectedItemProps {
     size?: number;
@@ -161,6 +162,7 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  */
 function Select(props: SelectProps): JSX.Element {
     const { applySameWidthModifier = true } = props;
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
     const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps } = useSelect<Item>({
         initialIsOpen: props.initialIsOpen,
         initialSelectedItem: props.initialValue,
@@ -170,6 +172,7 @@ function Select(props: SelectProps): JSX.Element {
             const selected = changes.selectedItem;
             props.onSelect?.(selected);
         },
+        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
         // Only set the selectedItem key if it has been explicitly set in props
         ...('selectedItem' in props && { selectedItem: props.selectedItem }),
     });
@@ -246,6 +249,8 @@ function Select(props: SelectProps): JSX.Element {
                         className={`${menuProps?.className ?? ''} ${props.itemClass}`}
                         itemClass={props.itemClass}
                         maxItems={props.maxItems}
+                        selectedItem={selectedItem}
+                        kbdHighlightIdx={kbdHighlightIdx}
                     />,
                     document.body
                 )}
