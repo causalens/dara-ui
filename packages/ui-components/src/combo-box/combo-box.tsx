@@ -187,7 +187,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 }
             }
         },
-        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         stateReducer: (state, { changes, type }) => {
             // This resets the input when the dropdown is opened
             if (

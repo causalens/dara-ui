@@ -287,7 +287,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                 props.onSelect(selected);
             }
         },
-        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         stateReducer: (state, { changes, type }) => {
             // Hack to scroll to the selected item when the menu is opened
             // https://github.com/downshift-js/downshift/issues/645

@@ -284,7 +284,7 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                 }
             }
         },
-        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         selectedItem: null,
         stateReducer: (state, { changes, type }) => {
             if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {

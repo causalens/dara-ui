@@ -227,7 +227,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                 }
             }
         },
-        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         stateReducer: (state, { changes, type }): Partial<UseComboboxState<Item>> => {
             // When props is forcefully updated then clear the input as well
             if (type === stateChangeTypes.ControlledPropUpdatedSelectedItem) {

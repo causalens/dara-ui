@@ -172,7 +172,7 @@ function Select(props: SelectProps): JSX.Element {
             const selected = changes.selectedItem;
             props.onSelect?.(selected);
         },
-        ...(syncKbdHighlightIdx(setKbdHighlightIdx)),
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         // Only set the selectedItem key if it has been explicitly set in props
         ...('selectedItem' in props && { selectedItem: props.selectedItem }),
     });

@@ -19,17 +19,19 @@ const setTypes = new Set([
  *
  * @param {function} setKbdHighlightIdx - Callback function to set the highlighted index for keyboard navigation.
  * @returns {object} An object containing the `onHighlightedIndexChange` method.
- * 
+ *
  * @example
  * const { onHighlightedIndexChange } = syncKbdHighlightIdx(setKbdHighlightIdx);
- * 
+ *
  * // Use this method in the Downshift hook to handle highlighted index changes
  * useSelect({
  *   items,
  *   onHighlightedIndexChange
  * });
  */
-export const syncKbdHighlightIdx = (setKbdHighlightIdx: (idx: number) => void): { onHighlightedIndexChange: ({ highlightedIndex, type }: any) => void; } => ({
+export const syncKbdHighlightIdx = (
+    setKbdHighlightIdx: (idx: number) => void
+): { onHighlightedIndexChange: ({ highlightedIndex, type }: any) => void } => ({
     onHighlightedIndexChange: ({ highlightedIndex, type }: any) => {
         // Hack to force a rerender of an element when highlighted with a keyboard
         if (setTypes.has(type)) {
@@ -40,4 +42,4 @@ export const syncKbdHighlightIdx = (setKbdHighlightIdx: (idx: number) => void): 
             setKbdHighlightIdx(undefined);
         }
     },
-})
+});
