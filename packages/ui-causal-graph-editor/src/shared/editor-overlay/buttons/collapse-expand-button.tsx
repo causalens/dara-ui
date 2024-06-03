@@ -26,7 +26,6 @@ interface CollapseExpandGroupButtonProps {
     onCollapseAll: () => void | Promise<void>;
     onExpandAll: () => void | Promise<void>;
     showExpandAll: boolean;
-
 }
 
 function CollapseExpandGroupButton(props: CollapseExpandGroupButtonProps): JSX.Element {
@@ -42,7 +41,9 @@ function CollapseExpandGroupButton(props: CollapseExpandGroupButtonProps): JSX.E
                 onClick={props.showExpandAll ? props.onCollapseAll : props.onExpandAll}
                 style={{ padding: '0 0.75rem' }}
             >
-                {props.showExpandAll ? <DownLeftAndUpRightToCenter /> : <UpRightAndDownLeftFromCenter />}
+                {props.showExpandAll ?
+                    <DownLeftAndUpRightToCenter />
+                :   <UpRightAndDownLeftFromCenter />}
             </FloatingButton>
         </Tooltip>
     );

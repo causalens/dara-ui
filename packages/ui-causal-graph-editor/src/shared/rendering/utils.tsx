@@ -83,16 +83,3 @@ export function isGraphLayoutWithTiers(layout: GraphLayout): layout is GraphLayo
 export function isGraphLayoutWithGroups(layout: GraphLayout): layout is GraphLayoutWithGrouping {
     return (layout as GraphLayoutWithGrouping).group !== undefined;
 }
-
-export function findKeyByValue(obj: Record<string, string[]>, searchValue: string): string {
-    if (Object.values(obj).flat().includes(searchValue)) {
-        let returnKey: string;
-        Object.keys(obj).forEach((key) => {
-            if (obj[key].includes(searchValue)) {
-                returnKey = key;
-            }
-        });
-        return returnKey;
-    }
-    return searchValue;
-}

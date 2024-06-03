@@ -45,7 +45,7 @@ import { SaveImageButton } from '@shared/editor-overlay/buttons';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import { GraphLayoutWithGrouping } from '@shared/graph-layout/common';
 import useGraphTooltip from '@shared/use-graph-tooltip';
-import { getNodeGroups, getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getGroupToNodesMap, getTooltipContent, willCreateCycle } from '@shared/utils';
 
 import {
     CausalGraph,
@@ -180,10 +180,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setError(e);
     };
 
-    const layoutHasGroup = useMemo(
-        () => (layout as GraphLayoutWithGrouping).group !== undefined,
-        [layout]
-    );
+    const layoutHasGroup = useMemo(() => (layout as GraphLayoutWithGrouping).group !== undefined, [layout]);
 
     const {
         getCenterPosition,
@@ -356,7 +353,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     function onAddEdge(edge: [string, string]): void {
         if (layoutHasGroup) {
             const layoutGroup = (layout as GraphLayoutWithGrouping).group;
-            const groupsObject = getNodeGroups(state.graph.nodes(), layoutGroup, state.graph);
+            const groupsObject = getGroupToNodesMap(state.graph.nodes(), layoutGroup, state.graph);
             const groups = Object.keys(groupsObject);
 
             if (groups.includes(edge[0]) && groups.includes(edge[1])) {

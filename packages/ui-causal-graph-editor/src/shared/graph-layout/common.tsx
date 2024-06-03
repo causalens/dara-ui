@@ -16,10 +16,12 @@
  */
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
+import { DEFAULT_NODE_SIZE } from '@shared/utils';
+
 import { DirectionType, GraphTiers, SimulationGraph } from '../../types';
 
 export abstract class GraphLayoutBuilder<T> {
-    _nodeSize = 64;
+    _nodeSize = DEFAULT_NODE_SIZE;
 
     _nodeFontSize = 16;
 

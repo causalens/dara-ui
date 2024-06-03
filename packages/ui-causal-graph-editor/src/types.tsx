@@ -320,3 +320,14 @@ export interface GroupingLayoutBuilder {
     /** The path for the property in the node that should be used for defining their layer */
     group: string;
 }
+
+/**
+ * Defines necessary properties for a group node to be drawn on the graph
+ */
+export interface GroupNode {
+    id: string;
+    originalMeta: CausalGraphNodeMeta;
+    variable_type: 'groupNode';
+    x: number;
+    y: number;
+}

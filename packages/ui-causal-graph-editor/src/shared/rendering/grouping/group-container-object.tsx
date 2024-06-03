@@ -16,6 +16,10 @@
  */
 import * as PIXI from 'pixi.js';
 
+import { DefaultTheme } from '@darajs/styled-components';
+
+import { DEFAULT_NODE_SIZE, TARGET_NODE_MULTIPLIER } from '@shared/utils';
+
 import { SimulationNode } from '@types';
 
 import { TextureCache } from '../texture-cache';
@@ -85,7 +89,8 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
     static updateContainerStyle(
         groupContainerGfx: PIXI.Container,
         nodes: SimulationNode[],
-        textureCache: TextureCache
+        textureCache: TextureCache,
+        theme: DefaultTheme
     ): void {
         let minX = Infinity;
         let maxX = -Infinity;
@@ -93,7 +98,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         let maxY = -Infinity;
 
         nodes.forEach((node) => {
-            let radius = node['meta.rendering_properties.size'] ?? 80; // 80 is 64*1.25 which is the default size for a target node
+            let radius = node['meta.rendering_properties.size'] ?? DEFAULT_NODE_SIZE * TARGET_NODE_MULTIPLIER;
             radius += 20; // Add padding
             minX = Math.min(minX, node.x - radius);
             maxX = Math.max(maxX, node.x + radius);
@@ -114,8 +119,8 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         // Get/create rectangle texture
         const rectangleTexture = textureCache.get(createKey(GROUP_RECTANGLE, minX, maxX, minY, maxY), () => {
             const graphics = new PIXI.Graphics();
-            graphics.lineStyle(2, 0x3796f6, 0.5); // Half-transparent border
-            graphics.beginFill(0xecf2fd, 1);
+            graphics.lineStyle(2, theme.colors.primary.replace('#', '0x'), 0.5); // Half-transparent border
+            graphics.beginFill(theme.colors.blue2.replace('#', '0x'), 1);
             graphics.drawRoundedRect(minX, minY, width, height, 8);
             graphics.endFill();
             return graphics;
@@ -124,7 +129,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         // Set the node texture and adjust its styles
         const rectangle = groupContainerGfx.getChildByName<PIXI.Sprite>(GROUP_RECTANGLE);
         rectangle.texture = rectangleTexture;
-        [rectangle.tint, rectangle.alpha] = colorToPixi('#ECF2FD');
+        [rectangle.tint, rectangle.alpha] = colorToPixi(theme.colors.blue2);
     }
 
     /**
@@ -142,14 +147,14 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
      * @param nodeStyle current node style
      * @param textureCache texture cache instance
      */
-    updateStyle(nodes: SimulationNode[], textureCache: TextureCache): void {
+    updateStyle(nodes: SimulationNode[], textureCache: TextureCache, theme: DefaultTheme): void {
         let minX = Infinity;
         let maxX = -Infinity;
         let minY = Infinity;
         let maxY = -Infinity;
 
         nodes.forEach((node) => {
-            let radius = node['meta.rendering_properties.size'] ?? 80; // 80 is 64*1.25 which is the default size for a target node
+            let radius = node['meta.rendering_properties.size'] ?? DEFAULT_NODE_SIZE * TARGET_NODE_MULTIPLIER;
             radius += 20; // Add padding
 
             minX = Math.min(minX, node.x - radius);
@@ -161,7 +166,7 @@ export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_
         const centerX = minX + (maxX - minX) / 2;
         const centerY = minY + (maxY - minY) / 2;
 
-        GroupContainerObject.updateContainerStyle(this.groupContainerGfx, nodes, textureCache);
+        GroupContainerObject.updateContainerStyle(this.groupContainerGfx, nodes, textureCache, theme);
         this.groupContainerGfx.position.copyFrom({ x: centerX, y: centerY });
     }
 }

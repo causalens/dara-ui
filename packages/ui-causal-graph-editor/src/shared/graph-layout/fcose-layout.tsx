@@ -25,7 +25,7 @@ import {
     SimulationGraph,
     TieredGraphLayoutBuilder,
 } from '../../types';
-import { getNodeGroups, getNodeOrder, getTiersArray } from '../utils';
+import { getGroupToNodesMap, getNodeOrder, getTiersArray } from '../utils';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
 cytoscape.use(fcose);
@@ -302,12 +302,20 @@ export function getTieredLayoutProperties(
  * @param relationships an object containing the group as a key and array of node ids as value
  */
 function assignParents(elements: cytoscape.ElementDefinition[], relationships: Record<string, string[]>): void {
+    // Create a lookup table for elements by their ID
+    const elementLookup: Record<string, cytoscape.ElementDefinition> = {};
+
+    // Populate the lookup table
+    elements.forEach((element) => {
+        elementLookup[element.data.id] = element;
+    });
+
     // Iterate over each parent in the relationships object
     for (const [parent, children] of Object.entries(relationships)) {
         // Iterate over each child ID
         children.forEach((childId) => {
-            // Find the node that matches this child ID
-            const node = elements.find((element) => element.data.id === childId);
+            // Find the node using the lookup table
+            const node = elementLookup[childId];
 
             // If the node is found, set its 'parent' attribute
             if (node) {
@@ -391,7 +399,7 @@ export default class FcoseLayout extends GraphLayout {
 
             // for grouping we are going to assign and utilise compound nodes
             if (this.group) {
-                const groupedNodes = getNodeGroups(graph.nodes(), this.group, graph);
+                const groupedNodes = getGroupToNodesMap(graph.nodes(), this.group, graph);
 
                 // create a node element for each group
                 Object.keys(groupedNodes).forEach((groupLabel) => {

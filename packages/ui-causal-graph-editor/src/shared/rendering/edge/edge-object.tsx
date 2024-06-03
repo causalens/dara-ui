@@ -331,19 +331,22 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
 
         // Number symbols
         const edgeNumberSymbol = edgeSymbolsGfx.getChildByName<PIXI.Sprite>(EDGE_NUMBER_SYMBOL);
-        const numberSymbolTexture = textureCache.get(createKey(EDGE_NUMBER_SYMBOL, edgeStyle.collapsedEdgesCount), () => {
-            if (edgeStyle.collapsedEdgesCount === undefined) {
-                return new PIXI.Graphics();
-            }
+        const numberSymbolTexture = textureCache.get(
+            createKey(EDGE_NUMBER_SYMBOL, edgeStyle.collapsedEdgesCount),
+            () => {
+                if (edgeStyle.collapsedEdgesCount === undefined) {
+                    return new PIXI.Graphics();
+                }
 
-            const textStyle = new PIXI.TextStyle({
-                fontFamily: 'Manrope',
-                fontSize: 18,
-                fill: colorToPixi(edgeStyle.color),
-            });
-            const text = new PIXI.Text(edgeStyle.collapsedEdgesCount, textStyle);
-            return text;
-        });
+                const textStyle = new PIXI.TextStyle({
+                    fontFamily: 'Manrope',
+                    fontSize: 18,
+                    fill: colorToPixi(edgeStyle.color),
+                });
+                const text = new PIXI.Text(edgeStyle.collapsedEdgesCount, textStyle);
+                return text;
+            }
+        );
 
         edgeNumberSymbol.texture = numberSymbolTexture;
         edgeNumberSymbol.position.y = edgeTopSymbol.position.y - 30;
@@ -354,7 +357,7 @@ export class EdgeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
                 (edgeGfx.rotation >= (-3 * Math.PI) / 2 && edgeGfx.rotation < -Math.PI)
             ) ?
                 -Math.PI / 2
-                : Math.PI / 2;
+            :   Math.PI / 2;
         [edgeStrengthSymbol.tint] = colorToPixi(edgeStyle.color);
         edgeNumberSymbol.alpha = 1;
 
