@@ -16,42 +16,39 @@
  */
 import { autoUpdate, flip, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxState, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled, { DefaultTheme, useTheme } from '@darajs/styled-components';
 
 import Badge from '../badge/badge';
-import { ChevronButton, Input, InputWrapper, NoItemsLabel, Wrapper } from '../combo-box/combo-box';
+import { Input, InputWrapper, Wrapper } from '../combo-box/combo-box';
+import ChevronButton from '../shared/chevron-button';
+import DropdownList from '../shared/dropdown-list';
+import ListItem, { StyledListItem } from '../shared/list-item';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import { matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useCombobox;
 
-const ListWrapper = styled(List)`
-    margin-left: -1px;
-    border-radius: 0 0 0.25rem 0.25rem;
-    box-shadow: ${(props) => props.theme.shadow.light};
-`;
-
 interface ListSpanProps {
     heading?: boolean;
-    hovered?: boolean;
     section?: string;
-    selected?: boolean;
+    isSelected?: boolean;
 }
 
-const getTextColor = (heading: boolean, selected: boolean, theme: DefaultTheme): string => {
+const getTextColor = (heading: boolean, isSelected: boolean, theme: DefaultTheme): string => {
     if (heading) {
         return theme.colors.text;
     }
-    if (selected) {
+    if (isSelected) {
         return theme.colors.primary;
     }
     return theme.colors.text;
 };
 
-const ListItemSpan = styled(ListItem)<ListSpanProps>`
+const ListItemSpan = styled(StyledListItem)<ListSpanProps>`
     cursor: ${(props) => (props?.heading ? 'text' : 'pointer')};
     user-select: ${(props) => (props?.heading ? 'text' : 'none')};
 
@@ -63,7 +60,7 @@ const ListItemSpan = styled(ListItem)<ListSpanProps>`
     padding-right: 0.7rem;
 
     font-weight: ${(props) => (props?.heading ? 'bold' : 'normal')};
-    color: ${(props) => getTextColor(props?.heading, props.selected, props.theme)};
+    color: ${(props) => getTextColor(props?.heading, props.isSelected, props.theme)};
 
     ${(props) => {
         if (props.heading) {
@@ -116,6 +113,44 @@ export interface SectionedListProps extends InteractiveComponentProps<Item> {
     style?: React.CSSProperties;
 }
 
+type SectionedListItemProps = {
+    item: ListItem;
+    index: number;
+    getItemProps: (options: { index: number; item: Item }) => any;
+    isSelected: boolean;
+    isHighlighted?: boolean;
+};
+
+const SectionedListItem = ({
+    item,
+    index,
+    getItemProps,
+    isSelected,
+    isHighlighted,
+}: SectionedListItemProps): JSX.Element => {
+    const theme = useTheme();
+    const { itemClassName, ...itemProps } = getItemProps({ index, item });
+    if (item.heading) {
+        delete itemProps.onClick;
+    }
+
+    return (
+        <ListItemSpan
+            {...itemProps}
+            heading={item.heading}
+            section={item.section}
+            isSelected={isSelected}
+            title={item.label}
+            item={item}
+            index={index}
+            isHighlighted={isHighlighted}
+        >
+            {item.label || item.section}
+            {item.badge && <Badge color={item.badge.color || theme.colors.primary}>{item.badge.label}</Badge>}
+        </ListItemSpan>
+    );
+};
+
 /**
  * A component for rendering lists, sectioned and non-sectioned. Takes an array of unpacked  ListItem objects and
  * renders a searchable list.
@@ -123,21 +158,19 @@ export interface SectionedListProps extends InteractiveComponentProps<Item> {
  * @param {SectionedListProps} props - the component props
  */
 function SectionedList(props: SectionedListProps): JSX.Element {
-    const theme = useTheme();
-
     const unpackedItems = useMemo(() => unpackSectionedList(props.items), [props.items]);
 
     const [pendingHighlight, setPendingHighlight] = useState(null);
     const [items, setItems] = useState(unpackedItems);
     const [inputValue, setInputValue] = useState(props.selectedItem?.label ?? '');
 
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
     const {
         selectedItem,
         isOpen,
         getMenuProps,
         getInputProps,
         getToggleButtonProps,
-        highlightedIndex,
         getItemProps,
         setHighlightedIndex,
     } = useCombobox<Item>({
@@ -194,6 +227,7 @@ function SectionedList(props: SectionedListProps): JSX.Element {
                 }
             }
         },
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         stateReducer: (state, { changes, type }): Partial<UseComboboxState<Item>> => {
             // When props is forcefully updated then clear the input as well
             if (type === stateChangeTypes.ControlledPropUpdatedSelectedItem) {
@@ -280,16 +314,26 @@ function SectionedList(props: SectionedListProps): JSX.Element {
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
-    const setFloatingRef = refs.setFloating;
+    const dropdownStyle = React.useMemo(
+        () => ({
+            ...floatingStyles,
+            marginLeft: -1,
+        }),
+        [floatingStyles]
+    );
 
-    const mergedRefs = useCallback(
-        (node: HTMLElement | null) => {
-            setFloatingRef(node);
-            setMenuRef(node);
-        },
-        [setFloatingRef, setMenuRef]
+    const renderListItem = useCallback(
+        (item: ListItem, index: number) => (
+            <SectionedListItem
+                key={`item-${index}-${isOpen && selectedItem?.label === item.label}`}
+                item={item}
+                index={index}
+                getItemProps={getItemProps}
+                isSelected={selectedItem?.value === item.value}
+                isHighlighted={isOpen && kbdHighlightIdx !== undefined && kbdHighlightIdx === index}
+            />
+        ),
+        [getItemProps, selectedItem, isOpen, kbdHighlightIdx]
     );
 
     return (
@@ -302,48 +346,21 @@ function SectionedList(props: SectionedListProps): JSX.Element {
         >
             <InputWrapper disabled={props.disabled} isOpen={isOpen} ref={refs.setReference}>
                 <Input {...getInputProps({ value: inputValue })} {...getReferenceProps()} />
-                <ChevronButton {...getToggleButtonProps()}>
-                    <Chevron disabled={props.disabled} isOpen={isOpen} />
-                </ChevronButton>
+                <ChevronButton disabled={props.disabled} isOpen={isOpen} getToggleButtonProps={getToggleButtonProps} />
             </InputWrapper>
             {ReactDOM.createPortal(
-                <ListWrapper
-                    {...menuProps}
-                    {...getFloatingProps()}
-                    ref={mergedRefs}
+                <DropdownList
+                    items={items}
+                    getItemProps={getItemProps}
+                    getFloatingProps={getFloatingProps}
+                    style={dropdownStyle}
                     isOpen={isOpen}
-                    style={{
-                        ...floatingStyles,
-                        zIndex: 9999,
-                    }}
+                    getMenuProps={getMenuProps}
+                    ref={refs.setFloating}
+                    kbdHighlightIdx={kbdHighlightIdx}
                 >
-                    {items.length > 0 &&
-                        items.map((item: ListItem, index: number) => {
-                            const itemProps = getItemProps({ index, item });
-                            if (item.heading) {
-                                delete itemProps.onClick;
-                            }
-                            return (
-                                <ListItemSpan
-                                    {...itemProps}
-                                    heading={item.heading}
-                                    hovered={index === highlightedIndex}
-                                    key={`item-${index}`}
-                                    section={item.section}
-                                    selected={item.value === selectedItem?.value}
-                                    title={item.label}
-                                >
-                                    {item.label || item.section}
-                                    {item.badge && (
-                                        <Badge color={item.badge.color || theme.colors.primary}>
-                                            {item.badge.label}
-                                        </Badge>
-                                    )}
-                                </ListItemSpan>
-                            );
-                        })}
-                    {items.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
-                </ListWrapper>,
+                    {renderListItem}
+                </DropdownList>,
                 document.body
             )}
         </Wrapper>

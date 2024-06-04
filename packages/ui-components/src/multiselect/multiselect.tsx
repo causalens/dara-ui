@@ -22,10 +22,12 @@ import ReactDOM from 'react-dom';
 import styled from '@darajs/styled-components';
 import { Cross } from '@darajs/ui-icons';
 
-import Button from '../button/button';
+import ChevronButton from '../shared/chevron-button';
+import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import { matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -194,35 +196,6 @@ const TagText = styled.span`
     white-space: nowrap;
 `;
 
-const NoItemsLabel = styled.span`
-    display: flex;
-    flex: 1 1 auto;
-    align-items: center;
-    justify-content: center;
-
-    height: 2rem;
-
-    font-size: 1rem;
-    color: ${(props) => props.theme.colors.grey4};
-
-    background-color: ${(props) => props.theme.colors.blue1};
-`;
-
-const DropdownList = styled(List)`
-    border-radius: 0 0 0.25rem 0.25rem;
-    outline: 0;
-    box-shadow: ${(props) => props.theme.shadow.light};
-`;
-
-const ChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling: 'ghost' }))`
-    min-width: 0;
-    height: auto;
-    margin: 0;
-    padding: 0 0.25rem;
-
-    background-color: transparent !important;
-`;
-
 export interface MultiSelectProps extends InteractiveComponentProps<Array<Item>> {
     /** Whether to open the select dropdown on load or not, defaults to false */
     initialIsOpen?: boolean;
@@ -289,38 +262,37 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
         [props.onTermChange, props.items, selectedItems, inputValue]
     );
 
-    const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps, getToggleButtonProps } =
-        useCombobox<Item>({
-            defaultHighlightedIndex: -1,
-            initialIsOpen: props.initialIsOpen,
-            inputValue,
-            itemToString: (item) => item?.label || '',
-            items: filteredItems,
-            onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
-                if (type === stateChangeTypes.InputChange) {
-                    onTermChange(internalInputVal);
+    const [kbdHighlightIdx, setKbdHighlightIdx] = useState<number | undefined>();
+    const { isOpen, getMenuProps, getInputProps, getItemProps, getToggleButtonProps } = useCombobox<Item>({
+        defaultHighlightedIndex: -1,
+        initialIsOpen: props.initialIsOpen,
+        inputValue,
+        itemToString: (item) => item?.label || '',
+        items: filteredItems,
+        onStateChange: ({ inputValue: internalInputVal, selectedItem, type }: any) => {
+            if (type === stateChangeTypes.InputChange) {
+                onTermChange(internalInputVal);
+            }
+            if (
+                [stateChangeTypes.InputKeyDownEnter, stateChangeTypes.ItemClick, stateChangeTypes.InputBlur].includes(
+                    type
+                )
+            ) {
+                if (selectedItem) {
+                    onTermChange('');
+                    addSelectedItem(selectedItem);
                 }
-                if (
-                    [
-                        stateChangeTypes.InputKeyDownEnter,
-                        stateChangeTypes.ItemClick,
-                        stateChangeTypes.InputBlur,
-                    ].includes(type)
-                ) {
-                    if (selectedItem) {
-                        onTermChange('');
-                        addSelectedItem(selectedItem);
-                    }
-                }
-            },
-            selectedItem: null,
-            stateReducer: (state, { changes, type }) => {
-                if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
-                    return { ...changes, isOpen: true };
-                }
-                return changes;
-            },
-        });
+            }
+        },
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
+        selectedItem: null,
+        stateReducer: (state, { changes, type }) => {
+            if (type === stateChangeTypes.ItemClick || type === stateChangeTypes.InputKeyDownEnter) {
+                return { ...changes, isOpen: true };
+            }
+            return changes;
+        },
+    });
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
@@ -330,9 +302,6 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
 
     const role = useRole(context, { role: 'listbox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
-
-    const menuProps = useMemo(() => getMenuProps({ ref: refs.setFloating }), [getMenuProps, refs.setFloating]);
-    const toggleProps = useMemo(() => getToggleButtonProps(), [getToggleButtonProps]);
 
     return (
         <Wrapper
@@ -372,35 +341,25 @@ function MultiSelect({ maxWidth = '100%', maxRows = 3, ...props }: MultiSelectPr
                             style={{ flex: '1 1 5ch' }}
                         />
                     </TagWrapper>
-                    <ChevronButton {...toggleProps}>
-                        <Chevron disabled={props.disabled} isOpen={isOpen} />
-                    </ChevronButton>
+                    <ChevronButton
+                        disabled={props.disabled}
+                        isOpen={isOpen}
+                        getToggleButtonProps={getToggleButtonProps}
+                    />
                 </InputWrapper>
             </Tooltip>
             {ReactDOM.createPortal(
                 <DropdownList
-                    {...menuProps}
-                    {...getFloatingProps()}
+                    items={filteredItems}
+                    getItemProps={getItemProps}
+                    getFloatingProps={getFloatingProps}
+                    style={floatingStyles}
                     isOpen={isOpen}
-                    style={{
-                        ...floatingStyles,
-                        zIndex: 9999,
-                    }}
-                >
-                    {filteredItems.length > 0 &&
-                        filteredItems.map((item, index) => (
-                            <ListItem
-                                {...getItemProps({ index, item })}
-                                hovered={index === highlightedIndex}
-                                key={`item-${index}`}
-                                size={props.size}
-                                title={item.label}
-                            >
-                                {item.label}
-                            </ListItem>
-                        ))}
-                    {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
-                </DropdownList>,
+                    getMenuProps={getMenuProps}
+                    size={props.size}
+                    ref={refs.setFloating}
+                    kbdHighlightIdx={kbdHighlightIdx}
+                />,
                 document.body
             )}
         </Wrapper>

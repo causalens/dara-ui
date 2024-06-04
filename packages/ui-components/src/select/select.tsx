@@ -21,9 +21,11 @@ import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
 
+import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import { Chevron, matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 interface SelectedItemProps {
     size?: number;
@@ -125,13 +127,6 @@ const SelectButton = styled.button<SelectButtonProps>`
     }
 `;
 
-const DropdownList = styled(List)`
-    margin-left: -1px;
-    border-radius: 0 0 0.25rem 0.25rem;
-    outline: 0;
-    box-shadow: ${(props) => props.theme.shadow.light};
-`;
-
 export interface SelectProps extends InteractiveComponentProps<Item> {
     /** Whether to force the list to the same width as the parent, defaults to true */
     applySameWidthModifier?: boolean;
@@ -167,19 +162,20 @@ export interface SelectProps extends InteractiveComponentProps<Item> {
  */
 function Select(props: SelectProps): JSX.Element {
     const { applySameWidthModifier = true } = props;
-    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, highlightedIndex, getItemProps } =
-        useSelect<Item>({
-            initialIsOpen: props.initialIsOpen,
-            initialSelectedItem: props.initialValue,
-            itemToString: (item) => item.label,
-            items: props.items,
-            onSelectedItemChange: (changes) => {
-                const selected = changes.selectedItem;
-                props.onSelect?.(selected);
-            },
-            // Only set the selectedItem key if it has been explicitly set in props
-            ...('selectedItem' in props && { selectedItem: props.selectedItem }),
-        });
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
+    const { isOpen, selectedItem, getToggleButtonProps, getMenuProps, getItemProps } = useSelect<Item>({
+        initialIsOpen: props.initialIsOpen,
+        initialSelectedItem: props.initialValue,
+        itemToString: (item) => item.label,
+        items: props.items,
+        onSelectedItemChange: (changes) => {
+            const selected = changes.selectedItem;
+            props.onSelect?.(selected);
+        },
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
+        // Only set the selectedItem key if it has been explicitly set in props
+        ...('selectedItem' in props && { selectedItem: props.selectedItem }),
+    });
 
     const { refs, floatingStyles, context } = useFloating<HTMLElement>({
         open: isOpen,
@@ -208,6 +204,14 @@ function Select(props: SelectProps): JSX.Element {
         [props.disabled, refs.setReference, getToggleButtonProps]
     );
 
+    const dropdownStyle = React.useMemo(
+        () => ({
+            ...floatingStyles,
+            marginLeft: -1,
+        }),
+        [floatingStyles]
+    );
+
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
             <Wrapper
@@ -234,33 +238,20 @@ function Select(props: SelectProps): JSX.Element {
                 </SelectButton>
                 {ReactDOM.createPortal(
                     <DropdownList
-                        {...menuProps}
-                        {...getFloatingProps()}
-                        className={`${(menuProps?.className as string) ?? ''} ${props.itemClass}`}
+                        items={props.items}
+                        getItemProps={getItemProps}
+                        getFloatingProps={getFloatingProps}
+                        style={dropdownStyle}
                         isOpen={isOpen}
+                        getMenuProps={getMenuProps}
+                        size={props.size}
+                        ref={refs.setFloating}
+                        className={`${menuProps?.className ?? ''} ${props.itemClass}`}
+                        itemClass={props.itemClass}
                         maxItems={props.maxItems}
-                        style={{
-                            ...floatingStyles,
-                            zIndex: 9999,
-                        }}
-                    >
-                        {props.items.map((item, index) => {
-                            const { itemClassName, ...itemProps } = getItemProps({ index, item });
-
-                            return (
-                                <ListItem
-                                    {...itemProps}
-                                    className={`${itemClassName as string} ${props.itemClass}`}
-                                    hovered={index === highlightedIndex}
-                                    key={`item-${index}`}
-                                    size={props.size}
-                                    title={item.label}
-                                >
-                                    {item.label}
-                                </ListItem>
-                            );
-                        })}
-                    </DropdownList>,
+                        selectedItem={selectedItem}
+                        kbdHighlightIdx={kbdHighlightIdx}
+                    />,
                     document.body
                 )}
             </Wrapper>

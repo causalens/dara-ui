@@ -51,18 +51,16 @@ const Icon = styled(ChevronDown).withConfig({ shouldForwardProp })<ChevronProps>
  * A rotating chevron, that flips from pointing down to up with the isOpen prop
  * @param {ChevronProps} props - the component props
  */
-function Chevron(props: ChevronProps, ref: React.ForwardedRef<SVGSVGElement>): JSX.Element {
-    return (
-        <Icon
-            angles={props.angles}
-            className={props.className}
-            disabled={props.disabled}
-            isOpen={props.isOpen}
-            onClick={props.onClick}
-            ref={ref}
-            style={props.style}
-        />
-    );
-}
+const Chevron = React.forwardRef<any, ChevronProps>((props, ref) => (
+    <Icon
+        angles={props.angles}
+        className={props.className}
+        disabled={props.disabled}
+        isOpen={props.isOpen}
+        onClick={props.onClick}
+        ref={ref}
+        style={props.style}
+    />
+));
 
-export default React.forwardRef(Chevron);
+export default React.memo(Chevron);

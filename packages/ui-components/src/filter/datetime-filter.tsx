@@ -17,39 +17,13 @@
 import { useMemo, useState } from 'react';
 import { FilterProps } from 'react-table';
 
-import styled, { DefaultTheme, createGlobalStyle } from '@darajs/styled-components';
+import styled from '@darajs/styled-components';
 
 import Datepicker from '../datepicker/datepicker';
 import Select from '../select/select';
 import { Item } from '../types';
 import { ApplyButton, FilterWrapper } from './categorical-filter';
 import { FilterHeader } from './numeric-filter';
-
-const GlobalStyle = createGlobalStyle<{ theme: DefaultTheme }>`
-    body {
-        /* stylelint-disable-next-line -- external classname */
-        .DatetimeFilterSelect {
-            background-color: ${(props) => props.theme.colors.grey1};
-
-            span {
-                background-color: ${(props) => props.theme.colors.grey1};
-                border-bottom: 1px solid ${(props) => props.theme.colors.grey1};
-
-                &[aria-selected="true"] {
-                    background-color: ${(props) => props.theme.colors.primary};
-                }
-
-                :hover {
-                    background-color: ${(props) => props.theme.colors.grey3};
-                }
-
-                :active {
-                    background-color: ${(props) => props.theme.colors.grey4};
-                }
-            }
-        }
-    }
-`;
 
 const DatetimeFilterWrapper = styled(FilterWrapper)`
     gap: 0;
@@ -217,7 +191,6 @@ function DatetimeFilter(props: DatetimeFilterProps): JSX.Element {
 
     return (
         <DatetimeFilterWrapper className={props.className}>
-            <GlobalStyle />
             <FilterHeader>
                 <StyledSelect
                     dropdownRef={(element) => {

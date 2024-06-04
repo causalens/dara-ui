@@ -16,15 +16,17 @@
  */
 import { autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxReturnValue, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
 
-import Button from '../button/button';
+import ChevronButton from '../shared/chevron-button';
+import DropdownList from '../shared/dropdown-list';
 import Tooltip from '../tooltip/tooltip';
 import { InteractiveComponentProps, Item } from '../types';
-import { Chevron, List, ListItem, matchWidthToReference } from '../utils';
+import { matchWidthToReference } from '../utils';
+import { syncKbdHighlightIdx } from '../utils/syncKbdHighlightIdx';
 
 const { stateChangeTypes } = useCombobox;
 
@@ -123,35 +125,6 @@ export const Input = styled.input`
     }
 `;
 
-export const NoItemsLabel = styled.span`
-    display: flex;
-    flex: 1 1 auto;
-    align-items: center;
-    justify-content: center;
-
-    height: 2rem;
-
-    font-size: 1rem;
-    color: ${(props) => props.theme.colors.text};
-
-    background-color: ${(props) => props.theme.colors.blue1};
-`;
-
-const DropdownList = styled(List)`
-    margin-left: -1px;
-    border-radius: 0 0 0.25rem 0.25rem;
-    box-shadow: ${(props) => props.theme.shadow.light};
-`;
-
-export const ChevronButton = styled(Button).attrs((attrs) => ({ ...attrs, styling: 'ghost' }))`
-    min-width: 0;
-    height: auto;
-    margin: 0;
-    padding: 0 0.25rem;
-
-    background-color: transparent !important;
-`;
-
 export interface ComboBoxProps extends InteractiveComponentProps<Item> {
     /** Whether to open the select dropdown on load or not, defaults to false */
     initialIsOpen?: boolean;
@@ -179,9 +152,14 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
     const [inputValue, setInputValue] = useState(props.initialValue?.label ?? props.selectedItem?.label ?? '');
     const [pendingHighlight, setPendingHighlight] = useState(null);
 
-    const filteredItems = props.items.filter((item) =>
-        inputValue ? item.label?.toLowerCase().includes(inputValue?.toLowerCase()) : true
+    const filteredItems = useMemo(
+        () =>
+            props.items.filter((item) =>
+                inputValue ? item.label?.toLowerCase().includes(inputValue?.toLowerCase()) : true
+            ),
+        [inputValue, props.items]
     );
+    const [kbdHighlightIdx, setKbdHighlightIdx] = React.useState<number | undefined>();
 
     const {
         selectedItem,
@@ -189,7 +167,6 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
         getMenuProps,
         getInputProps,
         getToggleButtonProps,
-        highlightedIndex,
         getItemProps,
         setHighlightedIndex,
     }: UseComboboxReturnValue<Item> = useCombobox<Item>({
@@ -210,6 +187,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                 }
             }
         },
+        ...syncKbdHighlightIdx(setKbdHighlightIdx),
         stateReducer: (state, { changes, type }) => {
             // This resets the input when the dropdown is opened
             if (
@@ -269,10 +247,16 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
         whileElementsMounted: isOpen ? autoUpdate : undefined,
     });
 
+    const dropdownStyle = useMemo(
+        () => ({
+            ...floatingStyles,
+            marginLeft: -1,
+        }),
+        [floatingStyles]
+    );
+
     const role = useRole(context, { role: 'combobox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
-
-    const menuProps = useMemo(() => getMenuProps({ ref: refs.setFloating }), [refs.setFloating, getMenuProps]);
 
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -294,34 +278,25 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                         }
                         size={props.size}
                     />
-                    <ChevronButton {...getToggleButtonProps()}>
-                        <Chevron disabled={props.disabled} isOpen={isOpen} />
-                    </ChevronButton>
+                    <ChevronButton
+                        disabled={props.disabled}
+                        isOpen={isOpen}
+                        getToggleButtonProps={getToggleButtonProps}
+                    />
                 </InputWrapper>
                 {ReactDOM.createPortal(
                     <DropdownList
-                        {...menuProps}
-                        {...getFloatingProps()}
+                        items={filteredItems}
+                        getItemProps={getItemProps}
+                        getFloatingProps={getFloatingProps}
+                        style={dropdownStyle}
                         isOpen={isOpen}
-                        style={{
-                            ...floatingStyles,
-                            zIndex: 9999,
-                        }}
-                    >
-                        {filteredItems.length > 0 &&
-                            filteredItems.map((item, index) => (
-                                <ListItem
-                                    {...getItemProps({ index, item })}
-                                    hovered={index === highlightedIndex}
-                                    key={`item-${index}`}
-                                    size={props.size}
-                                    title={item.label}
-                                >
-                                    {item.label}
-                                </ListItem>
-                            ))}
-                        {filteredItems.length === 0 && <NoItemsLabel>No Items</NoItemsLabel>}
-                    </DropdownList>,
+                        getMenuProps={getMenuProps}
+                        size={props.size}
+                        ref={refs.setFloating}
+                        selectedItem={selectedItem}
+                        kbdHighlightIdx={kbdHighlightIdx}
+                    />,
                     document.body
                 )}
             </Wrapper>
