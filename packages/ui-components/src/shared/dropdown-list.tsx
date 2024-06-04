@@ -79,12 +79,11 @@ const DropdownList = React.forwardRef<any, Props>(
             className={className}
         >
             {!isEmpty(items) ?
-                items.map((item, index) =>
-                    {
-                        const isSelected = selectedItem?.label === item.label;
-                        return children ?
+                items.map((item, index) => {
+                    const isSelected = selectedItem?.label === item.label;
+                    return children ?
                             children(item, index)
-                            : <ListItem
+                        :   <ListItem
                                 getItemProps={getItemProps}
                                 // Hack to force a scroll-in-to-view when the menu is opened
                                 // Only the selected item is rerendered
@@ -95,13 +94,12 @@ const DropdownList = React.forwardRef<any, Props>(
                                 item={item}
                                 index={index}
                                 itemClass={itemClass}
-                                isHighlighted={isOpen && (kbdHighlightIdx !== undefined && kbdHighlightIdx === index)}
+                                isHighlighted={isOpen && kbdHighlightIdx !== undefined && kbdHighlightIdx === index}
                                 isSelected={isSelected}
                             >
                                 {item.label}
                             </ListItem>;
-                    }
-                )
+                })
             :   <NoItemsLabel>No Items</NoItemsLabel>}
         </StyledDropdownList>
     )

@@ -209,7 +209,9 @@ const StyledDropdownList = React.memo(styled(DropdownList)<DropdownListProps>`
     gap: 0.125rem;
 
     width: 16.25rem;
-    max-height: calc(${(props) => (props.maxItems || 5) * 2}em + 2px + (${(props) => ((props.maxItems || 5) - 1)})*0.125em);
+    max-height: calc(
+        ${(props) => (props.maxItems || 5) * 2}em + 2px + (${(props) => (props.maxItems || 5) - 1}) * 0.125em
+    );
     margin-left: ${(props) => props.displacement}rem;
 
     background-color: ${(props) => props.theme.colors.grey1};
