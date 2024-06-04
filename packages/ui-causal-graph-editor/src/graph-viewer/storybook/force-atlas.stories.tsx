@@ -14,10 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { default as AddNodeButton } from './add-node-button';
-export { default as CenterGraphButton } from './center-graph-button';
-export { default as DragModeButton } from './drag-mode-button';
-export { default as RecalculateLayoutButton } from './recalculate-layout-button';
-export { default as SoftEdgeArrowButton } from './soft-edge-arrow-button';
-export { default as CollapseExpandButton } from './collapse-expand-button';
-export { default as SaveImageButton } from './save-image-button';
+import { Meta } from '@storybook/react';
+
+import { FRAUD } from '../../../tests/mocks/graphs';
+import { ForceAtlasLayout } from '../../shared/graph-layout';
+import { default as CausalGraphViewerComponent } from '../causal-graph-editor';
+import { Template } from './stories-utils';
+
+export default {
+    component: CausalGraphViewerComponent,
+    title: 'CausalGraphEditor/GraphEditor/ForceAtlas',
+} as Meta;
+
+export const ForceAtlas = Template.bind({});
+ForceAtlas.args = {
+    editable: true,
+    graphData: FRAUD,
+    graphLayout: ForceAtlasLayout.Builder.build(),
+};

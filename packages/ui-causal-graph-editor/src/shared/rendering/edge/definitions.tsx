@@ -39,6 +39,8 @@ export interface PixiEdgeStyle {
     state: EdgeState;
     /** Strength definition to be used if provided */
     strength?: EdgeStrengthDefinition;
+    /** The number of collapsed edges at either end of the edge */
+    collapsedEdgesCount?: number;
     /** Current theme object */
     theme: DefaultTheme;
     /** Optional thickness override */

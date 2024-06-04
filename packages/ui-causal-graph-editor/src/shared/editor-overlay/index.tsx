@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 export { default as Overlay } from './overlay';
-export { RecalculateLayoutButton, AddNodeButton, DragModeButton, CenterGraphButton } from './buttons';
+export {
+    RecalculateLayoutButton,
+    AddNodeButton,
+    DragModeButton,
+    CenterGraphButton,
+    CollapseExpandButton,
+} from './buttons';
 export { SearchBar, useSearch } from './search-bar';
 export { Legend, GraphLegendDefinition, getLegendData } from './legend';
 export { PanelContent, NodeInfoContent, EdgeInfoContent } from './panel-content';

@@ -18,7 +18,7 @@ import * as PIXI from 'pixi.js';
 
 import { ZoomState, ZoomThresholds } from '@types';
 
-import { GraphLayout, GraphLayoutWithTiers } from '../graph-layout/common';
+import { GraphLayout, GraphLayoutWithGrouping, GraphLayoutWithTiers } from '../graph-layout/common';
 
 export const MOUSE_EVENTS = ['mousemove', 'mouseover', 'mouseout', 'mousedown', 'mouseup'] as const;
 
@@ -78,4 +78,8 @@ export function getZoomState(scale: number, zoomThresholds?: ZoomThresholds): Zo
 
 export function isGraphLayoutWithTiers(layout: GraphLayout): layout is GraphLayoutWithTiers {
     return (layout as GraphLayoutWithTiers).tiers !== undefined;
+}
+
+export function isGraphLayoutWithGroups(layout: GraphLayout): layout is GraphLayoutWithGrouping {
+    return (layout as GraphLayoutWithGrouping).group !== undefined;
 }

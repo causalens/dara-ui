@@ -16,6 +16,8 @@
  */
 import { DefaultTheme } from '@darajs/styled-components';
 
+import { TARGET_NODE_MULTIPLIER } from '@shared/utils';
+
 import { PixiNodeStyle } from './definitions';
 
 /**
@@ -42,7 +44,7 @@ export function getNodeColor(group: PixiNodeStyle['group'], theme: DefaultTheme)
  * @param group group node is in
  */
 export function getNodeSize(size: number, group: PixiNodeStyle['group']): number {
-    const sizeMultiplier = group === 'target' ? 1.25 : 1;
+    const sizeMultiplier = group === 'target' ? TARGET_NODE_MULTIPLIER : 1;
 
     return size * sizeMultiplier;
 }

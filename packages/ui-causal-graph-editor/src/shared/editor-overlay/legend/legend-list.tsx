@@ -195,7 +195,7 @@ export function LegendList({ listItems }: LegendListProps): JSX.Element {
     return (
         <Ul>
             {listItems.map(({ label, ...props }) => (
-                <Li key={label}>
+                <Li key={`${label}-${props.type}`}>
                     <LegendSymbol {...props} />
                     <LegendText>{label}</LegendText>
                 </Li>

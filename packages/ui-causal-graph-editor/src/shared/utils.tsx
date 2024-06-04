@@ -20,6 +20,9 @@ import { DefaultTheme } from '@darajs/styled-components';
 
 import { EdgeType, GraphTiers, NodeGroup, SimulationGraph } from '../types';
 
+export const DEFAULT_NODE_SIZE = 64;
+export const TARGET_NODE_MULTIPLIER = 1.25;
+
 /**
  * Check if adding an edge to the graph will create a cycle.
  *
@@ -148,7 +151,7 @@ export function getNodeGroup(graph: SimulationGraph, id: string, isLatent?: bool
     let group: NodeGroup = 'other';
     if (isLatent) {
         group = 'latent';
-    } else if (graph.inDegree(id) > 0 && graph.outDegree(id) === 0) {
+    } else if (graph.hasNode(id) && graph.inDegree(id) > 0 && graph.outDegree(id) === 0) {
         group = 'target';
     }
 
@@ -207,8 +210,9 @@ export function getPathInNodeAttribute(attributes: Record<string, any>, path: st
  * @param nodes nodes to be grouped
  * @param group the attribute to group by
  * @param graph the graph
+ * @returns a record of group name to an array of nodes
  *  */
-export function getNodeGroups(nodes: string[], group: string, graph: SimulationGraph): Record<string, string[]> {
+export function getGroupToNodesMap(nodes: string[], group: string, graph: SimulationGraph): Record<string, string[]> {
     const attributePathArray = group.split('.');
 
     return nodes.reduce((groupAccumulator: Record<string, string[]>, node) => {
@@ -228,6 +232,30 @@ export function getNodeGroups(nodes: string[], group: string, graph: SimulationG
             }
         }
         return groupAccumulator;
+    }, {});
+}
+
+/**
+ * Gets the group for each node based on a given attribute
+ * @param nodes nodes to be checked
+ * @param group the attribute to check
+ * @param graph the graph
+ * @returns a map of node to group
+ */
+export function getNodeToGroupMap(nodes: string[], group: string, graph: SimulationGraph): Record<string, string> {
+    const attributePathArray = group.split('.');
+
+    return nodes.reduce((nodeToGroupMap: Record<string, string>, node) => {
+        const nodeAttributes = graph.getNodeAttributes(node);
+        // Traverse the attribute path to get the group value
+        const nodeGroup = attributePathArray.reduce(getPathInNodeAttribute, nodeAttributes);
+
+        // If the node group is found, map the node to its group
+        if (nodeGroup !== undefined) {
+            const groupKey = String(nodeGroup);
+            nodeToGroupMap[node] = groupKey;
+        }
+        return nodeToGroupMap;
     }, {});
 }
 
@@ -267,7 +295,7 @@ export function getTiersArray(tiers: GraphTiers, graph: SimulationGraph): string
         // must be of type TiersConfig
         const { group, rank } = tiers;
         const nodes = graph.nodes();
-        const tieredNodes = getNodeGroups(nodes, group, graph);
+        const tieredNodes = getGroupToNodesMap(nodes, group, graph);
 
         // if rank is defined use it to order the tiers
         if (rank) {
