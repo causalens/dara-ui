@@ -249,3 +249,14 @@ TimeSeries.args = {
     graphData: timeSeriesCausalGraph,
     graphLayout: timeSeriesLayout,
 };
+
+export const Empty = Template.bind({});
+Empty.args = {
+    editable: false,
+    graphData: {
+        edges: {},
+        nodes: {},
+        version: '2.0',
+    },
+    graphLayout: FcoseLayout.Builder.build(),
+};
