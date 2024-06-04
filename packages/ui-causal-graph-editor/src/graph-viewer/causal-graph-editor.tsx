@@ -45,7 +45,7 @@ import { SaveImageButton } from '@shared/editor-overlay/buttons';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
 import { GraphLayoutWithGrouping } from '@shared/graph-layout/common';
 import useGraphTooltip from '@shared/use-graph-tooltip';
-import { getGroupToNodesMap, getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getGroupToNodesMap, getNodeToGroupMap, getTooltipContent, willCreateCycle } from '@shared/utils';
 
 import {
     CausalGraph,
@@ -300,6 +300,21 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     // deletion
 
     function onRemoveNode(): void {
+        if (layoutHasGroup) {
+            const layoutGroup = (layout as GraphLayoutWithGrouping).group;
+            const groupsObject = getGroupToNodesMap(state.graph.nodes(), layoutGroup, state.graph);
+            const nodesToGroups = getNodeToGroupMap(state.graph.nodes(), layoutGroup, state.graph);
+            const group = nodesToGroups[selectedNode];
+            if (groupsObject[group].length === 1) {
+                props.onNotify?.({
+                    key: 'delete-group',
+                    message: 'Cannot delete the last node in a group',
+                    status: Status.WARNING,
+                    title: 'Group deletion',
+                });
+                return;
+            }
+        }
         api.removeNode(selectedNode);
         setSelectedNode(null);
     }
