@@ -139,7 +139,7 @@ const StyledDatepickerListItem = styled.span<DatepickerListItemStyleProps>`
     min-height: 2rem;
     padding: 0.25rem 1.5rem;
 
-    font-size: ${(props) => (props.size ? `${props.size}rem` : props.theme.font.size)};
+    font-size: 0.75rem;
     font-weight: 300;
     color: ${(props) => (props.isSelected ? '#FFF' : props.theme.colors.text)};
     text-overflow: ellipsis;
@@ -181,6 +181,7 @@ type DatepickerListItemProps = {
 const DatepickerListItem = React.memo(
     ({ item, index, getItemProps, isSelected, size, isHighlighted }: DatepickerListItemProps) => {
         const { itemClassName, ...itemProps } = getItemProps({ index, item });
+        console.log(itemProps)
 
         return (
             <StyledDatepickerListItem
@@ -216,6 +217,7 @@ const StyledDropdownList = React.memo(styled(DropdownList)<DropdownListProps>`
 
     background-color: ${(props) => props.theme.colors.grey1};
     border: none;
+    box-shadow: none;
 `);
 
 const DatepickerSelectButtonPrimary = React.memo(
