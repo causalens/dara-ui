@@ -44,7 +44,7 @@ export const StyledListItem = styled.span<ListItemProps>`
 
     :active {
         color: ${(props) => props.theme.colors.blue1};
-        background-color: ${(props) => props.theme.colors.primary};
+        background-color: ${(props) => props.theme.colors.blue4};
     }
 
     &:last-child {
