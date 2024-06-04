@@ -27,7 +27,7 @@ import { Status } from '@darajs/ui-utils';
 
 import { CustomLayout, FcoseLayout, GraphLayout } from '@shared/graph-layout';
 import { DragMode } from '@shared/use-drag-mode';
-import { getGroupToNodesMap, getNodeGroup, getNodeToGroupMap } from '@shared/utils';
+import { getGroupToNodesMap, getNodeCategory, getNodeToGroupMap } from '@shared/utils';
 
 import {
     EdgeConstraint,
@@ -1307,11 +1307,11 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
      * @param attributes node attributes
      */
     private getNodeStyle(node: NodeObject, attributes: SimulationNode): PixiNodeStyle {
-        const group = getNodeGroup(this.graph, attributes.id, attributes['meta.rendering_properties.latent']);
+        const group = getNodeCategory(this.graph, attributes.id, attributes['meta.rendering_properties.latent']);
 
         return {
             color: attributes['meta.rendering_properties.color'],
-            group,
+            category: group,
             highlight_color: attributes['meta.rendering_properties.highlight_color'],
             isEdgeSelected: !!this.selectedEdge,
             isSourceOfNewEdge: this.isCreatingEdge && this.mousedownNodeKey === attributes.id,

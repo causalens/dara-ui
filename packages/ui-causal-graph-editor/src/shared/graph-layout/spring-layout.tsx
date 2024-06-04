@@ -26,7 +26,7 @@ import {
     GroupingLayoutBuilder,
     SimulationGraph,
     SimulationNode,
-    SimulationNodeWithGroup,
+    SimulationNodeWithCategory,
     TieredGraphLayoutBuilder,
 } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
@@ -123,7 +123,7 @@ function applyOrderNodesForce(
     tiers: GraphTiers,
     graph: SimulationGraph,
     orientation: DirectionType,
-    nodesMap: Map<string, SimulationNodeWithGroup>
+    nodesMap: Map<string, SimulationNodeWithCategory>
 ): void {
     if (!Array.isArray(tiers)) {
         const { order_nodes_by } = tiers;
@@ -135,7 +135,7 @@ function applyOrderNodesForce(
                 .map((entry) => entry[0]);
             const nodeSeparation = 200;
 
-            function forceOrder(): d3.Force<SimulationNodeWithGroup, undefined> {
+            function forceOrder(): d3.Force<SimulationNodeWithCategory, undefined> {
                 function force(alpha: number): void {
                     sortedNodesOrderArray.forEach((nodeName, index) => {
                         const targetPosition = index * nodeSeparation;
@@ -175,19 +175,19 @@ function applyOrderNodesForce(
 export function applyTierForces(
     simulation: d3.Simulation<SimulationNode, D3SimulationEdge>,
     graph: SimulationGraph,
-    nodes: SimulationNodeWithGroup[],
+    nodes: SimulationNodeWithCategory[],
     tiers: GraphTiers,
     tiersSeparation: number,
     orientation: DirectionType
 ): void {
     const tiersArray = getTiersArray(tiers, graph);
 
-    const nodesMapping = new Map<string, SimulationNodeWithGroup>();
+    const nodesMapping = new Map<string, SimulationNodeWithCategory>();
     nodes.forEach((node) => nodesMapping.set(node.id, node));
 
     applyOrderNodesForce(simulation, tiers, graph, orientation, nodesMapping);
 
-    function forceLayer(): d3.Force<SimulationNodeWithGroup, undefined> {
+    function forceLayer(): d3.Force<SimulationNodeWithCategory, undefined> {
         function force(alpha: number): void {
             tiersArray.forEach((tier, index) => {
                 const targetPosition = index * tiersSeparation;

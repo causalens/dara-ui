@@ -32,9 +32,9 @@ import {
     SimulationEdge,
     SimulationGraph,
     SimulationNode,
-    SimulationNodeWithGroup,
+    SimulationNodeWithCategory,
 } from '../types';
-import { getNodeGroup, getNodeOrder, getTiersArray } from './utils';
+import { getNodeCategory, getNodeOrder, getTiersArray } from './utils';
 
 interface NodeOrder {
     group: string;
@@ -74,21 +74,21 @@ export function dagGraphParser(graph: SimulationGraph, tiers?: GraphTiers): MutG
 
     const nodes: DagNodeData[] = graph.mapNodes((id: string, attributes: SimulationNode) => {
         const parentIds = graph.inboundNeighbors(id);
-        let nodeGroup = 'latent';
+        let nodeType = 'latent';
         let nodeOrder;
         let nodeRank;
 
         if (tiers) {
             const nodeData = nodeTiersMap.get(id);
             // in the case of e.g. a new node group etc may be undefined
-            nodeGroup = nodeData?.group;
+            nodeType = nodeData?.group;
             nodeOrder = nodeData?.order;
             nodeRank = nodeData?.rank;
         }
 
         return {
             ...attributes,
-            group: nodeGroup,
+            group: nodeType,
             ord: nodeOrder,
             parentIds,
             rank: nodeRank,
@@ -105,16 +105,16 @@ export function dagGraphParser(graph: SimulationGraph, tiers?: GraphTiers): MutG
  *
  * @param graph graph to get edges from
  */
-export function getD3Data(graph: SimulationGraph): [edges: D3SimulationEdge[], nodes: SimulationNodeWithGroup[]] {
+export function getD3Data(graph: SimulationGraph): [edges: D3SimulationEdge[], nodes: SimulationNodeWithCategory[]] {
     const nodes = graph.reduceNodes(
         (acc, id, attrs) => ({
             ...acc,
             [id]: {
                 ...attrs,
-                group: getNodeGroup(graph, id, attrs['meta.rendering_properties.latent']),
+                category: getNodeCategory(graph, id, attrs['meta.rendering_properties.latent']),
             },
         }),
-        {} as Record<string, SimulationNodeWithGroup>
+        {} as Record<string, SimulationNodeWithCategory>
     );
 
     const edges = graph.mapEdges((edgeKey, attrs, source, target) => {

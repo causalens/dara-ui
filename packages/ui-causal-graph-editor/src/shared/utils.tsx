@@ -18,7 +18,7 @@ import { hasCycle } from 'graphology-dag';
 
 import { DefaultTheme } from '@darajs/styled-components';
 
-import { EdgeType, GraphTiers, NodeGroup, SimulationGraph } from '../types';
+import { EdgeType, GraphTiers, NodeCategory, SimulationGraph } from '../types';
 
 export const DEFAULT_NODE_SIZE = 64;
 export const TARGET_NODE_MULTIPLIER = 1.25;
@@ -141,21 +141,21 @@ export function getTooltipContent(
 }
 
 /**
- * Get node group
+ * Get node category
  *
  * @param graph current graph state instance
  * @param id node id
  * @param isLatent whether the node is latent
  */
-export function getNodeGroup(graph: SimulationGraph, id: string, isLatent?: boolean): NodeGroup {
-    let group: NodeGroup = 'other';
+export function getNodeCategory(graph: SimulationGraph, id: string, isLatent?: boolean): NodeCategory {
+    let category: NodeCategory = 'other';
     if (isLatent) {
-        group = 'latent';
+        category = 'latent';
     } else if (graph.hasNode(id) && graph.inDegree(id) > 0 && graph.outDegree(id) === 0) {
-        group = 'target';
+        category = 'target';
     }
 
-    return group;
+    return category;
 }
 
 /**
