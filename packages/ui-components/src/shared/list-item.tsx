@@ -7,6 +7,7 @@ import { Item } from '../types';
 
 interface ListItemProps {
     isHighlighted?: boolean;
+    isSelected?: boolean;
     size?: number;
 }
 
@@ -26,7 +27,15 @@ export const StyledListItem = styled.span<ListItemProps>`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    background-color: ${(props) => (props.isHighlighted ? props.theme.colors.grey2 : props.theme.colors.blue1)};
+    background-color: ${(props) => {
+        if (props.isSelected) {
+            return props.theme.colors.blue3;
+        }
+        if (props.isHighlighted) {
+            return props.theme.colors.grey2;
+        }
+        return props.theme.colors.blue1;
+    }};
     border-bottom: 1px solid ${(props) => props.theme.colors.grey3};
 
     :hover {
@@ -54,6 +63,8 @@ type Props = {
     index: number;
     /** Whether the item is highlighted. For example when using keyboard navigation */
     isHighlighted?: boolean;
+    /** Whether the item is selected */
+    isSelected?: boolean;
     /** Function to get props for the item */
     getItemProps: (options: UseComboboxGetItemPropsOptions<Item>) => any;
     /** Optional CSS classname for the list item */
@@ -76,6 +87,7 @@ const ListItem = ({
     itemClass,
     children,
     isHighlighted,
+    isSelected,
 }: Props): JSX.Element => {
     const { itemClassName, ...itemProps } = getItemProps({ index, item });
 
@@ -87,6 +99,7 @@ const ListItem = ({
             size={size}
             item={item}
             isHighlighted={isHighlighted}
+            isSelected={isSelected}
         >
             {children}
         </StyledListItem>
