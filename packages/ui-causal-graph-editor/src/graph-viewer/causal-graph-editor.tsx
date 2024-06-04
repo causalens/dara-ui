@@ -305,7 +305,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
             const groupsObject = getGroupToNodesMap(state.graph.nodes(), layoutGroup, state.graph);
             const nodesToGroups = getNodeToGroupMap(state.graph.nodes(), layoutGroup, state.graph);
             const group = nodesToGroups[selectedNode];
-            if (groupsObject[group].length === 1) {
+            if (groupsObject[group]?.length === 1) {
                 props.onNotify?.({
                     key: 'delete-group',
                     message: 'Cannot delete the last node in a group',
