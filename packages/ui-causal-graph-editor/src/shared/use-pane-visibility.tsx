@@ -15,6 +15,10 @@ export default function usePaneVisibility(
     const isPaneVisible = React.useRef(false);
 
     React.useEffect(() => {
+        if (!pane.current) {
+            return;
+        }
+
         const observer = new IntersectionObserver((entries) => {
             for (const entry of entries) {
                 isPaneVisible.current = entry.isIntersecting;

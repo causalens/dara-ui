@@ -149,17 +149,19 @@ export function useRenderEngine({
 
     // Start engine after first render, stop it on destroy
     React.useEffect(() => {
-        engine.current.start(parentRef.current).then(() => {
-            // Attach listeners for each event type
-            ENGINE_EVENTS.forEach((eventName) => {
-                engine.current.addListener(eventName, (...args) => {
-                    listeners.current[eventName]?.apply(null, args);
+        if (parentRef.current) {
+            engine.current.start(parentRef.current).then(() => {
+                // Attach listeners for each event type
+                ENGINE_EVENTS.forEach((eventName) => {
+                    engine.current.addListener(eventName, (...args) => {
+                        listeners.current[eventName]?.apply(null, args);
+                    });
                 });
             });
-        });
+        }
 
         return () => {
-            engine.current.destroy();
+            engine.current?.destroy();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

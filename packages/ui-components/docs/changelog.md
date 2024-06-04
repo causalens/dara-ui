@@ -2,6 +2,19 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed a crash when `null` was passed to `MultiSelect`'s `selectedItems` prop.
+
+## 1.9.5
+
+-   Fixed an issue where select components would sometimes error out with "Maximum update depth..." React error
+
+## 1.9.3
+
+-   Fixed a downshift ref warning in `Select` and `DatepickerSelect` components.
+
+
 ## 1.9.2
 
 -   Removed margin from `Chat` component
@@ -18,7 +31,7 @@ title: Changelog
 
 -   `Chat` component now displays its messages content as `Markdown`.
 -   `Chat` component now displays next line breaks.
--   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter. 
+-   `Textarea` component when `onComplete` prop is passed adds next line with shift + enter.
 -   Added a new `Markdown` component.
 -   **Breaking** `Chat` now takes a `active_user` prop, and display user info in each message.
 -   **Breaking** `Chat` component now only allows users that wrote a message to edit it.

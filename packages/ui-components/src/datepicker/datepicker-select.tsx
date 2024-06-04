@@ -269,7 +269,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
     const setFloatingRef = refs.setFloating;
     const { dropdownRef } = props;
 
-    const mergedRefs = React.useCallback(
+    const mergedDropdownRef = React.useCallback(
         (node: HTMLElement | null) => {
             setFloatingRef(node);
             setMenuRef(node);
@@ -289,8 +289,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
             >
                 <SelectButtonPrimary
                     disabled={props.disabled}
-                    {...getToggleButtonProps({ disabled: props.disabled })}
-                    ref={refs.setReference}
+                    {...getToggleButtonProps({ disabled: props.disabled, ref: refs.setReference })}
                     {...getReferenceProps()}
                     type="button"
                 >
@@ -301,7 +300,7 @@ function DatepickerSelect(props: SelectProps): JSX.Element {
                     <DropdownList
                         {...menuProps}
                         {...getFloatingProps()}
-                        ref={mergedRefs}
+                        ref={mergedDropdownRef}
                         className={`${menuProps?.className ?? ''} ${props.itemClass}`}
                         displacement={props.displacement}
                         isOpen={isOpen}

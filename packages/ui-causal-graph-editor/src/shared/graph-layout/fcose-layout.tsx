@@ -378,6 +378,11 @@ export default class FcoseLayout extends GraphLayout {
         layout: LayoutMapping<XYPosition>;
     }> {
         return new Promise((resolve) => {
+            if (graph.nodes().length === 0) {
+                resolve({ layout: {} });
+                return;
+            }
+
             const hasPositions = graph.getNodeAttribute(graph.nodes()[0], 'x');
             const size = graph.getAttribute('size');
             const tiersPlacement =

@@ -157,6 +157,10 @@ export default class ForceAtlasLayout extends GraphLayout {
     applyLayout(graph: SimulationGraph): Promise<{
         layout: LayoutMapping<XYPosition>;
     }> {
+        if (graph.nodes().length === 0) {
+            return Promise.resolve({ layout: {} });
+        }
+
         const firstNodeAttrs = graph.getNodeAttributes(graph.nodes()[0]);
         const graphClone = graph.copy();
         const size = graphClone.getAttribute('size');

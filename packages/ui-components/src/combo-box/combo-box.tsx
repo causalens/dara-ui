@@ -16,7 +16,7 @@
  */
 import { autoUpdate, flip, offset, shift, useFloating, useInteractions, useRole } from '@floating-ui/react';
 import { UseComboboxReturnValue, UseComboboxStateChangeTypes, useCombobox } from 'downshift';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import styled from '@darajs/styled-components';
@@ -272,17 +272,7 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
     const role = useRole(context, { role: 'combobox' });
     const { getReferenceProps, getFloatingProps } = useInteractions([role]);
 
-    const menuProps = getMenuProps();
-    const setMenuRef = menuProps.ref;
-    const setFloatingRef = refs.setFloating;
-
-    const mergedRefs = useCallback(
-        (node: HTMLElement | null) => {
-            setFloatingRef(node);
-            setMenuRef(node);
-        },
-        [setFloatingRef, setMenuRef]
-    );
+    const menuProps = useMemo(() => getMenuProps({ ref: refs.setFloating }), [refs.setFloating, getMenuProps]);
 
     return (
         <Tooltip content={props.errorMsg} disabled={!props.errorMsg} styling="error">
@@ -312,7 +302,6 @@ function ComboBox(props: ComboBoxProps): JSX.Element {
                     <DropdownList
                         {...menuProps}
                         {...getFloatingProps()}
-                        ref={mergedRefs}
                         isOpen={isOpen}
                         style={{
                             ...floatingStyles,
