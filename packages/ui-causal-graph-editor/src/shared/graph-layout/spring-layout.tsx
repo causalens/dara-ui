@@ -23,6 +23,7 @@ import {
     D3SimulationEdge,
     DirectionType,
     GraphTiers,
+    GroupingLayoutBuilder,
     SimulationGraph,
     SimulationNode,
     SimulationNodeWithGroup,
@@ -32,7 +33,10 @@ import { getD3Data, nodesToLayout } from '../parsers';
 import { getNodeOrder, getTiersArray } from '../utils';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
-class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements TieredGraphLayoutBuilder {
+class SpringLayoutBuilder
+    extends GraphLayoutBuilder<SpringLayout>
+    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder
+{
     _collisionForce = 2;
 
     _gravity = -50;
@@ -46,6 +50,8 @@ class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements Ti
     orientation: DirectionType = 'horizontal';
 
     tiers: GraphTiers;
+
+    group: string;
 
     /**
      * Set the multiplier for collision force
@@ -224,6 +230,8 @@ export default class SpringLayout extends GraphLayout {
 
     public tiers: GraphTiers;
 
+    public group: string;
+
     constructor(builder: SpringLayoutBuilder) {
         super(builder);
         this.collisionForce = builder._collisionForce;
@@ -233,6 +241,7 @@ export default class SpringLayout extends GraphLayout {
         this.tierSeparation = builder._tierSeparation;
         this.orientation = builder.orientation;
         this.tiers = builder.tiers;
+        this.group = builder.group;
     }
 
     applyLayout(
@@ -248,6 +257,8 @@ export default class SpringLayout extends GraphLayout {
     }> {
         // We're modifying edges/nodes
         let [edges, nodes] = getD3Data(graph);
+
+        console.log(this.group);
 
         const simulation: Simulation<SimulationNode, D3SimulationEdge> = d3
             .forceSimulation(nodes)
