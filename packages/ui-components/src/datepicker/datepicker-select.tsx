@@ -181,7 +181,6 @@ type DatepickerListItemProps = {
 const DatepickerListItem = React.memo(
     ({ item, index, getItemProps, isSelected, size, isHighlighted }: DatepickerListItemProps) => {
         const { itemClassName, ...itemProps } = getItemProps({ index, item });
-        console.log(itemProps)
 
         return (
             <StyledDatepickerListItem
