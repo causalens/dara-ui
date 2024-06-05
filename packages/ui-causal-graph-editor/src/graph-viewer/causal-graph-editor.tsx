@@ -29,7 +29,6 @@ import { ConfirmationModal } from '@darajs/ui-widgets';
 import {
     AddNodeButton,
     CenterGraphButton,
-    CollapseExpandButton,
     DragModeButton,
     EdgeInfoContent,
     GraphLegendDefinition,
@@ -43,9 +42,8 @@ import {
 } from '@shared/editor-overlay';
 import { SaveImageButton } from '@shared/editor-overlay/buttons';
 import ZoomPrompt from '@shared/editor-overlay/zoom-prompt';
-import { GraphLayoutWithGrouping } from '@shared/graph-layout/common';
 import useGraphTooltip from '@shared/use-graph-tooltip';
-import { getGroupToNodesMap, getNodeToGroupMap, getTooltipContent, willCreateCycle } from '@shared/utils';
+import { getTooltipContent, willCreateCycle } from '@shared/utils';
 
 import {
     CausalGraph,
@@ -180,14 +178,10 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
         setError(e);
     };
 
-    const layoutHasGroup = useMemo(() => (layout as GraphLayoutWithGrouping).group !== undefined, [layout]);
-
     const {
         getCenterPosition,
         useEngineEvent,
         resetViewport,
-        collapseGroups,
-        expandGroups,
         resetLayout,
         extractImage,
         onSetDragMode,
@@ -221,7 +215,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     }
 
     const [hasFocus, setHasFocus] = useState(false);
-    const [showCollapseAll, setShowCollapseAll] = useState(true);
 
     function onPaneFocus(focus: boolean): void {
         setHasFocus(focus);
@@ -300,21 +293,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     // deletion
 
     function onRemoveNode(): void {
-        if (layoutHasGroup) {
-            const layoutGroup = (layout as GraphLayoutWithGrouping).group;
-            const groupsObject = getGroupToNodesMap(state.graph.nodes(), layoutGroup, state.graph);
-            const nodesToGroups = getNodeToGroupMap(state.graph.nodes(), layoutGroup, state.graph);
-            const group = nodesToGroups[selectedNode];
-            if (groupsObject[group]?.length === 1) {
-                props.onNotify?.({
-                    key: 'delete-group',
-                    message: 'Cannot delete the last node in a group',
-                    status: Status.WARNING,
-                    title: 'Group deletion',
-                });
-                return;
-            }
-        }
         api.removeNode(selectedNode);
         setSelectedNode(null);
     }
@@ -366,21 +344,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
     // other api handlers
 
     function onAddEdge(edge: [string, string]): void {
-        if (layoutHasGroup) {
-            const layoutGroup = (layout as GraphLayoutWithGrouping).group;
-            const groupsObject = getGroupToNodesMap(state.graph.nodes(), layoutGroup, state.graph);
-            const groups = Object.keys(groupsObject);
-
-            if (groups.includes(edge[0]) && groups.includes(edge[1])) {
-                props.onNotify?.({
-                    key: 'create-edge-group',
-                    message: 'Adding edge between groups is not allowed',
-                    status: Status.WARNING,
-                    title: 'Group edge detected',
-                });
-                return;
-            }
-        }
         // Skip if a cycle would be created
         // The check needs to happen before we commit an action
         if (willCreateCycle(state.graph, edge)) {
@@ -531,24 +494,6 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                 width: 0,
             }) as DOMRect;
         setTooltipContent(edgeTooltipContent);
-    });
-
-    useEngineEvent('groupMouseover', (event, groupId) => {
-        tooltipRef.current = () =>
-            ({
-                bottom: event.clientY,
-                height: 0,
-                left: event.clientX,
-                right: event.clientX,
-                top: event.clientY,
-                width: 0,
-            }) as DOMRect;
-
-        setTooltipContent(getTooltipContent(groupId, '', theme));
-    });
-
-    useEngineEvent('groupMouseout', () => {
-        setTooltipContent(null);
     });
 
     useEngineEvent('edgeMouseout', () => {
@@ -761,33 +706,13 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                             topRight={
                                 <>
                                     <SearchBar
-                                        onChange={(value) => {
-                                            onSearchBarChange(value);
-                                            // if the user searches, we want to expand all groups to perform the search
-                                            if (layoutHasGroup) {
-                                                expandGroups();
-                                                setShowCollapseAll(true);
-                                            }
-                                        }}
+                                        onChange={onSearchBarChange}
                                         onClose={() => setSelectedNode(null)}
                                         onNext={onNextSearchResult}
                                         onPrev={onPrevSearchResult}
                                         selectedResult={currentSearchNode + 1}
                                         totalNumberOfResults={searchResults.length}
                                     />
-                                    {layoutHasGroup && (
-                                        <CollapseExpandButton
-                                            onCollapseAll={() => {
-                                                setShowCollapseAll(false);
-                                                collapseGroups();
-                                            }}
-                                            onExpandAll={() => {
-                                                expandGroups();
-                                                setShowCollapseAll(true);
-                                            }}
-                                            showExpandAll={showCollapseAll}
-                                        />
-                                    )}
                                     <CenterGraphButton onResetZoom={resetViewport} />
                                     <AddNodeButton onAddNode={onAddNode} />
                                     <DragModeButton dragMode={dragMode} setDragMode={setDragMode} />

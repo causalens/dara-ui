@@ -107,7 +107,7 @@ export const FRAUD: CausalGraph = {
             },
             'Number of Children': {
                 destination: {
-                    identifier: 'Number of Children',
+                    identifier: 'Number of Childre',
                     meta: {},
                     variable_type: VariableType.UNSPECIFIED,
                 },

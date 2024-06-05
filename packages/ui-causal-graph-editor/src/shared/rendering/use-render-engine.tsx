@@ -75,14 +75,6 @@ interface UseRenderEngineApi {
      */
     resetViewport: () => void;
     /**
-     * Collapses all groups
-     */
-    collapseGroups: () => void;
-    /**
-     * Expand all groups
-     */
-    expandGroups: () => void;
-    /**
      * Get current canvas state as an image
      */
     extractImage: () => Promise<string | undefined>;
@@ -221,16 +213,6 @@ export function useRenderEngine({
         resetViewport: () => {
             if (engine.current.initialized) {
                 engine.current.resetViewport();
-            }
-        },
-        collapseGroups: () => {
-            if (engine.current.initialized) {
-                engine.current.collapseAllGroups();
-            }
-        },
-        expandGroups: () => {
-            if (engine.current.initialized) {
-                engine.current.expandAllGroups();
             }
         },
         extractImage: () => {

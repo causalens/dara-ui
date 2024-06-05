@@ -55,7 +55,6 @@ export interface EdgeRenderingMeta {
     forced?: boolean;
     thickness?: number;
     tooltip?: string | Record<string, string>;
-    collapsedEdgesCount?: number;
 }
 
 export type FlatEdgeRenderingMeta = RenderingMetaKeys<EdgeRenderingMeta>;
@@ -182,8 +181,6 @@ export interface SimulationEdge extends FlatEdgeRenderingMeta {
 
     /**  optional list of positions the edge should be curved through */
     points?: XYPosition[];
-    /** The edge id */
-    id?: string;
 }
 
 /**
@@ -311,23 +308,4 @@ export type GraphTiers = string[][] | TiersConfig;
 export interface TieredGraphLayoutBuilder {
     orientation?: DirectionType;
     tiers: GraphTiers;
-}
-
-/**
- * Defines necessary properties that need to be implemented by graph layouts to support grouping/cluster layouts
- */
-export interface GroupingLayoutBuilder {
-    /** The path for the property in the node that should be used for defining their layer */
-    group: string;
-}
-
-/**
- * Defines necessary properties for a group node to be drawn on the graph
- */
-export interface GroupNode {
-    id: string;
-    originalMeta: CausalGraphNodeMeta;
-    variable_type: 'groupNode';
-    x: number;
-    y: number;
 }

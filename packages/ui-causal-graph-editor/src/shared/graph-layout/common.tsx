@@ -17,10 +17,9 @@
 import { LayoutMapping, XYPosition } from 'graphology-layout/utils';
 
 import { DirectionType, GraphTiers, SimulationGraph } from '../../types';
-import { DEFAULT_NODE_SIZE } from '../utils';
 
 export abstract class GraphLayoutBuilder<T> {
-    _nodeSize = DEFAULT_NODE_SIZE;
+    _nodeSize = 64;
 
     _nodeFontSize = 16;
 
@@ -96,8 +95,4 @@ export abstract class GraphLayout {
 export interface GraphLayoutWithTiers extends GraphLayout {
     orientation: DirectionType;
     tiers: GraphTiers;
-}
-
-export interface GraphLayoutWithGrouping extends GraphLayout {
-    group: string;
 }

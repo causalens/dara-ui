@@ -8,12 +8,10 @@ title: Changelog
 
 ## 1.9.3
 
--   Fixed an issue where a graph `Legend` node and edge could not have the same label.
--   Added support for grouping layout in `Fcose` layouts. It allows for nodes to be placed on groups which can be collapsed and expanded in order to simplify graph visual structure to the user.
+-   Added a new 'Save as Image' button to the graph viewer UI to download the currently displayed graph pane as a high-resolution PNG image.
 
 ## 1.9.2
 
--   Added a new 'Save as Image' button to the graph viewer UI to download the currently displayed graph pane as a high-resolution PNG image.
 -   Fixed an issue where if parent hugged content `NodeHierarchyBuilder` would always scroll.
 -   Fixed an issue where `FcoseLayout` would crash when an array of array of nodes was passed to tiers which included a node that did not exist on the graph.
 
