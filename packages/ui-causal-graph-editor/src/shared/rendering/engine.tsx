@@ -468,9 +468,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         let numberOfCollapsedEdges =
                             graphHasFinalEdge ?
                                 this.graph.getEdgeAttributes(finalSource, finalTarget)[
-                                    'meta.rendering_properties.collapsedEdgesCount'
+                                'meta.rendering_properties.collapsedEdgesCount'
                                 ]
-                            :   0;
+                                : 0;
 
                         // upddate the number of collapsed edges count if needed
                         if (graphHasFinalEdge && edgeHasChanged && group === finalSource) {
@@ -533,6 +533,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 });
             });
 
+            this.debouncedUpdateLayout();
             this.requestRender();
         }
     }
@@ -585,6 +586,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             // redraw all group containers
             this.createGroupContainers();
 
+            this.debouncedUpdateLayout();
             this.requestRender();
         }
     }

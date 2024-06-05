@@ -54,14 +54,23 @@ SpringTiers.args = {
     graphLayout: springLayout,
 };
 
-export const SpringGrouping = Template.bind({});
+export const SpringGroupingLarge = Template.bind({});
+
+const groupingLayoutLarge = SpringLayout.Builder.build();
+groupingLayoutLarge.group = 'meta.group';
+
+SpringGroupingLarge.args = {
+    graphData: FRAUD,
+    graphLayout: groupingLayoutLarge,
+    editable: true,
+};
+
+export const SpringGroupingSmall = Template.bind({});
 
 const groupingLayout = SpringLayout.Builder.build();
-// groupingLayout.group = 'meta.group';
 groupingLayout.group = 'meta.test';
 
-SpringGrouping.args = {
-    // graphData: FRAUD,
+SpringGroupingSmall.args = {
     graphData: nodeTiersCausalGraph,
     graphLayout: groupingLayout,
     editable: true,

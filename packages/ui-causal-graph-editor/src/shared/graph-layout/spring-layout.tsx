@@ -22,6 +22,7 @@ import debounce from 'lodash/debounce';
 import {
     D3SimulationEdge,
     DirectionType,
+    EdgeType,
     GraphTiers,
     GroupingLayoutBuilder,
     SimulationGraph,
@@ -30,13 +31,12 @@ import {
     TieredGraphLayoutBuilder,
 } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
-import { getNodeOrder, getTiersArray } from '../utils';
+import { getGroupToNodesMap, getNodeOrder, getNodeToGroupMap, getTiersArray } from '../utils';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
 class SpringLayoutBuilder
     extends GraphLayoutBuilder<SpringLayout>
-    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder
-{
+    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder {
     _collisionForce = 2;
 
     _gravity = -50;
@@ -46,6 +46,8 @@ class SpringLayoutBuilder
     _warmupTicks = 100;
 
     _tierSeparation = 300;
+
+    _groupRepelStrength = 500;
 
     orientation: DirectionType = 'horizontal';
 
@@ -100,6 +102,16 @@ class SpringLayoutBuilder
      */
     tierSeparation(separation: number): this {
         this._tierSeparation = separation;
+        return this;
+    }
+
+    /**
+     * Set the repulsive force strength between groups
+     *
+     * @param force force
+     */
+    groupRepelStrength(force: number): this {
+        this._groupRepelStrength = force;
         return this;
     }
 
@@ -212,6 +224,53 @@ export function applyTierForces(
 }
 
 /**
+ * Create edges between nodes in the same group
+ *
+ * @param nodeList list of node names
+ */
+function createGroupEdges(nodeList: SimulationNodeWithCategory[]): D3SimulationEdge[] {
+    const edges: D3SimulationEdge[] = [];
+    if (nodeList.length > 1) {
+        for (let i = 0; i < nodeList.length; i++) {
+            for (let j = i + 1; j < nodeList.length; j++) {
+                edges.push({ source: nodeList[i], target: nodeList[j], originalMeta: {}, edge_type: EdgeType.UNDIRECTED_EDGE });
+            }
+        }
+    }
+    return edges;
+}
+
+function createEdgesWithinAllGroups(group: string, graph: SimulationGraph, nodes: SimulationNodeWithCategory[]): D3SimulationEdge[] {
+    const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
+    const edges: D3SimulationEdge[] = [];
+
+    Object.keys(groupsToNodes).forEach((groupName) => {
+        const nodeStringsList = groupsToNodes[groupName];
+        const nodeList = nodeStringsList.map((nodeString) => nodes.find((node) => node.id === nodeString));
+        const groupEdges = createGroupEdges(nodeList);
+        edges.push(...groupEdges);
+    });
+
+    return edges;
+}
+
+/**
+ * Apply a custom cluster repelling force between groups
+ * This force is applied to the first node of each group and repels it from the first node of other groups
+ * The strength of the force is based on the size of the group
+ * The force is applied every 10 ticks to help with performance
+ * 
+ * @param alpha the alpha value of the simulation
+ * @param tickCounter the tick counter of the simulation
+ * @param nodes the nodes of the simulation
+ * @param graph the simulation graph
+ * @param group the group to apply the force to
+ * @param clusterRepelStrength the strength of the repelling force
+ * @param applyEveryNTicks the number of ticks to apply the force
+*/
+
+
+/**
  * The Spring layout uses a force simulation to position nodes.
  * The layout keeps the simulation running as nodes are being dragged which produces the spring behaviour of edges.
  */
@@ -226,6 +285,8 @@ export default class SpringLayout extends GraphLayout {
 
     public tierSeparation: number;
 
+    public groupRepelStrength: number;
+
     public orientation: DirectionType;
 
     public tiers: GraphTiers;
@@ -239,6 +300,7 @@ export default class SpringLayout extends GraphLayout {
         this.gravity = builder._gravity;
         this.warmupTicks = builder._warmupTicks;
         this.tierSeparation = builder._tierSeparation;
+        this.groupRepelStrength = builder._groupRepelStrength;
         this.orientation = builder.orientation;
         this.tiers = builder.tiers;
         this.group = builder.group;
@@ -258,9 +320,12 @@ export default class SpringLayout extends GraphLayout {
         // We're modifying edges/nodes
         let [edges, nodes] = getD3Data(graph);
 
-        console.log(this.group);
+        const group = this.group;
+        const warmUpTicks = this.warmupTicks;
+        const repelStrength = this.groupRepelStrength;
+        let tickCounter = 0;
 
-        const simulation: Simulation<SimulationNode, D3SimulationEdge> = d3
+        let simulation: Simulation<SimulationNode, D3SimulationEdge> = d3
             .forceSimulation(nodes)
             // The link force pulls linked nodes together so they try to be a given distance apart
             .force(
@@ -278,15 +343,99 @@ export default class SpringLayout extends GraphLayout {
             .force('center', d3.forceCenter())
             .stop(); // don't start just yet
 
+        if (group) {
+            const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
+            const groupKeys = Object.keys(groupsToNodes);
+            const firstNodes: Record<string, SimulationNode> = {};
+            // Precompute the first node of each group, we get the first node just as an approximation fo the position of that group
+            groupKeys.forEach((groupKey) => {
+                const nodeId = groupsToNodes[groupKey][0];
+                firstNodes[groupKey] = nodes.find((node) => node.id === nodeId)!;
+            });
+
+            function clusterRepelForce(alpha: number) {
+                // Only apply the force every N ticks
+                if (tickCounter % 50 !== 0) {
+                    return;
+                }
+
+                console.log('applied', tickCounter)
+
+                for (let i = 0; i < groupKeys.length; i++) {
+                    const groupA = groupKeys[i];
+                    const nodeA = firstNodes[groupA];
+                    const groupASize = groupsToNodes[groupA].length;
+
+                    // start at i + 1 to avoid double counting
+                    for (let j = i + 1; j < groupKeys.length; j++) {
+                        const groupB = groupKeys[j];
+                        const nodeB = firstNodes[groupB];
+                        const groupBSize = groupsToNodes[groupB].length;
+
+                        // get the distance between the two nodes
+                        const dx = nodeA.x! - nodeB.x!;
+                        const dy = nodeA.y! - nodeB.y!;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 3000) {
+                            // We calculate strength as Coulomb's law, where we take the number of nodes in a group as their charge
+                            const cappedDistance = Math.max(distance, 1)
+                            const strengthFactor = groupASize * groupBSize;
+                            const strength = (1000 * strengthFactor) / (cappedDistance * cappedDistance);
+
+                            if (strength > 0.001) {
+
+                                const dxStrength = dx * strength * alpha;
+                                const dyStrength = dy * strength * alpha;
+
+                                // add a velocity to each node based on the strength such that they are in opposite directions
+                                nodeA.vx! += dxStrength;
+                                nodeA.vy! += dyStrength;
+                                nodeB.vx! -= dxStrength;
+                                nodeB.vy! -= dyStrength;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // We create fake edges between nodes in the same group so that they stay together
+            const groupEdges = createEdgesWithinAllGroups(this.group, graph, nodes);
+
+            simulation = d3
+                .forceSimulation(nodes)
+                // Apply the force that keeps nodes within a group together
+                .force(
+                    'groupLinks',
+                    d3.forceLink<SimulationNode, D3SimulationEdge>(groupEdges)
+                        .id((d) => d.id)
+                        .distance(() => this.nodeSize * this.linkForce)
+                )
+                // Apply the force that repels groups from each other
+                .force('clusterRepel', clusterRepelForce)
+                // The collide force makes sure that the nodes never overlap with each other
+                .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
+                // The center force keeps nodes in the middle of the viewport
+                .force('center', d3.forceCenter())
+                .stop(); // don't start just yet
+        }
+
         if (this.tiers) {
             applyTierForces(simulation, graph, nodes, this.tiers, this.tierSeparation, this.orientation);
         }
 
         // Warm-up the simulation so the jump to the center isn't visible
-        simulation.tick(this.warmupTicks);
+        // simulation.tick(this.warmupTicks);
+
+        // Initial warm-up phase
+        for (let i = 0; i < this.warmupTicks; i++) {
+            simulation.tick();
+            tickCounter++;
+        }
 
         simulation
             .on('tick', () => {
+                tickCounter++;
                 // On each tick, update simulation nodes
                 const newNodes = nodesToLayout(simulation.nodes());
 
