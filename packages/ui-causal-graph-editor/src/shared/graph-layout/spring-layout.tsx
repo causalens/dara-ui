@@ -265,21 +265,6 @@ function createEdgesWithinAllGroups(
 }
 
 /**
- * Apply a custom cluster repelling force between groups
- * This force is applied to the first node of each group and repels it from the first node of other groups
- * The strength of the force is based on the size of the group
- * The force is applied every 10 ticks to help with performance
- *
- * @param alpha the alpha value of the simulation
- * @param tickCounter the tick counter of the simulation
- * @param nodes the nodes of the simulation
- * @param graph the simulation graph
- * @param group the group to apply the force to
- * @param clusterRepelStrength the strength of the repelling force
- * @param applyEveryNTicks the number of ticks to apply the force
- */
-
-/**
  * The Spring layout uses a force simulation to position nodes.
  * The layout keeps the simulation running as nodes are being dragged which produces the spring behaviour of edges.
  */
@@ -337,7 +322,7 @@ export default class SpringLayout extends GraphLayout {
             const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
             const groupKeys = Object.keys(groupsToNodes);
             const firstNodes: Record<string, SimulationNode> = {};
-            // Pre-compute the first node of each group, we get the first node just as an approximation fo the position of that group
+            // Pre-compute the first node of each group, we get the first node just as an approximation for the position of that group
             groupKeys.forEach((groupKey) => {
                 const nodeId = groupsToNodes[groupKey][0];
                 firstNodes[groupKey] = nodes.find((node) => node.id === nodeId)!;
