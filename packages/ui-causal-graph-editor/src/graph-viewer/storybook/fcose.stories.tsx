@@ -74,14 +74,14 @@ FcoseTiers.args = {
 export const FcoseGrouping = Template.bind({});
 
 const groupingLayout = FcoseLayout.Builder.build();
-// groupingLayout.group = 'meta.group';
-groupingLayout.group = 'meta.test';
+groupingLayout.group = 'meta.group';
+// groupingLayout.group = 'meta.test';
 
 // groupingLayout.nodeRepulsion = 10000000;
 
 FcoseGrouping.args = {
-    // graphData: FRAUD,
-    graphData: nodeTiersCausalGraph,
+    graphData: FRAUD,
+    // graphData: nodeTiersCausalGraph,
     graphLayout: groupingLayout,
     editable: true,
 };

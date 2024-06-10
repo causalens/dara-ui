@@ -325,23 +325,7 @@ export default class SpringLayout extends GraphLayout {
         const repelStrength = this.groupRepelStrength;
         let tickCounter = 0;
 
-        let simulation: Simulation<SimulationNode, D3SimulationEdge> = d3
-            .forceSimulation(nodes)
-            // The link force pulls linked nodes together so they try to be a given distance apart
-            .force(
-                'links',
-                d3
-                    .forceLink<SimulationNode, SimulationLinkDatum<SimulationNode>>(edges)
-                    .id((d) => d.id)
-                    .distance(() => this.nodeSize * this.linkForce)
-            )
-            // The charge force acts to push the nodes away from each other so they have space
-            .force('charge', d3.forceManyBody().strength(this.gravity))
-            // The collide force makes sure that the nodes never overlap with each other
-            .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
-            // The center force keeps nodes in the middle of the viewport
-            .force('center', d3.forceCenter())
-            .stop(); // don't start just yet
+        let simulation: Simulation<SimulationNode, D3SimulationEdge>
 
         if (group) {
             const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
@@ -354,47 +338,43 @@ export default class SpringLayout extends GraphLayout {
             });
 
             function clusterRepelForce(alpha: number) {
-                // Only apply the force every N ticks
-                if (tickCounter % 50 !== 0) {
-                    return;
-                }
-
-                console.log('applied', tickCounter)
+                console.log('cluster force running')
 
                 for (let i = 0; i < groupKeys.length; i++) {
                     const groupA = groupKeys[i];
                     const nodeA = firstNodes[groupA];
                     const groupASize = groupsToNodes[groupA].length;
 
-                    // start at i + 1 to avoid double counting
                     for (let j = i + 1; j < groupKeys.length; j++) {
                         const groupB = groupKeys[j];
                         const nodeB = firstNodes[groupB];
                         const groupBSize = groupsToNodes[groupB].length;
 
-                        // get the distance between the two nodes
+                        // Distance calculation
                         const dx = nodeA.x! - nodeB.x!;
                         const dy = nodeA.y! - nodeB.y!;
                         const distance = Math.sqrt(dx * dx + dy * dy);
 
-                        if (distance < 3000) {
-                            // We calculate strength as Coulomb's law, where we take the number of nodes in a group as their charge
-                            const cappedDistance = Math.max(distance, 1)
-                            const strengthFactor = groupASize * groupBSize;
-                            const strength = (1000 * strengthFactor) / (cappedDistance * cappedDistance);
-
-                            if (strength > 0.001) {
-
-                                const dxStrength = dx * strength * alpha;
-                                const dyStrength = dy * strength * alpha;
-
-                                // add a velocity to each node based on the strength such that they are in opposite directions
-                                nodeA.vx! += dxStrength;
-                                nodeA.vy! += dyStrength;
-                                nodeB.vx! -= dxStrength;
-                                nodeB.vy! -= dyStrength;
-                            }
+                        if (distance > 3000) {
+                            continue; // Skip force calculation for distant groups
                         }
+
+                        // Strength calculation
+                        const cappedDistance = Math.max(distance, 1);
+                        const strengthFactor = groupASize * groupBSize;
+                        const strength = (2000 * strengthFactor * alpha) / (cappedDistance * cappedDistance);
+
+                        console.log('Strength', strength, groupA, groupB);
+
+                        if (strength < 0.01) {
+                            continue; // Skip weak forces
+                        }
+
+                        nodeA.vx += nodeA.x * strength;
+                        nodeA.vy += nodeA.y * strength;
+                        nodeB.vx -= nodeB.x * strength;
+                        nodeB.vy -= nodeB.y * strength;
+
                     }
                 }
             }
@@ -404,6 +384,8 @@ export default class SpringLayout extends GraphLayout {
 
             simulation = d3
                 .forceSimulation(nodes)
+                // Apply the force that repels groups from each other
+                .force('clusterRepel', clusterRepelForce)
                 // Apply the force that keeps nodes within a group together
                 .force(
                     'groupLinks',
@@ -411,8 +393,24 @@ export default class SpringLayout extends GraphLayout {
                         .id((d) => d.id)
                         .distance(() => this.nodeSize * this.linkForce)
                 )
-                // Apply the force that repels groups from each other
-                .force('clusterRepel', clusterRepelForce)
+                // The collide force makes sure that the nodes never overlap with each other
+                .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
+                // The center force keeps nodes in the middle of the viewport
+                .force('center', d3.forceCenter())
+                .stop(); // don't start just yet
+        } else {
+            simulation = d3
+                .forceSimulation(nodes)
+                // The link force pulls linked nodes together so they try to be a given distance apart
+                .force(
+                    'links',
+                    d3
+                        .forceLink<SimulationNode, SimulationLinkDatum<SimulationNode>>(edges)
+                        .id((d) => d.id)
+                        .distance(() => this.nodeSize * this.linkForce)
+                )
+                // The charge force acts to push the nodes away from each other so they have space
+                .force('charge', d3.forceManyBody().strength(this.gravity))
                 // The collide force makes sure that the nodes never overlap with each other
                 .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
                 // The center force keeps nodes in the middle of the viewport
@@ -445,7 +443,7 @@ export default class SpringLayout extends GraphLayout {
             .restart();
 
         const onAddNode = debounce(() => {
-            [edges, nodes] = getD3Data(graph);
+            // [edges, nodes] = getD3Data(graph);
 
             // replace nodes, re-add link force
             simulation

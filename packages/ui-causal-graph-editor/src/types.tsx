@@ -328,6 +328,4 @@ export interface GroupNode {
     id: string;
     originalMeta: CausalGraphNodeMeta;
     variable_type: 'groupNode';
-    x: number;
-    y: number;
 }

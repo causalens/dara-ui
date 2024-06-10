@@ -418,13 +418,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
             // first create all group nodes so that we have something to connect the edges to
             groupsArray.forEach((group) => {
-                const container = this.groupContainerMap.get(group).groupContainerGfx;
                 const groupNodeAttributes: GroupNode = {
                     id: group,
                     originalMeta: {},
                     variable_type: 'groupNode',
-                    x: container.x,
-                    y: container.y,
                 };
                 // remove all group containers
                 this.dropGroupContainer(group);
@@ -533,7 +530,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                 });
             });
 
-            this.debouncedUpdateLayout();
             this.requestRender();
         }
     }
