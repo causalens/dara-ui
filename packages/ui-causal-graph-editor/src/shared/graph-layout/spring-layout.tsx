@@ -31,12 +31,13 @@ import {
     TieredGraphLayoutBuilder,
 } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
-import { getGroupToNodesMap, getNodeOrder, getNodeToGroupMap, getTiersArray } from '../utils';
+import { getGroupToNodesMap, getNodeOrder, getTiersArray } from '../utils';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
 class SpringLayoutBuilder
     extends GraphLayoutBuilder<SpringLayout>
-    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder {
+    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder
+{
     _collisionForce = 2;
 
     _gravity = -50;
@@ -47,7 +48,7 @@ class SpringLayoutBuilder
 
     _tierSeparation = 300;
 
-    _groupRepelStrength = 500;
+    _groupRepelStrength = 2000;
 
     orientation: DirectionType = 'horizontal';
 
@@ -151,15 +152,15 @@ function applyOrderNodesForce(
                 function force(alpha: number): void {
                     sortedNodesOrderArray.forEach((nodeName, index) => {
                         const targetPosition = index * nodeSeparation;
-                        const targettedNode = nodesMap.get(nodeName);
+                        const targetedNode = nodesMap.get(nodeName);
 
-                        if (targettedNode) {
+                        if (targetedNode) {
                             if (orientation === 'horizontal') {
                                 // Apply a nudge towards the target y position
-                                targettedNode.vy += (targetPosition - targettedNode.y) * alpha;
+                                targetedNode.vy += (targetPosition - targetedNode.y) * alpha;
                             } else {
                                 // Apply a nudge towards the target x position
-                                targettedNode.vx += (targetPosition - targettedNode.x) * alpha;
+                                targetedNode.vx += (targetPosition - targetedNode.x) * alpha;
                             }
                         }
                     });
@@ -204,14 +205,14 @@ export function applyTierForces(
             tiersArray.forEach((tier, index) => {
                 const targetPosition = index * tiersSeparation;
                 tier.forEach((nodeName) => {
-                    const targettedNode = nodesMapping.get(nodeName);
-                    if (targettedNode) {
+                    const targetedNode = nodesMapping.get(nodeName);
+                    if (targetedNode) {
                         if (orientation === 'horizontal') {
                             // Directly set the x position
-                            targettedNode.x = targetPosition + (targettedNode.x - targetPosition) * alpha;
+                            targetedNode.x = targetPosition + (targetedNode.x - targetPosition) * alpha;
                         } else {
                             // Directly set the y position
-                            targettedNode.y = targetPosition + (targettedNode.y - targetPosition) * alpha;
+                            targetedNode.y = targetPosition + (targetedNode.y - targetPosition) * alpha;
                         }
                     }
                 });
@@ -233,14 +234,23 @@ function createGroupEdges(nodeList: SimulationNodeWithCategory[]): D3SimulationE
     if (nodeList.length > 1) {
         for (let i = 0; i < nodeList.length; i++) {
             for (let j = i + 1; j < nodeList.length; j++) {
-                edges.push({ source: nodeList[i], target: nodeList[j], originalMeta: {}, edge_type: EdgeType.UNDIRECTED_EDGE });
+                edges.push({
+                    source: nodeList[i],
+                    target: nodeList[j],
+                    originalMeta: {},
+                    edge_type: EdgeType.UNDIRECTED_EDGE,
+                });
             }
         }
     }
     return edges;
 }
 
-function createEdgesWithinAllGroups(group: string, graph: SimulationGraph, nodes: SimulationNodeWithCategory[]): D3SimulationEdge[] {
+function createEdgesWithinAllGroups(
+    group: string,
+    graph: SimulationGraph,
+    nodes: SimulationNodeWithCategory[]
+): D3SimulationEdge[] {
     const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
     const edges: D3SimulationEdge[] = [];
 
@@ -259,7 +269,7 @@ function createEdgesWithinAllGroups(group: string, graph: SimulationGraph, nodes
  * This force is applied to the first node of each group and repels it from the first node of other groups
  * The strength of the force is based on the size of the group
  * The force is applied every 10 ticks to help with performance
- * 
+ *
  * @param alpha the alpha value of the simulation
  * @param tickCounter the tick counter of the simulation
  * @param nodes the nodes of the simulation
@@ -267,8 +277,7 @@ function createEdgesWithinAllGroups(group: string, graph: SimulationGraph, nodes
  * @param group the group to apply the force to
  * @param clusterRepelStrength the strength of the repelling force
  * @param applyEveryNTicks the number of ticks to apply the force
-*/
-
+ */
 
 /**
  * The Spring layout uses a force simulation to position nodes.
@@ -318,28 +327,23 @@ export default class SpringLayout extends GraphLayout {
         onStartDrag?: () => void | Promise<void>;
     }> {
         // We're modifying edges/nodes
-        let [edges, nodes] = getD3Data(graph);
+        const [edges, nodes] = getD3Data(graph);
 
-        const group = this.group;
-        const warmUpTicks = this.warmupTicks;
-        const repelStrength = this.groupRepelStrength;
-        let tickCounter = 0;
+        const { group, groupRepelStrength } = this;
 
-        let simulation: Simulation<SimulationNode, D3SimulationEdge>
+        let simulation: Simulation<SimulationNode, D3SimulationEdge>;
 
         if (group) {
             const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
             const groupKeys = Object.keys(groupsToNodes);
             const firstNodes: Record<string, SimulationNode> = {};
-            // Precompute the first node of each group, we get the first node just as an approximation fo the position of that group
+            // Pre-compute the first node of each group, we get the first node just as an approximation fo the position of that group
             groupKeys.forEach((groupKey) => {
                 const nodeId = groupsToNodes[groupKey][0];
                 firstNodes[groupKey] = nodes.find((node) => node.id === nodeId)!;
             });
 
-            function clusterRepelForce(alpha: number) {
-                console.log('cluster force running')
-
+            function clusterRepelForce(alpha: number): void {
                 for (let i = 0; i < groupKeys.length; i++) {
                     const groupA = groupKeys[i];
                     const nodeA = firstNodes[groupA];
@@ -351,8 +355,8 @@ export default class SpringLayout extends GraphLayout {
                         const groupBSize = groupsToNodes[groupB].length;
 
                         // Distance calculation
-                        const dx = nodeA.x! - nodeB.x!;
-                        const dy = nodeA.y! - nodeB.y!;
+                        const dx = nodeA.x - nodeB.x;
+                        const dy = nodeA.y - nodeB.y;
                         const distance = Math.sqrt(dx * dx + dy * dy);
 
                         if (distance > 3000) {
@@ -362,9 +366,8 @@ export default class SpringLayout extends GraphLayout {
                         // Strength calculation
                         const cappedDistance = Math.max(distance, 1);
                         const strengthFactor = groupASize * groupBSize;
-                        const strength = (2000 * strengthFactor * alpha) / (cappedDistance * cappedDistance);
-
-                        console.log('Strength', strength, groupA, groupB);
+                        const strength =
+                            (groupRepelStrength * strengthFactor * alpha) / (cappedDistance * cappedDistance);
 
                         if (strength < 0.01) {
                             continue; // Skip weak forces
@@ -374,7 +377,6 @@ export default class SpringLayout extends GraphLayout {
                         nodeA.vy += nodeA.y * strength;
                         nodeB.vx -= nodeB.x * strength;
                         nodeB.vy -= nodeB.y * strength;
-
                     }
                 }
             }
@@ -389,7 +391,8 @@ export default class SpringLayout extends GraphLayout {
                 // Apply the force that keeps nodes within a group together
                 .force(
                     'groupLinks',
-                    d3.forceLink<SimulationNode, D3SimulationEdge>(groupEdges)
+                    d3
+                        .forceLink<SimulationNode, D3SimulationEdge>(groupEdges)
                         .id((d) => d.id)
                         .distance(() => this.nodeSize * this.linkForce)
                 )
@@ -423,17 +426,10 @@ export default class SpringLayout extends GraphLayout {
         }
 
         // Warm-up the simulation so the jump to the center isn't visible
-        // simulation.tick(this.warmupTicks);
-
-        // Initial warm-up phase
-        for (let i = 0; i < this.warmupTicks; i++) {
-            simulation.tick();
-            tickCounter++;
-        }
+        simulation.tick(this.warmupTicks);
 
         simulation
             .on('tick', () => {
-                tickCounter++;
                 // On each tick, update simulation nodes
                 const newNodes = nodesToLayout(simulation.nodes());
 
@@ -443,8 +439,6 @@ export default class SpringLayout extends GraphLayout {
             .restart();
 
         const onAddNode = debounce(() => {
-            // [edges, nodes] = getD3Data(graph);
-
             // replace nodes, re-add link force
             simulation
                 .nodes(nodes)
