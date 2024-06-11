@@ -45,7 +45,7 @@ const SwitchWrapper = styled.div<EnabledProp>`
     color: ${(props) => props.theme.colors.blue1};
 
     background-color: ${(props) => (props.enabled ? props.theme.colors.primary : props.theme.colors.secondary)};
-    border-radius: 12px;
+    border-radius: 0.75rem;
 
     svg {
         color: ${(props) => props.theme.colors.blue1};
@@ -54,7 +54,7 @@ const SwitchWrapper = styled.div<EnabledProp>`
 
 const SwitchHandle = styled.span<EnabledProp>`
     position: absolute;
-    top: 2px;
+    top: 0.125rem;
     left: ${(props) => (props.enabled ? 'calc(100% - 1.375rem)' : '0.125rem')};
 
     display: inline-block;
