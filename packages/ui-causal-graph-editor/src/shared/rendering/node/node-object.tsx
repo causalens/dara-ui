@@ -230,9 +230,9 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
     ): void {
         // Get/create label texture
         const labelTexture = textureCache.get(
-            createKey(NODE_LABEL, nodeStyle.label, nodeStyle.size, nodeStyle.group),
+            createKey(NODE_LABEL, nodeStyle.label, nodeStyle.size, nodeStyle.category),
             () => {
-                const nodeRadius = getNodeSize(nodeStyle.size, nodeStyle.group);
+                const nodeRadius = getNodeSize(nodeStyle.size, nodeStyle.category);
                 const nodeSize = nodeRadius * 2;
                 const maxSize = nodeSize - 10; // leave space on sides
 
@@ -303,7 +303,7 @@ export class NodeObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[nu
      * @param textureCache texture cache instance
      */
     updateStyle(nodeStyle: PixiNodeStyle, textureCache: TextureCache): void {
-        const [defaultColor, defaultFontColor] = getNodeColor(nodeStyle.group, nodeStyle.theme);
+        const [defaultColor, defaultFontColor] = getNodeColor(nodeStyle.category, nodeStyle.theme);
         // Apply default styles
         nodeStyle.color ??= defaultColor;
         nodeStyle.highlight_color ??= nodeStyle.theme.colors.primary;

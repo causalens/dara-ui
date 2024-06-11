@@ -22,7 +22,7 @@ import {
     DirectionType,
     GraphTiers,
     SimulationGraph,
-    SimulationNodeWithGroup,
+    SimulationNodeWithCategory,
     TieredGraphLayoutBuilder,
 } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
@@ -102,7 +102,7 @@ export default class MarketingLayout extends GraphLayout {
             .force(
                 'link',
                 d3
-                    .forceLink<SimulationNodeWithGroup, SimulationLinkDatum<SimulationNodeWithGroup>>(edges)
+                    .forceLink<SimulationNodeWithCategory, SimulationLinkDatum<SimulationNodeWithCategory>>(edges)
                     .id((d) => d.id)
                     .distance(() => this.nodeSize * 3)
                     .strength(this.targetLocation === 'center' ? 0.7 : 0.1)
@@ -113,12 +113,12 @@ export default class MarketingLayout extends GraphLayout {
             .force(
                 'y',
                 d3
-                    .forceY<SimulationNodeWithGroup>()
+                    .forceY<SimulationNodeWithCategory>()
                     .y((node) => {
-                        if (node.group === 'target') {
+                        if (node.category === 'target') {
                             return this.nodeSize * 10;
                         }
-                        if (node.group === 'latent') {
+                        if (node.category === 'latent') {
                             return this.nodeSize * 2;
                         }
 
@@ -132,12 +132,12 @@ export default class MarketingLayout extends GraphLayout {
             .force(
                 'radial',
                 d3
-                    .forceRadial<SimulationNodeWithGroup>(
+                    .forceRadial<SimulationNodeWithCategory>(
                         (node) => {
-                            if (node.group === 'target') {
+                            if (node.category === 'target') {
                                 return 0;
                             }
-                            if (node.group === 'latent') {
+                            if (node.category === 'latent') {
                                 return this.nodeSize * 8;
                             }
 
@@ -150,7 +150,7 @@ export default class MarketingLayout extends GraphLayout {
                         if (this.targetLocation === 'center') {
                             return 1;
                         }
-                        return node.group === 'other' ? 0.7 : 1;
+                        return node.category === 'other' ? 0.7 : 1;
                     })
             )
             .stop();

@@ -21,13 +21,13 @@ import { TARGET_NODE_MULTIPLIER } from '@shared/utils';
 import { PixiNodeStyle } from './definitions';
 
 /**
- * Get node color based on its group
+ * Get node color based on its category
  *
- * @param group node group
+ * @param category node category
  * @param theme current theme colors
  */
-export function getNodeColor(group: PixiNodeStyle['group'], theme: DefaultTheme): [bg: string, font: string] {
-    switch (group) {
+export function getNodeColor(category: PixiNodeStyle['category'], theme: DefaultTheme): [bg: string, font: string] {
+    switch (category) {
         case 'target':
             return [theme.colors.secondary, theme.colors.blue1];
         case 'latent':
@@ -38,13 +38,13 @@ export function getNodeColor(group: PixiNodeStyle['group'], theme: DefaultTheme)
 }
 
 /**
- * Get node size based on configured size and group
+ * Get node size based on configured size and category
  *
  * @param size configured node size
  * @param group group node is in
  */
-export function getNodeSize(size: number, group: PixiNodeStyle['group']): number {
-    const sizeMultiplier = group === 'target' ? TARGET_NODE_MULTIPLIER : 1;
+export function getNodeSize(size: number, category: PixiNodeStyle['category']): number {
+    const sizeMultiplier = category === 'target' ? TARGET_NODE_MULTIPLIER : 1;
 
     return size * sizeMultiplier;
 }

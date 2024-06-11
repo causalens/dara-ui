@@ -53,3 +53,25 @@ SpringTiers.args = {
     graphData: FRAUD,
     graphLayout: springLayout,
 };
+
+export const SpringGroupingLarge = Template.bind({});
+
+const groupingLayoutLarge = SpringLayout.Builder.build();
+groupingLayoutLarge.group = 'meta.group';
+
+SpringGroupingLarge.args = {
+    graphData: FRAUD,
+    graphLayout: groupingLayoutLarge,
+    editable: true,
+};
+
+export const SpringGroupingSmall = Template.bind({});
+
+const groupingLayout = SpringLayout.Builder.build();
+groupingLayout.group = 'meta.test';
+
+SpringGroupingSmall.args = {
+    graphData: nodeTiersCausalGraph,
+    graphLayout: groupingLayout,
+    editable: true,
+};

@@ -16,7 +16,7 @@
  */
 import { DefaultTheme } from '@darajs/styled-components';
 
-import { NodeGroup } from '../../../types';
+import { NodeCategory } from '../../../types';
 
 export const BORDER_PADDING = 2;
 
@@ -26,8 +26,8 @@ export const BORDER_PADDING = 2;
 export interface PixiNodeStyle {
     /** Node background color */
     color?: string;
-    /** The group node belongs to */
-    group: NodeGroup;
+    /** The category the node belongs to */
+    category: NodeCategory;
     /** Border/shadow color */
     highlight_color?: string;
     /** Whether there is a edge currently selected */

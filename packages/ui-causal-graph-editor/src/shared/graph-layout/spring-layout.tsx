@@ -22,17 +22,22 @@ import debounce from 'lodash/debounce';
 import {
     D3SimulationEdge,
     DirectionType,
+    EdgeType,
     GraphTiers,
+    GroupingLayoutBuilder,
     SimulationGraph,
     SimulationNode,
-    SimulationNodeWithGroup,
+    SimulationNodeWithCategory,
     TieredGraphLayoutBuilder,
 } from '../../types';
 import { getD3Data, nodesToLayout } from '../parsers';
-import { getNodeOrder, getTiersArray } from '../utils';
+import { getGroupToNodesMap, getNodeOrder, getTiersArray } from '../utils';
 import { GraphLayout, GraphLayoutBuilder } from './common';
 
-class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements TieredGraphLayoutBuilder {
+class SpringLayoutBuilder
+    extends GraphLayoutBuilder<SpringLayout>
+    implements TieredGraphLayoutBuilder, GroupingLayoutBuilder
+{
     _collisionForce = 2;
 
     _gravity = -50;
@@ -43,9 +48,13 @@ class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements Ti
 
     _tierSeparation = 300;
 
+    _groupRepelStrength = 2000;
+
     orientation: DirectionType = 'horizontal';
 
     tiers: GraphTiers;
+
+    group: string;
 
     /**
      * Set the multiplier for collision force
@@ -97,6 +106,16 @@ class SpringLayoutBuilder extends GraphLayoutBuilder<SpringLayout> implements Ti
         return this;
     }
 
+    /**
+     * Set the repulsive force strength between groups
+     *
+     * @param force force
+     */
+    groupRepelStrength(force: number): this {
+        this._groupRepelStrength = force;
+        return this;
+    }
+
     build(): SpringLayout {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new SpringLayout(this);
@@ -117,7 +136,7 @@ function applyOrderNodesForce(
     tiers: GraphTiers,
     graph: SimulationGraph,
     orientation: DirectionType,
-    nodesMap: Map<string, SimulationNodeWithGroup>
+    nodesMap: Map<string, SimulationNodeWithCategory>
 ): void {
     if (!Array.isArray(tiers)) {
         const { order_nodes_by } = tiers;
@@ -129,19 +148,19 @@ function applyOrderNodesForce(
                 .map((entry) => entry[0]);
             const nodeSeparation = 200;
 
-            function forceOrder(): d3.Force<SimulationNodeWithGroup, undefined> {
+            function forceOrder(): d3.Force<SimulationNodeWithCategory, undefined> {
                 function force(alpha: number): void {
                     sortedNodesOrderArray.forEach((nodeName, index) => {
                         const targetPosition = index * nodeSeparation;
-                        const targettedNode = nodesMap.get(nodeName);
+                        const targetedNode = nodesMap.get(nodeName);
 
-                        if (targettedNode) {
+                        if (targetedNode) {
                             if (orientation === 'horizontal') {
                                 // Apply a nudge towards the target y position
-                                targettedNode.vy += (targetPosition - targettedNode.y) * alpha;
+                                targetedNode.vy += (targetPosition - targetedNode.y) * alpha;
                             } else {
                                 // Apply a nudge towards the target x position
-                                targettedNode.vx += (targetPosition - targettedNode.x) * alpha;
+                                targetedNode.vx += (targetPosition - targetedNode.x) * alpha;
                             }
                         }
                     });
@@ -169,31 +188,31 @@ function applyOrderNodesForce(
 export function applyTierForces(
     simulation: d3.Simulation<SimulationNode, D3SimulationEdge>,
     graph: SimulationGraph,
-    nodes: SimulationNodeWithGroup[],
+    nodes: SimulationNodeWithCategory[],
     tiers: GraphTiers,
     tiersSeparation: number,
     orientation: DirectionType
 ): void {
     const tiersArray = getTiersArray(tiers, graph);
 
-    const nodesMapping = new Map<string, SimulationNodeWithGroup>();
+    const nodesMapping = new Map<string, SimulationNodeWithCategory>();
     nodes.forEach((node) => nodesMapping.set(node.id, node));
 
     applyOrderNodesForce(simulation, tiers, graph, orientation, nodesMapping);
 
-    function forceLayer(): d3.Force<SimulationNodeWithGroup, undefined> {
+    function forceLayer(): d3.Force<SimulationNodeWithCategory, undefined> {
         function force(alpha: number): void {
             tiersArray.forEach((tier, index) => {
                 const targetPosition = index * tiersSeparation;
                 tier.forEach((nodeName) => {
-                    const targettedNode = nodesMapping.get(nodeName);
-                    if (targettedNode) {
+                    const targetedNode = nodesMapping.get(nodeName);
+                    if (targetedNode) {
                         if (orientation === 'horizontal') {
                             // Directly set the x position
-                            targettedNode.x = targetPosition + (targettedNode.x - targetPosition) * alpha;
+                            targetedNode.x = targetPosition + (targetedNode.x - targetPosition) * alpha;
                         } else {
                             // Directly set the y position
-                            targettedNode.y = targetPosition + (targettedNode.y - targetPosition) * alpha;
+                            targetedNode.y = targetPosition + (targetedNode.y - targetPosition) * alpha;
                         }
                     }
                 });
@@ -203,6 +222,46 @@ export function applyTierForces(
     }
     // apply layer force
     simulation.force('layer', forceLayer());
+}
+
+/**
+ * Create edges between nodes in the same group
+ *
+ * @param nodeList list of node names
+ */
+function createGroupEdges(nodeList: SimulationNodeWithCategory[]): D3SimulationEdge[] {
+    const edges: D3SimulationEdge[] = [];
+    if (nodeList.length > 1) {
+        for (let i = 0; i < nodeList.length; i++) {
+            for (let j = i + 1; j < nodeList.length; j++) {
+                edges.push({
+                    source: nodeList[i],
+                    target: nodeList[j],
+                    originalMeta: {},
+                    edge_type: EdgeType.UNDIRECTED_EDGE,
+                });
+            }
+        }
+    }
+    return edges;
+}
+
+function createEdgesWithinAllGroups(
+    group: string,
+    graph: SimulationGraph,
+    nodes: SimulationNodeWithCategory[]
+): D3SimulationEdge[] {
+    const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
+    const edges: D3SimulationEdge[] = [];
+
+    Object.keys(groupsToNodes).forEach((groupName) => {
+        const nodeStringsList = groupsToNodes[groupName];
+        const nodeList = nodeStringsList.map((nodeString) => nodes.find((node) => node.id === nodeString));
+        const groupEdges = createGroupEdges(nodeList);
+        edges.push(...groupEdges);
+    });
+
+    return edges;
 }
 
 /**
@@ -220,9 +279,13 @@ export default class SpringLayout extends GraphLayout {
 
     public tierSeparation: number;
 
+    public groupRepelStrength: number;
+
     public orientation: DirectionType;
 
     public tiers: GraphTiers;
+
+    public group: string;
 
     constructor(builder: SpringLayoutBuilder) {
         super(builder);
@@ -231,8 +294,10 @@ export default class SpringLayout extends GraphLayout {
         this.gravity = builder._gravity;
         this.warmupTicks = builder._warmupTicks;
         this.tierSeparation = builder._tierSeparation;
+        this.groupRepelStrength = builder._groupRepelStrength;
         this.orientation = builder.orientation;
         this.tiers = builder.tiers;
+        this.group = builder.group;
     }
 
     applyLayout(
@@ -247,25 +312,99 @@ export default class SpringLayout extends GraphLayout {
         onStartDrag?: () => void | Promise<void>;
     }> {
         // We're modifying edges/nodes
-        let [edges, nodes] = getD3Data(graph);
+        const [edges, nodes] = getD3Data(graph);
 
-        const simulation: Simulation<SimulationNode, D3SimulationEdge> = d3
-            .forceSimulation(nodes)
-            // The link force pulls linked nodes together so they try to be a given distance apart
-            .force(
-                'links',
-                d3
-                    .forceLink<SimulationNode, SimulationLinkDatum<SimulationNode>>(edges)
-                    .id((d) => d.id)
-                    .distance(() => this.nodeSize * this.linkForce)
-            )
-            // The charge force acts to push the nodes away from each other so they have space
-            .force('charge', d3.forceManyBody().strength(this.gravity))
-            // The collide force makes sure that the nodes never overlap with each other
-            .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
-            // The center force keeps nodes in the middle of the viewport
-            .force('center', d3.forceCenter())
-            .stop(); // don't start just yet
+        const { group, groupRepelStrength } = this;
+
+        let simulation: Simulation<SimulationNode, D3SimulationEdge>;
+
+        if (group) {
+            const groupsToNodes = getGroupToNodesMap(graph.nodes(), group, graph);
+            const groupKeys = Object.keys(groupsToNodes);
+            const firstNodes: Record<string, SimulationNode> = {};
+            // Pre-compute the first node of each group, we get the first node just as an approximation for the position of that group
+            groupKeys.forEach((groupKey) => {
+                const nodeId = groupsToNodes[groupKey][0];
+                firstNodes[groupKey] = nodes.find((node) => node.id === nodeId)!;
+            });
+
+            function clusterRepelForce(alpha: number): void {
+                for (let i = 0; i < groupKeys.length; i++) {
+                    const groupA = groupKeys[i];
+                    const nodeA = firstNodes[groupA];
+                    const groupASize = groupsToNodes[groupA].length;
+
+                    for (let j = i + 1; j < groupKeys.length; j++) {
+                        const groupB = groupKeys[j];
+                        const nodeB = firstNodes[groupB];
+                        const groupBSize = groupsToNodes[groupB].length;
+
+                        // Distance calculation
+                        const dx = nodeA.x - nodeB.x;
+                        const dy = nodeA.y - nodeB.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance > 3000) {
+                            continue; // Skip force calculation for distant groups
+                        }
+
+                        // Strength calculation
+                        const cappedDistance = Math.max(distance, 1);
+                        const strengthFactor = groupASize * groupBSize;
+                        const strength =
+                            (groupRepelStrength * strengthFactor * alpha) / (cappedDistance * cappedDistance);
+
+                        if (strength < 0.01) {
+                            continue; // Skip weak forces
+                        }
+
+                        nodeA.vx += nodeA.x * strength;
+                        nodeA.vy += nodeA.y * strength;
+                        nodeB.vx -= nodeB.x * strength;
+                        nodeB.vy -= nodeB.y * strength;
+                    }
+                }
+            }
+
+            // We create fake edges between nodes in the same group so that they stay together
+            const groupEdges = createEdgesWithinAllGroups(this.group, graph, nodes);
+
+            simulation = d3
+                .forceSimulation(nodes)
+                // Apply the force that repels groups from each other
+                .force('clusterRepel', clusterRepelForce)
+                // Apply the force that keeps nodes within a group together
+                .force(
+                    'groupLinks',
+                    d3
+                        .forceLink<SimulationNode, D3SimulationEdge>(groupEdges)
+                        .id((d) => d.id)
+                        .distance(() => this.nodeSize * this.linkForce)
+                )
+                // The collide force makes sure that the nodes never overlap with each other
+                .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
+                // The center force keeps nodes in the middle of the viewport
+                .force('center', d3.forceCenter())
+                .stop(); // don't start just yet
+        } else {
+            simulation = d3
+                .forceSimulation(nodes)
+                // The link force pulls linked nodes together so they try to be a given distance apart
+                .force(
+                    'links',
+                    d3
+                        .forceLink<SimulationNode, SimulationLinkDatum<SimulationNode>>(edges)
+                        .id((d) => d.id)
+                        .distance(() => this.nodeSize * this.linkForce)
+                )
+                // The charge force acts to push the nodes away from each other so they have space
+                .force('charge', d3.forceManyBody().strength(this.gravity))
+                // The collide force makes sure that the nodes never overlap with each other
+                .force('collide', d3.forceCollide(this.nodeSize * this.collisionForce))
+                // The center force keeps nodes in the middle of the viewport
+                .force('center', d3.forceCenter())
+                .stop(); // don't start just yet
+        }
 
         if (this.tiers) {
             applyTierForces(simulation, graph, nodes, this.tiers, this.tierSeparation, this.orientation);
@@ -285,8 +424,6 @@ export default class SpringLayout extends GraphLayout {
             .restart();
 
         const onAddNode = debounce(() => {
-            [edges, nodes] = getD3Data(graph);
-
             // replace nodes, re-add link force
             simulation
                 .nodes(nodes)

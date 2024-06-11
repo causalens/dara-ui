@@ -144,7 +144,7 @@ export interface GraphState {
     restorableNodes?: SimulationNode[];
 }
 
-export type NodeGroup = 'latent' | 'target' | 'other';
+export type NodeCategory = 'latent' | 'target' | 'other';
 
 export interface SimulationNode extends FlatNodeRenderingMeta {
     /** extra properties of a node */
@@ -169,8 +169,8 @@ export interface SimulationNode extends FlatNodeRenderingMeta {
     y?: number;
 }
 
-/** Node data with group injected */
-export type SimulationNodeWithGroup = SimulationNode & { group: NodeGroup };
+/** Node data with type injected */
+export type SimulationNodeWithCategory = SimulationNode & { category: NodeCategory };
 
 export interface SimulationEdge extends FlatEdgeRenderingMeta {
     /** Thetype of the edge */
@@ -190,8 +190,8 @@ export interface SimulationEdge extends FlatEdgeRenderingMeta {
  * D3 variant of edge data, requires putting references to source and target
  */
 export interface D3SimulationEdge extends SimulationEdge {
-    source: SimulationNodeWithGroup;
-    target: SimulationNodeWithGroup;
+    source: SimulationNodeWithCategory;
+    target: SimulationNodeWithCategory;
 }
 
 export interface SimulationAttributes {
@@ -328,6 +328,4 @@ export interface GroupNode {
     id: string;
     originalMeta: CausalGraphNodeMeta;
     variable_type: 'groupNode';
-    x: number;
-    y: number;
 }

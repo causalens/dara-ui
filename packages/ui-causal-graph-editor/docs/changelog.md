@@ -2,6 +2,11 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Added support for grouping layout in `Fcose` and `Spring` layouts. It allows for nodes to be placed on groups which can be collapsed and expanded in order to simplify graph visual structure to the user.
+
+
 ## 1.9.4
 
 -   Fixed an issue where the GraphEditor would error if the graph was empty in some cases
@@ -9,7 +14,6 @@ title: Changelog
 ## 1.9.3
 
 -   Fixed an issue where a graph `Legend` node and edge could not have the same label.
--   Added support for grouping layout in `Fcose` layouts. It allows for nodes to be placed on groups which can be collapsed and expanded in order to simplify graph visual structure to the user.
 
 ## 1.9.2
 
