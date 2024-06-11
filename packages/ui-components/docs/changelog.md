@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where `Switch` appeared off centre when the base font size was changed.
+
 ## 1.9.6
 
 -   Increased performance of `Select`, `Multiselect`, `ComboBox`, `ContextMenu`, `DatepickerSelect`, `SectionedList` components in large lists by upto 485x.
