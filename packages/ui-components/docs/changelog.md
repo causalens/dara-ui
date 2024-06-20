@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.10.0
 
 -   Fixed an issue where `Switch` appeared off centre when the base font size was changed.
 
