@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed and issue where the nodes could escape their containers in grouping layouts.
+
 ## 1.10.0
 
 -   Added support for grouping layout in `Fcose` and `Spring` layouts. It allows for nodes to be placed on groups which can be collapsed and expanded in order to simplify graph visual structure to the user.
