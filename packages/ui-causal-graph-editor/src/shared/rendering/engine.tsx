@@ -465,9 +465,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
                         let numberOfCollapsedEdges =
                             graphHasFinalEdge ?
                                 this.graph.getEdgeAttributes(finalSource, finalTarget)[
-                                    'meta.rendering_properties.collapsedEdgesCount'
+                                'meta.rendering_properties.collapsedEdgesCount'
                                 ]
-                            :   0;
+                                : 0;
 
                         // upddate the number of collapsed edges count if needed
                         if (graphHasFinalEdge && edgeHasChanged && group === finalSource) {
@@ -1140,9 +1140,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.groupContainerMap.set(id, groupContainer);
 
         groupContainer.addListener('mouseover', (event: PIXI.FederatedMouseEvent) => {
-            // Always show hover state
-            this.hoverGroupContainer(id, nodes);
-
             // Only trigger the event (i.e. tooltip) if not currently dragging
             if (!this.mousedownNodeKey) {
                 this.emit('groupMouseover', event, id);
@@ -1152,9 +1149,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             const local = groupContainer.groupContainerGfx.toLocal(event.global);
             const isInGroupContainer = groupContainer.groupContainerGfx.hitArea.contains(local.x, local.y);
 
-            // only trigger mouseout if it's actually outside the node (could be within label)
+            // only trigger mouseout if it's actually outside the group (could be within label)
             if (!isInGroupContainer) {
-                this.unhoverGroupContainer(id, nodes);
                 this.emit('groupMouseout', event, id);
             }
 
@@ -1339,24 +1335,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         // update style
         edge.state.hover = true;
         this.updateEdgeStyleByKey(id);
-        this.requestRender();
-    }
-
-    /**
-     * Enable hover state for given group container
-     *
-     * @param id id of edge to hover
-     * @param nodes a list of simulation nodes that are part of the group
-     */
-    private hoverGroupContainer(id: string, nodes: SimulationNode[]): void {
-        const groupContainer = this.groupContainerMap.get(id);
-        if (groupContainer.state.hover) {
-            return;
-        }
-
-        // update style
-        groupContainer.state.hover = true;
-        this.updateGroupContainerStyle(id, nodes);
         this.requestRender();
     }
 
@@ -1620,24 +1598,6 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
-     * Disable hover state for given group container
-     *
-     * @param id id of node to unhover
-     * @param nodes a list of simulation nodes that are part of the group
-     */
-    private unhoverGroupContainer(id: string, nodes: SimulationNode[]): void {
-        const groupContainer = this.groupContainerMap.get(id);
-        if (!groupContainer.state.hover) {
-            return;
-        }
-
-        // update style
-        groupContainer.state.hover = false;
-        this.updateGroupContainerStyle(id, nodes);
-        this.requestRender();
-    }
-
-    /**
      * Update edge style
      *
      * @param id id of edge to update
@@ -1814,8 +1774,8 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /**
      * Update style of given group container
      *
-     * @param id id of node to update
-     * @param attributes node attributes
+     * @param id id of group to update
+     * @param nodes array of nodes that are part of the group
      */
     private updateGroupContainerStyle(id: string, nodes: SimulationNode[]): void {
         const groupContainer = this.groupContainerMap.get(id);

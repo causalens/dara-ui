@@ -24,7 +24,6 @@ import { SimulationNode } from '@types';
 
 import { TextureCache } from '../texture-cache';
 import { MOUSE_EVENTS, colorToPixi, createKey } from '../utils';
-import { GroupContainerState } from './definitions';
 
 const GROUP_RECTANGLE = 'GROUP_RECTANGLE';
 const GROUP_BORDER = 'GROUP_BORDER';
@@ -34,13 +33,6 @@ const GROUP_BORDER = 'GROUP_BORDER';
  */
 export class GroupContainerObject extends PIXI.utils.EventEmitter<(typeof MOUSE_EVENTS)[number]> {
     groupContainerGfx: PIXI.Container;
-
-    /**
-     * Current group container state
-     */
-    state: GroupContainerState = {
-        hover: false,
-    };
 
     constructor() {
         super();
