@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.10.2
 
 -   Fixed and issue where the nodes could escape their containers in grouping layouts.
 
