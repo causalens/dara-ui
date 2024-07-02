@@ -805,7 +805,19 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.viewport.addChild(this.nodeLabelLayer);
 
         // obesrve window resizing
-        this.resizeObserver = new ResizeObserver(() => {
+        this.resizeObserver = new ResizeObserver((entries) => {
+            const oldBounds = this.graph.getAttribute('extras')?.bounds;
+            const boundsChanged = entries.some((entry) => {
+                const newBounds = entry.contentRect;
+                const newWidth = Math.round(newBounds.width);
+                const newHeight = Math.round(newBounds.height);
+                return oldBounds?.width !== newWidth || oldBounds?.height !== newHeight;
+            });
+
+            if (!boundsChanged) {
+                return;
+            }
+
             this.app.resize();
             this.viewport.resize(this.container.clientWidth, this.container.clientHeight);
             this.background.updatePosition(this.container);
@@ -1703,6 +1715,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.onCleanup?.();
 
         try {
+            // Store the old size to avoid recalculating layout if the size hasn't changed
+            this.graph.setAttribute('extras', {
+                bounds: { width: this.container.clientWidth, height: this.container.clientHeight },
+            });
             const { layout, edgePoints, onStartDrag, onEndDrag, onCleanup, onMove, onAddNode, onAddEdge } =
                 await this.layout.applyLayout(this.graph, (l, e) => this.setLayout(l, e, false));
             this.onAddNode = onAddNode;

@@ -239,19 +239,32 @@ export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
     const [numEdges, setNumEdges] = useState(1600);
     const [numNodes, setNumNodes] = useState(800);
     const [parsedData, setParsedData] = useState<CausalGraph>();
+    const [render, setRender] = useState(false);
 
     useEffect(() => {
+        if (!render) {
+            return;
+        }
+
         const newGraph = clusters(Graph, {
             clusters: numClusters,
             order: numNodes,
             size: numEdges,
         });
         setParsedData(graphToCausalGraph(newGraph));
-    }, [numClusters, numEdges, numNodes]);
+    }, [numClusters, numEdges, numNodes, render]);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div>
+                <button
+                    onClick={() => {
+                        setNumEdges((prev) => prev + 1);
+                        setRender(true);
+                    }}
+                >
+                    Render
+                </button>
                 <span>Numer of Clusters</span>
                 <input defaultValue={numClusters} onChange={(e) => setNumClusters(e.target.valueAsNumber)} />
                 <span>Numer of Edges</span>
