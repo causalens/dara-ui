@@ -1716,9 +1716,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
         try {
             // Store the old size to avoid recalculating layout if the size hasn't changed
-            this.graph.setAttribute('extras', {
+            this.graph.updateAttribute('extras', (prev) => ({
+                ...prev,
                 bounds: { width: this.container.clientWidth, height: this.container.clientHeight },
-            });
+            }));
             const { layout, edgePoints, onStartDrag, onEndDrag, onCleanup, onMove, onAddNode, onAddEdge } =
                 await this.layout.applyLayout(this.graph, (l, e) => this.setLayout(l, e, false));
             this.onAddNode = onAddNode;
