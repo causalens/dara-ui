@@ -312,6 +312,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     public markStylesDirty(): void {
         this.isStyleDirty = true;
     }
+
     /**
      * Request the graph to be re-rendered
      */
