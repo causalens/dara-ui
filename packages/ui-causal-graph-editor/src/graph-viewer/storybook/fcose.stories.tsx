@@ -258,6 +258,7 @@ export const RandomClusters = (args: CausalGraphEditorProps): JSX.Element => {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div>
                 <button
+                    type="button"
                     onClick={() => {
                         setNumEdges((prev) => prev + 1);
                         setRender(true);
