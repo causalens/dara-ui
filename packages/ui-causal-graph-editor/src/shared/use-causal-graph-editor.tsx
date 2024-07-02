@@ -112,7 +112,7 @@ export default function useCausalGraphEditor(
             const newEditorMode = editorMode ?? (isDag(parsedGraph) ? EditorMode.DEFAULT : EditorMode.PAG_VIEWER);
 
             dispatch({
-                graph: causalGraphParser(graphData, availableInputs, state.graph),
+                graph: parsedGraph,
                 editorMode: newEditorMode,
                 type: GraphActionType.INIT_GRAPH,
             });
