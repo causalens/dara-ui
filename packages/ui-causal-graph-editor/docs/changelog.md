@@ -8,6 +8,7 @@ title: Changelog
 -   Reduce update time in `useCausalGraphEditor` by another `~33%` by skipping duplicate parsing of a causal graph.
 -   Improve performance of `causalGraphParser` by up to 50x during large graph changes by performing a style update only once per frame.
 
+
 ## 1.10.2
 
 -   Fixed and issue where the nodes could escape their containers in grouping layouts.
