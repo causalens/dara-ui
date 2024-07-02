@@ -804,7 +804,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.viewport.addChild(this.nodeLayer);
         this.viewport.addChild(this.nodeLabelLayer);
 
-        // obesrve window resizing
+        // Observe window resizing
         this.resizeObserver = new ResizeObserver((entries) => {
             const oldBounds = this.graph.getAttribute('extras')?.bounds;
             const boundsChanged = entries.some((entry) => {
