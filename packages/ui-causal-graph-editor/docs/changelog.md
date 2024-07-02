@@ -4,7 +4,7 @@ title: Changelog
 
 ## NEXT
 
--   Reduce initial render time of CausalGraphEditor by `~33%` by skipping a duplicate layout calculation.
+-   Reduce initial render time of `CausalGraphEditor` by `~33%` by skipping a duplicate layout calculation.
 
 ## 1.10.2
 
