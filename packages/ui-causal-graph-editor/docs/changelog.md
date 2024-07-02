@@ -2,6 +2,11 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Reduce initial render time of `CausalGraphEditor` by `~33%` by skipping a duplicate layout calculation.
+-   Reduce update time in `useCausalGraphEditor` by another `~33%` by skipping duplicate parsing of a causal graph.
+
 ## 1.10.2
 
 -   Fixed and issue where the nodes could escape their containers in grouping layouts.
@@ -13,7 +18,7 @@ title: Changelog
 
 ## 1.9.4
 
--   Fixed an issue where the GraphEditor would error if the graph was empty in some cases
+-   Fixed an issue where the GraphEditor would error if the graph was empty in some cases.
 
 ## 1.9.3
 
