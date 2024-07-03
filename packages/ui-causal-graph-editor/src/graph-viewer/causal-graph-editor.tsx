@@ -100,6 +100,7 @@ const NotificationWrapper = styled.div`
 
 const GraphPane = styled.div<{ $hasFocus: boolean }>`
     position: relative;
+    z-index: 1;
 
     display: flex;
     flex: 1 1 auto;
@@ -838,6 +839,7 @@ function CausalGraphEditor({ requireFocusToZoom = true, ...props }: CausalGraphE
                         )}
                         <div ref={canvasParentRef} style={{ height: '100%', width: '100%' }} />
                         <Tooltip
+                            appendTo={canvasParentRef.current}
                             content={tooltipContent}
                             followCursor
                             getReferenceClientRect={tooltipRef.current}
