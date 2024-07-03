@@ -2,7 +2,7 @@
 title: Changelog
 ---
 
-## NEXT
+## 1.10.3
 
 -   Reduce initial render time of `CausalGraphEditor` by `~33%` by skipping a duplicate layout calculation.
 -   Reduce update time in `useCausalGraphEditor` by another `~33%` by skipping duplicate parsing of a causal graph.
