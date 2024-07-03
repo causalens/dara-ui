@@ -214,6 +214,9 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     /** Last render request ID - used to skip extra render calls */
     private renderRequestId: number = null;
 
+    /** Whether the styles are dirty and need to be updated in the animation frame */
+    private isStyleDirty = false;
+
     /** ResizeObserver instance watching window resizes */
     private resizeObserver: ResizeObserver;
 
@@ -304,6 +307,13 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     }
 
     /**
+     * Mark styles to update them in the next animation frame
+     */
+    public markStylesDirty(): void {
+        this.isStyleDirty = true;
+    }
+
+    /**
      * Request the graph to be re-rendered
      */
     public requestRender(): void {
@@ -312,6 +322,10 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         }
 
         this.renderRequestId = requestAnimationFrame(() => {
+            if (this.isStyleDirty) {
+                this.updateStyles();
+                this.isStyleDirty = false;
+            }
             if (this.viewport && this.app.stage) {
                 this.graph.forEachEdge((e, attrs, source, target, sourceNodeAttributes, targetNodeAttributes) => {
                     const edgeObject = this.edgeMap.get(e);
@@ -582,7 +596,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             // redraw all group containers
             this.createGroupContainers();
 
-            this.debouncedUpdateLayout();
+            this.markStylesDirty();
             this.requestRender();
         }
     }
@@ -670,7 +684,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         }
 
         // Update all visuals as we might need to dim things
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
     }
 
@@ -704,7 +718,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.selectedNode = id;
 
         // Update all visuals as we might need to dim things
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
     }
 
@@ -727,7 +741,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.background.updateTexture(theme, this.textureCache);
         [(this.app.renderer as PIXI.Renderer).background.color] = colorToPixi(this.theme.colors.blue1);
 
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
     }
 
@@ -864,7 +878,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         this.createGraph();
         this.resetViewport();
         // need to update styles once again after changing the viewport
-        this.updateStyles();
+        this.markStylesDirty();
         this.initialized = true;
         this.resetViewport();
     }
@@ -1456,7 +1470,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
     private onGraphAttributesUpdated({ attributes }: { attributes: { size?: number; uid?: string } }): void {
         // UID is re-generated on each parser run; beyond first run make sure to keep visuals up-to-date
         if (this.uid) {
-            this.updateStyles();
+            this.markStylesDirty();
             this.requestRender();
         }
         this.uid = attributes.uid;
@@ -1471,7 +1485,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             this.debouncedUpdateLayout();
         }
 
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
         this.onAddNode?.();
     }
@@ -1492,7 +1506,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
         const targetNodeAttrs = this.graph.getNodeAttributes(target);
         this.createEdge(key, attributes, source, target, sourceNodeAttrs, targetNodeAttrs);
         this.updateStrengthRange();
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
         this.onAddEdge?.();
     }
@@ -1508,12 +1522,12 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
 
     private onGraphEdgeAttributesUpdated(): void {
         this.updateStrengthRange();
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
     }
 
     private onGraphNodeAttributesUpdated(): void {
-        this.updateStyles();
+        this.markStylesDirty();
         this.requestRender();
     }
 
@@ -1541,7 +1555,7 @@ export class Engine extends PIXI.utils.EventEmitter<EngineEvents> {
             this.resetViewport();
         }
 
-        this.updateStyles();
+        this.markStylesDirty();
 
         // re-render with new layout
         this.requestRender();
