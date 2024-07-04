@@ -2,6 +2,10 @@
 title: Changelog
 ---
 
+## NEXT
+
+-   Fixed an issue where `CausalGraphEditor` tooltips would appear above other elements on a page.
+
 ## 1.10.3
 
 -   Reduce initial render time of `CausalGraphEditor` by `~33%` by skipping a duplicate layout calculation.
